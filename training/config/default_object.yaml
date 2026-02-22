@@ -1,17 +1,19 @@
 defaults:
-  - default_object.yaml
+  - default_dataset
 
-exp_name: exp001
+# torchrun --master_port=29600 --nproc_per_node=1 launch.py  --config default_object
+
+exp_name: test_0224_object
 img_size: 518
 num_workers: 8
 seed_value: 42
-accum_steps: 2    # We did not use gradient accumulation in our training, while if you suffer from OOM, you can try to use it.
+accum_steps: 1    # We did not use gradient accumulation in our training, while if you suffer from OOM, you can try to use it.
 patch_size: 14
 val_epoch_freq: 5
-max_img_per_gpu: 48
+max_img_per_gpu: 24
 
-limit_train_batches: 800
-limit_val_batches: 400
+limit_train_batches: 10000
+limit_val_batches: 1
 
 
 data:
@@ -25,13 +27,13 @@ data:
       patch_size: ${patch_size}
       debug: False
       repeat_batch: False
+      img_nums: [4, 8]
     dataset:
       _target_: data.composed_dataset.ComposedDataset
       dataset_configs:
-        - _target_: data.datasets.co3d.Co3dDataset
+        - _target_: data.datasets.6dpose.SixDPoseDataset
           split: train
-          CO3D_DIR: /YOUR/PATH/TO/CO3D
-          CO3D_ANNOTATION_DIR: /YOUR/PATH/TO/CO3D_ANNOTATION
+          AUTOMATIC_DATASET_DIR: /mnt/train-data-4-hdd/yian/6dpose_obj/automatic_dataset
   val:
     _target_: data.dynamic_dataloader.DynamicTorchDataset
     num_workers: ${num_workers}
@@ -40,17 +42,17 @@ data:
       img_size: ${img_size}
       patch_size: ${patch_size}
       debug: False
+      img_nums: [4, 8]
     dataset:
       _target_: data.composed_dataset.ComposedDataset
       dataset_configs:
-        - _target_: data.datasets.co3d.Co3dDataset
-          split: test
-          CO3D_DIR: /YOUR/PATH/TO/CO3D
-          CO3D_ANNOTATION_DIR: /YOUR/PATH/TO/CO3D_ANNOTATION
+        - _target_: data.datasets.6dpose.SixDPoseDataset
+          split: train
+          AUTOMATIC_DATASET_DIR: /mnt/train-data-4-hdd/yian/6dpose_obj/automatic_dataset
 
 
 logging:
-  log_dir: logs
+  log_dir: logs/${exp_name}
   log_visuals: False
   log_freq: 1
   log_level_primary: DEBUG
@@ -63,55 +65,59 @@ logging:
     train:
       keys_to_log:
         - loss_objective
-        - loss_camera
-        - loss_T
-        - loss_R
-        - loss_FL
-        - loss_conf_depth
-        - loss_reg_depth
-        - loss_grad_depth
+        - loss_conf_object_point
+        - loss_reg_object_point
+        - loss_grad_object_point
+        - loss_object_srt
+        - loss_object_pose
+        - loss_object_scale
+        - loss_object_translation
+        - loss_object_pose_init
     val:
       keys_to_log:
         - loss_objective
-        - loss_camera
-        - loss_T
-        - loss_R
-        - loss_FL
-        - loss_conf_depth
-        - loss_reg_depth
-        - loss_grad_depth
+        - loss_conf_object_point
+        - loss_reg_object_point
+        - loss_grad_object_point
+        - loss_object_srt
+        - loss_object_pose
+        - loss_object_scale
+        - loss_object_translation
+        - loss_object_pose_init
 
 
 
 checkpoint:
   save_dir: logs/${exp_name}/ckpts
   save_freq: 5
-  resume_checkpoint_path: /YOUR/PATH/TO/CKPT
+  resume_checkpoint_path: /mnt/train-data-4-hdd/yian/vggt_old/model/model.pt
   strict: False
 
 
 loss:
   _target_: loss.MultitaskLoss
-  camera: 
-    weight: 5.0
-    loss_type: "l1" # The paper uses smooth l1 loss, but we found l1 loss is more stable than smooth l1 and l2 loss.  
-  depth:
-    weight: 1.0
-    gradient_loss_fn: "grad" 
-    valid_range: 0.98
+  camera: null
+  depth: null
   point: null
-  # If you want to enable point, use the following config
-  # point: 
-  #   weight: 1.0
-  #   gradient_loss_fn: "normal" 
-  #   valid_range: 0.98
-  track: null   
+  track: null
+  object_point:
+    weight: 5.0
+    gradient_loss_fn: "normal"
+    valid_range: 0.98
+  object_srt:
+    weight: 1.0
+    loss_type: "l1"
+    weight_pose: 5.0
+    weight_scale: 1.0
+    weight_translation: 1.0
+    init_w: 1.0
 
 
 
 
 optim:
   param_group_modifiers: False
+  train_object_token_only: False
 
   optimizer:
     _target_: torch.optim.AdamW
@@ -119,7 +125,7 @@ optim:
     weight_decay: 0.05
 
   frozen_module_names:
-      - "*aggregator*"  # example, freeze the aggregator
+      - "*aggregator*"
 
   amp:
     enabled: True
@@ -127,13 +133,16 @@ optim:
   gradient_clip:
     _target_: train_utils.gradient_clip.GradientClipper
     configs:
+      # - module_name: ["shared_object_latent"]
+      #   max_norm: 1.0
+      #   norm_type: 2
       - module_name: ["aggregator"]
         max_norm: 1.0   # feel free to reduce this if you see instabilities
         norm_type: 2
-      - module_name: ["depth"]
+      - module_name: ["object_pt_head"]
         max_norm: 1.0   # feel free to reduce this if you see instabilities
         norm_type: 2
-      - module_name: ["camera"]
+      - module_name: ["object_srt_head"]
         max_norm: 1.0   # feel free to reduce this if you see instabilities
         norm_type: 2
   options:
@@ -155,14 +164,19 @@ optim:
           value: 0.05
 
 
+
+
 max_epochs: 20
 
 model:
   _target_: vggt.models.vggt.VGGT
-  enable_camera: True
-  enable_depth: True
+  enable_camera: False
+  enable_depth: False
   enable_point: False
   enable_track: False
+  enable_object_point: True
+  enable_object_srt: True
+  use_shared_object_latent: False # set False to switch back to the original version (no shared latent)
 
 
 distributed:

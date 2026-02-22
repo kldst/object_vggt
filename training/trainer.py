@@ -262,6 +262,20 @@ class Trainer:
                 f"[Done] Freezing modules: {self.optim_conf.frozen_module_names} on rank {self.distributed_rank}"
             )
 
+        # Optional mode: freeze full aggregator but keep object latent token trainable.
+        if bool(getattr(self.optim_conf, "train_object_token_only", False)):
+            if not hasattr(self.model, "aggregator"):
+                raise ValueError("train_object_token_only=True requires model.aggregator")
+            if not hasattr(self.model.aggregator, "object_token"):
+                raise ValueError("train_object_token_only=True requires model.aggregator.object_token")
+
+            for p in self.model.aggregator.parameters():
+                p.requires_grad = False
+            self.model.aggregator.object_token.requires_grad = True
+            logging.info(
+                "[Done] train_object_token_only=True: aggregator frozen, aggregator.object_token unfrozen."
+            )
+
         # Log model summary on rank 0
         if self.rank == 0:
             model_summary_path = os.path.join(self.logging_conf.log_dir, "model.txt")
@@ -555,6 +569,37 @@ class Trainer:
             with torch.cuda.amp.autocast(enabled=False):
                 batch = self._process_batch(batch)
 
+            if self.rank == 0:
+                dbg_seq_name = batch.get("seq_name", None)
+                dbg_ids = batch.get("ids", None)
+                dbg_cam_indices = batch.get("camera_indices", None)
+
+                if torch.is_tensor(dbg_ids):
+                    dbg_ids_first = dbg_ids[0].detach().cpu().tolist() if dbg_ids.numel() > 0 else []
+                    dbg_ids_shape = tuple(dbg_ids.shape)
+                else:
+                    dbg_ids_first = dbg_ids
+                    dbg_ids_shape = None
+
+                if torch.is_tensor(dbg_cam_indices):
+                    dbg_cam_first = (
+                        dbg_cam_indices[0].detach().cpu().tolist() if dbg_cam_indices.numel() > 0 else []
+                    )
+                else:
+                    dbg_cam_first = dbg_cam_indices
+
+                if isinstance(dbg_seq_name, (list, tuple)):
+                    dbg_seq_show = dbg_seq_name[:2]
+                else:
+                    dbg_seq_show = dbg_seq_name
+
+                print(
+                    f"[BatchDebug] epoch={self.epoch} iter={data_iter} "
+                    f"seq_name={dbg_seq_show} ids_shape={dbg_ids_shape} "
+                    f"ids_first={dbg_ids_first} camera_indices_first={dbg_cam_first}",
+                    flush=True,
+                )
+
             batch = copy_data_to_device(batch, self.device, non_blocking=True)
 
             accum_steps = self.accum_steps
@@ -716,6 +761,12 @@ class Trainer:
     def _process_batch(self, batch: Mapping):      
         if self.data_conf.train.common_config.repeat_batch:
             batch = self._apply_batch_repetition(batch)
+
+        skip_normalization = batch.get("skip_normalization", False)
+        if isinstance(skip_normalization, torch.Tensor):
+            skip_normalization = bool(torch.all(skip_normalization).item())
+        if skip_normalization:
+            return batch
         
         # Normalize camera extrinsics and points. The function returns new tensors.
         normalized_extrinsics, normalized_cam_points, normalized_world_points, normalized_depths = \
@@ -865,4 +916,3 @@ def get_chunk_from_data(data: Any, chunk_id: int, num_chunks: int) -> Any:
         return [get_chunk_from_data(value, chunk_id, num_chunks) for value in data]
     else:
         return data
-

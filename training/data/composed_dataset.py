@@ -144,6 +144,24 @@ class ComposedDataset(Dataset, ABC):
             "point_masks": point_masks,
         }
 
+        # Optional fields for custom datasets (e.g. 6d pose training).
+        optional_float_array_keys = [
+            "object_scale", "object_rotation", "object_translation", "object_srt"
+        ]
+        for key in optional_float_array_keys:
+            if key in batch:
+                sample[key] = torch.from_numpy(np.asarray(batch[key]).astype(np.float32))
+
+        optional_int_array_keys = ["camera_indices"]
+        for key in optional_int_array_keys:
+            if key in batch:
+                sample[key] = torch.from_numpy(np.asarray(batch[key]).astype(np.int64))
+
+        optional_meta_keys = ["object_name", "run_name", "input_name", "skip_normalization"]
+        for key in optional_meta_keys:
+            if key in batch:
+                sample[key] = batch[key]
+
         # --- Track Processing (if enabled) ---
         if self.load_track:
             if batch["tracks"] is not None:

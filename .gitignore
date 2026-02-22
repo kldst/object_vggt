@@ -144,6 +144,10 @@ dmypy.json
 **/outputs/skyseg.onnx
 skyseg.onnx
 
+# Ignore training logs directory
+training/logs/
+
 # pixi environments
 .pixi
 *.egg-info
+

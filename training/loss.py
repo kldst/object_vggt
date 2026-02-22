@@ -24,13 +24,15 @@ class MultitaskLoss(torch.nn.Module):
     - Point loss
     - Tracking loss (not cleaned yet, dirty code is at the bottom of this file)
     """
-    def __init__(self, camera=None, depth=None, point=None, track=None, **kwargs):
+    def __init__(self, camera=None, depth=None, point=None, track=None, object_point=None, object_srt=None, **kwargs):
         super().__init__()
         # Loss configuration dictionaries for each task
         self.camera = camera
         self.depth = depth
         self.point = point
         self.track = track
+        self.object_point = object_point
+        self.object_srt = object_srt
 
     def forward(self, predictions, batch) -> torch.Tensor:
         """
@@ -69,13 +71,135 @@ class MultitaskLoss(torch.nn.Module):
             total_loss = total_loss + point_loss
             loss_dict.update(point_loss_dict)
 
+        # Object-space point reconstruction loss
+        if "object_points" in predictions and self.object_point is not None:
+            object_point_loss_dict = compute_object_point_loss(predictions, batch, **self.object_point)
+            object_point_loss = (
+                object_point_loss_dict["loss_conf_object_point"]
+                + object_point_loss_dict["loss_reg_object_point"]
+                + object_point_loss_dict["loss_grad_object_point"]
+            )
+            object_point_loss = object_point_loss * self.object_point["weight"]
+            total_loss = total_loss + object_point_loss
+            loss_dict.update(object_point_loss_dict)
+
         # Tracking loss - not cleaned yet, dirty code is at the bottom of this file
         if "track" in predictions:
             raise NotImplementedError("Track loss is not cleaned up yet")
+
+        # 6D object SRT loss
+        if "object_pose" in predictions and self.object_srt is not None:
+            object_srt_loss_dict = compute_object_srt_loss(predictions, batch, **self.object_srt)
+            total_loss = total_loss + object_srt_loss_dict["loss_object_srt"] * self.object_srt["weight"]
+            loss_dict.update(object_srt_loss_dict)
         
         loss_dict["objective"] = total_loss
 
         return loss_dict
+
+
+def _rotation_matrix_to_rot6d(rotation_matrix: torch.Tensor) -> torch.Tensor:
+    """
+    Convert rotation matrix (..., 3, 3) to 6D rotation representation (..., 6)
+    using the first two columns.
+    """
+    return rotation_matrix[..., :, :2].reshape(*rotation_matrix.shape[:-2], 6)
+
+
+def _vector_loss(pred: torch.Tensor, gt: torch.Tensor, loss_type: str = "l1") -> torch.Tensor:
+    if loss_type == "l1":
+        return (pred - gt).abs().mean()
+    if loss_type == "l2":
+        return ((pred - gt) ** 2).mean()
+    raise ValueError(f"Unknown loss_type: {loss_type}")
+
+
+def compute_object_srt_loss(
+    predictions,
+    batch,
+    loss_type="l1",
+    weight_pose=1.0,
+    weight_scale=1.0,
+    weight_translation=1.0,
+    init_w=1.0,
+    **kwargs,
+):
+    """
+    Compute 6D object SRT loss.
+
+    Required prediction keys:
+      - object_pose: (B, 6)
+      - object_scale: (B, 1) or (B,)
+      - object_translation: (B, 3)
+    Optional prediction key:
+      - pred_pose_0: (B, 6), first-step pose for init supervision
+
+    Required batch keys:
+      - object_rotation: (B, 3, 3)
+      - object_scale: (B, 1) or (B,)
+      - object_translation: (B, 3)
+    Optional batch key:
+      - has_object: (B,) bool mask
+    """
+    pred_pose = predictions["object_pose"]
+    pred_scale = predictions["object_scale"]
+    pred_translation = predictions["object_translation"]
+    pred_pose_0 = predictions.get("pred_pose_0", None)
+
+    gt_rot = batch["object_rotation"]
+    gt_pose = _rotation_matrix_to_rot6d(gt_rot)
+    gt_scale = batch["object_scale"]
+    gt_translation = batch["object_translation"]
+
+    if gt_scale.dim() == 1:
+        gt_scale = gt_scale.unsqueeze(-1)
+    if pred_scale.dim() == 1:
+        pred_scale = pred_scale.unsqueeze(-1)
+
+    has_object = batch.get("has_object", None)
+    if has_object is not None:
+        valid_mask = has_object.bool()
+        if valid_mask.sum() == 0:
+            dummy = (pred_pose * 0).mean()
+            return {
+                "loss_object_srt": dummy,
+                "loss_object_pose": dummy,
+                "loss_object_scale": dummy,
+                "loss_object_translation": dummy,
+                "loss_object_pose_init": dummy,
+            }
+        pred_pose = pred_pose[valid_mask]
+        pred_scale = pred_scale[valid_mask]
+        pred_translation = pred_translation[valid_mask]
+        gt_pose = gt_pose[valid_mask]
+        gt_scale = gt_scale[valid_mask]
+        gt_translation = gt_translation[valid_mask]
+        if pred_pose_0 is not None:
+            pred_pose_0 = pred_pose_0[valid_mask]
+
+    loss_pose = _vector_loss(pred_pose, gt_pose, loss_type=loss_type)
+    loss_scale = _vector_loss(pred_scale, gt_scale, loss_type=loss_type)
+    loss_translation = _vector_loss(pred_translation, gt_translation, loss_type=loss_type)
+
+    if pred_pose_0 is not None:
+        loss_pose_init = _vector_loss(pred_pose_0, gt_pose, loss_type=loss_type)
+    else:
+        loss_pose_init = (pred_pose * 0).mean()
+
+    total = (
+        weight_pose * loss_pose
+        + weight_scale * loss_scale
+        + weight_translation * loss_translation
+        + float(init_w) * loss_pose_init
+    )
+
+    return {
+        "loss_object_srt": total,
+        "loss_object_pose": loss_pose,
+        "loss_object_scale": loss_scale,
+        "loss_object_translation": loss_translation,
+        "loss_object_pose_init": loss_pose_init,
+    }
 
 
 def compute_camera_loss(
@@ -276,6 +400,47 @@ def compute_depth_loss(predictions, batch, gamma=1.0, alpha=0.2, gradient_loss_f
     }
 
     return loss_dict
+
+
+def compute_object_point_loss(predictions, batch, gamma=1.0, alpha=0.2, gradient_loss_fn=None, valid_range=-1, **kwargs):
+    """
+    Compute object-space point loss.
+
+    Same logic as compute_point_loss, but uses object prediction keys:
+      - predictions['object_points']
+      - predictions['object_points_conf']
+    """
+    pred_points = predictions["object_points"]
+    pred_points_conf = predictions["object_points_conf"]
+    gt_points = batch["world_points"]
+    gt_points_mask = batch["point_masks"]
+
+    gt_points = check_and_fix_inf_nan(gt_points, "gt_object_points")
+
+    if gt_points_mask.sum() < 100:
+        dummy_loss = (0.0 * pred_points).mean()
+        return {
+            "loss_conf_object_point": dummy_loss,
+            "loss_reg_object_point": dummy_loss,
+            "loss_grad_object_point": dummy_loss,
+        }
+
+    loss_conf, loss_grad, loss_reg = regression_loss(
+        pred_points,
+        gt_points,
+        gt_points_mask,
+        conf=pred_points_conf,
+        gradient_loss_fn=gradient_loss_fn,
+        gamma=gamma,
+        alpha=alpha,
+        valid_range=valid_range,
+    )
+
+    return {
+        "loss_conf_object_point": loss_conf,
+        "loss_reg_object_point": loss_reg,
+        "loss_grad_object_point": loss_grad,
+    }
 
 
 def regression_loss(pred, gt, mask, conf=None, gradient_loss_fn=None, gamma=1.0, alpha=0.2, valid_range=-1):
@@ -805,5 +970,3 @@ def sequence_loss(flow_preds, flow_gt, vis, valids, gamma=0.8, vis_aware=False, 
 
     return flow_loss
 '''
-
-
