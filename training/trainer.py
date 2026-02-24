@@ -76,6 +76,7 @@ class Trainer:
         optim: Optional[Dict[str, Any]] = None,
         loss: Optional[Dict[str, Any]] = None,
         env_variables: Optional[Dict[str, Any]] = None,
+        debug: Optional[Dict[str, Any]] = None,
         accum_steps: int = 1,
         **kwargs,
     ):
@@ -120,6 +121,10 @@ class Trainer:
         self.limit_train_batches = limit_train_batches
         self.limit_val_batches = limit_val_batches
         self.seed_value = seed_value
+        self.force_model_output_to_ground_truth = bool(
+            getattr(debug, "force_model_output_to_ground_truth", False)
+        )
+        self._force_model_output_log_once = False
         
         # 'where' tracks training progress from 0.0 to 1.0 for schedulers
         self.where = 0.0
@@ -782,7 +787,7 @@ class Trainer:
         batch["extrinsics"] = normalized_extrinsics
         batch["cam_points"] = normalized_cam_points
         batch["world_points"] = normalized_world_points
-        batch["depths"] = normalized_depths
+        batch["dep ths"] = normalized_depths
 
         return batch
 
@@ -795,9 +800,54 @@ class Trainer:
         """
         # Forward pass
         y_hat = model(images=batch["images"])
+        if self.force_model_output_to_ground_truth:
+            y_hat = self._override_predictions_with_ground_truth(y_hat, batch, phase)
         
         # Loss computation
         loss_dict = self.loss(y_hat, batch)
+        if self.force_model_output_to_ground_truth and self.rank == 0:
+            max_abs_diff_valid = None
+            direct_reg_valid = None
+            direct_conf_valid = None
+            if (
+                "object_points" in y_hat
+                and "world_points" in batch
+                and "point_masks" in batch
+            ):
+                obj_pred = y_hat["object_points"]
+                gt_world = batch["world_points"]
+                valid_mask = batch["point_masks"].bool()
+                if valid_mask.any():
+                    valid_diff = (obj_pred - gt_world).abs()[valid_mask]
+                    if valid_diff.numel() > 0:
+                        max_abs_diff_valid = float(valid_diff.max().detach().item())
+                        vec_diff = torch.norm((obj_pred - gt_world)[valid_mask], dim=-1)
+                        direct_reg_valid = float(vec_diff.mean().detach().item())
+
+                        if "object_points_conf" in y_hat:
+                            conf = y_hat["object_points_conf"][valid_mask]
+                            # Match loss.py config default (alpha=0.2, gamma=1.0) for quick sanity check.
+                            direct_conf = vec_diff * conf - 0.2 * torch.log(conf)
+                            direct_conf_valid = float(direct_conf.mean().detach().item())
+                else:
+                    max_abs_diff_valid = 0.0
+
+            debug_loss_items = []
+            for key, value in loss_dict.items():
+                if torch.is_tensor(value):
+                    debug_loss_items.append(f"{key}={float(value.detach().item()):.6f}")
+                else:
+                    debug_loss_items.append(f"{key}={float(value):.6f}")
+            if max_abs_diff_valid is not None:
+                debug_loss_items.append(f"max_abs_diff_valid={max_abs_diff_valid:.6f}")
+            if direct_reg_valid is not None:
+                debug_loss_items.append(f"direct_reg_valid={direct_reg_valid:.6f}")
+            if direct_conf_valid is not None:
+                debug_loss_items.append(f"direct_conf_valid={direct_conf_valid:.6f}")
+            print(
+                f"[DebugLoss] phase={phase} step={self.steps[phase]} " + ", ".join(debug_loss_items),
+                flush=True,
+            )
         
         # Combine all data for logging
         log_data = {**y_hat, **loss_dict, **batch}
@@ -807,6 +857,58 @@ class Trainer:
 
         self.steps[phase] += 1
         return loss_dict
+
+    def _override_predictions_with_ground_truth(self, predictions: Mapping, batch: Mapping, phase: str) -> Dict[str, Any]:
+        """
+        Debug helper: replace selected model outputs with GT while preserving autograd graph.
+        """
+        debug_predictions = dict(predictions)
+        overridden_keys = []
+
+        if "object_points" in debug_predictions and "world_points" in batch:
+            debug_predictions["object_points"] = (
+                batch["world_points"].to(debug_predictions["object_points"].dtype)
+                + 0.0 * debug_predictions["object_points"]
+            )
+            overridden_keys.append("object_points")
+
+        if "object_points_conf" in debug_predictions and "point_masks" in batch:
+            gt_conf = batch["point_masks"].to(debug_predictions["object_points_conf"].dtype)
+            debug_predictions["object_points_conf"] = gt_conf + 0.0 * debug_predictions["object_points_conf"]
+            overridden_keys.append("object_points_conf")
+
+        if "world_points" in debug_predictions and "world_points" in batch:
+            debug_predictions["world_points"] = (
+                batch["world_points"].to(debug_predictions["world_points"].dtype)
+                + 0.0 * debug_predictions["world_points"]
+            )
+            overridden_keys.append("world_points")
+
+        if "world_points_conf" in debug_predictions and "point_masks" in batch:
+            gt_conf = batch["point_masks"].to(debug_predictions["world_points_conf"].dtype)
+            debug_predictions["world_points_conf"] = gt_conf + 0.0 * debug_predictions["world_points_conf"]
+            overridden_keys.append("world_points_conf")
+
+        if "depth" in debug_predictions and "depths" in batch:
+            gt_depth = batch["depths"]
+            if gt_depth.dim() == 4:
+                gt_depth = gt_depth[..., None]
+            debug_predictions["depth"] = gt_depth.to(debug_predictions["depth"].dtype) + 0.0 * debug_predictions["depth"]
+            overridden_keys.append("depth")
+
+        if "depth_conf" in debug_predictions and "point_masks" in batch:
+            gt_conf = batch["point_masks"].to(debug_predictions["depth_conf"].dtype)
+            debug_predictions["depth_conf"] = gt_conf + 0.0 * debug_predictions["depth_conf"]
+            overridden_keys.append("depth_conf")
+
+        if not self._force_model_output_log_once and self.rank == 0:
+            logging.info(
+                f"[Debug] force_model_output_to_ground_truth=True ({phase}); overridden prediction keys: "
+                f"{sorted(set(overridden_keys)) if overridden_keys else 'None'}"
+            )
+            self._force_model_output_log_once = True
+
+        return debug_predictions
 
     def _update_and_log_scalars(self, data: Mapping, phase: str, step: int, loss_meters: dict):
         """Updates average meters and logs scalar values to TensorBoard."""

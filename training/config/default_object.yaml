@@ -3,7 +3,7 @@ defaults:
 
 # torchrun --master_port=29600 --nproc_per_node=1 launch.py  --config default_object
 
-exp_name: test_0224_object
+exp_name: test_0223_object_small_dataset
 img_size: 518
 num_workers: 8
 seed_value: 42
@@ -15,6 +15,8 @@ max_img_per_gpu: 24
 limit_train_batches: 10000
 limit_val_batches: 1
 
+debug:
+  force_model_output_to_ground_truth: False
 
 data:
   # The code for data still looks too complicated. I should refactor this again (do I have time?...)
@@ -26,14 +28,16 @@ data:
       img_size: ${img_size}
       patch_size: ${patch_size}
       debug: False
+      map_xyz_bfloat16: True
       repeat_batch: False
-      img_nums: [4, 8]
+      img_nums: [4, 6]
     dataset:
       _target_: data.composed_dataset.ComposedDataset
       dataset_configs:
         - _target_: data.datasets.6dpose.SixDPoseDataset
           split: train
           AUTOMATIC_DATASET_DIR: /mnt/train-data-4-hdd/yian/6dpose_obj/automatic_dataset
+          only_run_name: run_0000
   val:
     _target_: data.dynamic_dataloader.DynamicTorchDataset
     num_workers: ${num_workers}
@@ -42,13 +46,15 @@ data:
       img_size: ${img_size}
       patch_size: ${patch_size}
       debug: False
-      img_nums: [4, 8]
+      map_xyz_bfloat16: True
+      img_nums: [4, 6]
     dataset:
       _target_: data.composed_dataset.ComposedDataset
       dataset_configs:
         - _target_: data.datasets.6dpose.SixDPoseDataset
           split: train
           AUTOMATIC_DATASET_DIR: /mnt/train-data-4-hdd/yian/6dpose_obj/automatic_dataset
+          only_run_name: run_0000
 
 
 logging:
@@ -101,16 +107,18 @@ loss:
   point: null
   track: null
   object_point:
-    weight: 5.0
-    gradient_loss_fn: "normal"
-    valid_range: 0.98
-  object_srt:
     weight: 1.0
-    loss_type: "l1"
-    weight_pose: 5.0
-    weight_scale: 1.0
-    weight_translation: 1.0
-    init_w: 1.0
+    gamma: 1.0
+    alpha: 0.2
+    gradient_loss_fn: "normal"
+    valid_range: -1
+  # object_srt:
+  #   weight: 1.0
+  #   loss_type: "l1"
+  #   weight_pose: 5.0
+  #   weight_scale: 1.0
+  #   weight_translation: 1.0
+  #   init_w: 1.0
 
 
 
@@ -142,9 +150,9 @@ optim:
       - module_name: ["object_pt_head"]
         max_norm: 1.0   # feel free to reduce this if you see instabilities
         norm_type: 2
-      - module_name: ["object_srt_head"]
-        max_norm: 1.0   # feel free to reduce this if you see instabilities
-        norm_type: 2
+      # - module_name: ["object_srt_head"]
+      #   max_norm: 1.0   # feel free to reduce this if you see instabilities
+      #   norm_type: 2
   options:
     lr:
       - scheduler:
@@ -175,7 +183,7 @@ model:
   enable_point: False
   enable_track: False
   enable_object_point: True
-  enable_object_srt: True
+  enable_object_srt: False
   use_shared_object_latent: False # set False to switch back to the original version (no shared latent)
 
 

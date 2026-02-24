@@ -402,7 +402,15 @@ def compute_depth_loss(predictions, batch, gamma=1.0, alpha=0.2, gradient_loss_f
     return loss_dict
 
 
-def compute_object_point_loss(predictions, batch, gamma=1.0, alpha=0.2, gradient_loss_fn=None, valid_range=-1, **kwargs):
+def compute_object_point_loss(
+    predictions,
+    batch,
+    gamma=1.0,
+    alpha=0.2,
+    gradient_loss_fn=None,
+    valid_range=-1,
+    **kwargs,
+):
     """
     Compute object-space point loss.
 
@@ -412,10 +420,12 @@ def compute_object_point_loss(predictions, batch, gamma=1.0, alpha=0.2, gradient
     """
     pred_points = predictions["object_points"]
     pred_points_conf = predictions["object_points_conf"]
-    gt_points = batch["world_points"]
+    gt_points_raw = batch["world_points"]
     gt_points_mask = batch["point_masks"]
 
-    gt_points = check_and_fix_inf_nan(gt_points, "gt_object_points")
+    gt_points = check_and_fix_inf_nan(gt_points_raw, "gt_object_points", 1000)
+
+    # Debug diagnostics for GT-vs-pred mismatch after check_and_fix_inf_nan().
 
     if gt_points_mask.sum() < 100:
         dummy_loss = (0.0 * pred_points).mean()
@@ -425,6 +435,7 @@ def compute_object_point_loss(predictions, batch, gamma=1.0, alpha=0.2, gradient
             "loss_grad_object_point": dummy_loss,
         }
 
+    # Keep the exact same regression path as compute_point_loss.
     loss_conf, loss_grad, loss_reg = regression_loss(
         pred_points,
         gt_points,

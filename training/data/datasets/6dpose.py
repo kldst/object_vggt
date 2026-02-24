@@ -36,6 +36,8 @@ class SixDPoseDataset(BaseDataset):
         len_test: int = 10000,
         verify_files: bool = True,
         min_num_frames: int = 1,
+        only_run_name: str = "",
+        only_run_names: Optional[List[str]] = None,
     ):
         super().__init__(common_conf=common_conf)
 
@@ -51,6 +53,11 @@ class SixDPoseDataset(BaseDataset):
 
         self.verify_files = verify_files
         self.min_num_frames = min_num_frames
+        self.only_run_name = (only_run_name or "").strip()
+        self.only_run_names = [x.strip() for x in (only_run_names or []) if str(x).strip()]
+        if self.only_run_name:
+            # Keep backward-friendly single-run flag while allowing multi-run list.
+            self.only_run_names = [self.only_run_name]
 
         if split == "train":
             self.len_train = len_train
@@ -80,6 +87,13 @@ class SixDPoseDataset(BaseDataset):
             raise FileNotFoundError(f"Image root not found: {self.image_root}")
 
         run_names = sorted([d for d in os.listdir(self.image_root) if d.startswith("run_")])
+        if self.only_run_names:
+            only_set = set(self.only_run_names)
+            run_names = [r for r in run_names if r in only_set]
+            if len(run_names) == 0:
+                raise RuntimeError(
+                    f"No runs matched only_run_names={sorted(only_set)} under image_root={self.image_root}"
+                )
         if self.debug:
             run_names = run_names[:1]
 

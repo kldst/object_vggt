@@ -74,6 +74,7 @@ class ComposedDataset(Dataset, ABC):
         # Whether the dataset is being used for training (affects augmentations)
         self.training = common_config.training
         self.common_config = common_config
+        self.map_xyz_bfloat16 = bool(getattr(common_config, "map_xyz_bfloat16", False))
 
         self.total_samples = len(self.base_dataset)
 
@@ -116,6 +117,9 @@ class ComposedDataset(Dataset, ABC):
         intrinsics = torch.from_numpy(np.stack(batch["intrinsics"]).astype(np.float32))
         cam_points = torch.from_numpy(np.stack(batch["cam_points"]).astype(np.float32))
         world_points = torch.from_numpy(np.stack(batch["world_points"]).astype(np.float32))
+        if self.map_xyz_bfloat16:
+            cam_points = cam_points.to(torch.bfloat16)
+            world_points = world_points.to(torch.bfloat16)
         point_masks = torch.from_numpy(np.stack(batch["point_masks"])) # Mask indicating valid depths / world points / cam points per frame
         ids = torch.from_numpy(batch["ids"])    # Frame indices sampled from the original sequence
 
