@@ -78,7 +78,8 @@ class ObjectPoseTransformerDecoderHead(nn.Module):
 		self.cfg = cfg or ObjectPoseHeadConfig()
 
 		init_scale, init_translate, init_rot6d = _load_global_init_params(self.cfg.init_params_path)
-		self.register_buffer("init_scale", torch.from_numpy(init_scale).unsqueeze(0))  # (1,1)
+		init_log_scale = np.log(np.clip(init_scale, a_min=1e-8, a_max=None))
+		self.register_buffer("init_log_scale", torch.from_numpy(init_log_scale).unsqueeze(0))  # (1,1)
 		self.register_buffer("init_translate", torch.from_numpy(init_translate).unsqueeze(0))  # (1,3)
 		self.register_buffer("init_pose", torch.from_numpy(init_rot6d).unsqueeze(0))  # (1,6)
 
@@ -107,7 +108,7 @@ class ObjectPoseTransformerDecoderHead(nn.Module):
 		"""context_tokens: (B, N, C_context) -> (object_pose_6d, object_scale_1, object_translation_3, pred_pose_0)."""
 		B = context_tokens.shape[0]
 		pred_pose = self.init_pose.expand(B, -1)
-		pred_scale = self.init_scale.expand(B, -1)
+		pred_log_scale = self.init_log_scale.expand(B, -1)
 		pred_translate = self.init_translate.expand(B, -1)
 		pred_pose_0 = pred_pose
 
@@ -115,11 +116,12 @@ class ObjectPoseTransformerDecoderHead(nn.Module):
 			token = torch.zeros((B, 1, 1), device=context_tokens.device, dtype=context_tokens.dtype)
 			token_out = self.transformer(token, context=context_tokens).squeeze(1)
 			pred_pose = self.decpose(token_out) + pred_pose
-			pred_scale = self.decscale(token_out) + pred_scale
+			pred_log_scale = self.decscale(token_out) + pred_log_scale
 			pred_translate = self.dectranslate(token_out) + pred_translate
 			if iter_idx == 0:
 				pred_pose_0 = pred_pose
 
+		pred_scale = torch.exp(pred_log_scale)
 		return pred_pose, pred_scale, pred_translate, pred_pose_0
 
 
