@@ -38,6 +38,8 @@ class SixDPoseDataset(BaseDataset):
         min_num_frames: int = 1,
         only_run_name: str = "",
         only_run_names: Optional[List[str]] = None,
+        only_run_start: Optional[str] = None,
+        only_run_end: Optional[str] = None,
     ):
         super().__init__(common_conf=common_conf)
 
@@ -58,6 +60,16 @@ class SixDPoseDataset(BaseDataset):
         if self.only_run_name:
             # Keep backward-friendly single-run flag while allowing multi-run list.
             self.only_run_names = [self.only_run_name]
+        self.only_run_start_idx = self._parse_run_index(only_run_start)
+        self.only_run_end_idx = self._parse_run_index(only_run_end)
+        if (
+            self.only_run_start_idx is not None
+            and self.only_run_end_idx is not None
+            and self.only_run_start_idx > self.only_run_end_idx
+        ):
+            raise ValueError(
+                f"Invalid run range: only_run_start={only_run_start} > only_run_end={only_run_end}"
+            )
 
         if split == "train":
             self.len_train = len_train
@@ -93,6 +105,23 @@ class SixDPoseDataset(BaseDataset):
             if len(run_names) == 0:
                 raise RuntimeError(
                     f"No runs matched only_run_names={sorted(only_set)} under image_root={self.image_root}"
+                )
+        if self.only_run_start_idx is not None or self.only_run_end_idx is not None:
+            run_names_in_range = []
+            for run_name in run_names:
+                run_idx = self._parse_run_index(run_name)
+                if run_idx is None:
+                    continue
+                if self.only_run_start_idx is not None and run_idx < self.only_run_start_idx:
+                    continue
+                if self.only_run_end_idx is not None and run_idx > self.only_run_end_idx:
+                    continue
+                run_names_in_range.append(run_name)
+            run_names = run_names_in_range
+            if len(run_names) == 0:
+                raise RuntimeError(
+                    "No runs matched range filter "
+                    f"[{self.only_run_start_idx}, {self.only_run_end_idx}] under image_root={self.image_root}"
                 )
         if self.debug:
             run_names = run_names[:1]
@@ -166,6 +195,21 @@ class SixDPoseDataset(BaseDataset):
         return records
 
     @staticmethod
+    def _parse_run_index(run_name: Optional[str]) -> Optional[int]:
+        if run_name is None:
+            return None
+        s = str(run_name).strip()
+        if not s:
+            return None
+        if s.isdigit():
+            return int(s)
+        if s.startswith("run_"):
+            tail = s[4:]
+            if tail.isdigit():
+                return int(tail)
+        raise ValueError(f"Invalid run spec '{run_name}'. Expected e.g. 'run_0000' or '0'.")
+
+    @staticmethod
     def _build_records_by_frame_num(records: List[Dict]) -> Dict[int, List[int]]:
         records_by_len: Dict[int, List[int]] = {}
         for idx, rec in enumerate(records):
@@ -175,6 +219,8 @@ class SixDPoseDataset(BaseDataset):
 
     @staticmethod
     def _decode_obj_srt(obj_srt: Dict) -> Dict[str, np.ndarray]:
+        # Keep NumPy side in float32 for compatibility (some NumPy builds do not support bfloat16).
+        # Cast to torch.bfloat16 later in composed_dataset.py.
         s = np.float32(obj_srt["s"])
         t = np.array(obj_srt["t"], dtype=np.float32)
         r = np.array(obj_srt["R_flat9_row_major"], dtype=np.float32).reshape(3, 3)
@@ -315,6 +361,7 @@ class SixDPoseDataset(BaseDataset):
             "cam_points": cam_points,
             "world_points": world_points,
             "point_masks": point_masks,
+            "object_masks": point_masks,
             "original_sizes": original_sizes,
             "camera_indices": np.array(camera_indices, dtype=np.int64),
             "object_name": object_name,

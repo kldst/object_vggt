@@ -11,7 +11,7 @@ from hydra import initialize, compose
 from omegaconf import DictConfig, OmegaConf
 
 
-os.environ['CUDA_VISIBLE_DEVICES'] = '2'
+os.environ['CUDA_VISIBLE_DEVICES'] = '3'
 
 def _prepend_repo_root_to_sys_path():
     repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))

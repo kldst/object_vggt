@@ -32,30 +32,26 @@ def _default_init_params_path() -> Optional[str]:
 	return str(candidate) if candidate.is_file() else None
 
 
-def _load_global_init_params(init_params_path: Optional[str]) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
-	"""Return (init_scale_1, init_translate_3, init_rot6d_6) as numpy arrays."""
+def _load_global_init_params(init_params_path: Optional[str]) -> Tuple[np.ndarray, np.ndarray]:
+	"""Return (init_translate_3, init_rot6d_6) as numpy arrays."""
 	if init_params_path is None:
 		init_params_path = _default_init_params_path()
 	if init_params_path is None:
 		return (
-			np.array([1.0], dtype=np.float32),
 			np.array([0.0, 0.0, 1.0], dtype=np.float32),
 			np.array([1.0, 0.0, 0.0, 0.0, 1.0, 0.0], dtype=np.float32),
 		)
 
 	data = np.load(init_params_path)
-	init_scale = data.get("global_init_scale")
 	init_translate = data.get("global_init_translate")
 	init_rot6d = data.get("global_init_rot6d")
-	if init_scale is None or init_translate is None or init_rot6d is None:
+	if init_translate is None or init_rot6d is None:
 		return (
-			np.array([1.0], dtype=np.float32),
 			np.array([0.0, 0.0, 1.0], dtype=np.float32),
 			np.array([1.0, 0.0, 0.0, 0.0, 1.0, 0.0], dtype=np.float32),
 		)
 
 	return (
-		init_scale.astype(np.float32).reshape(-1)[:1],
 		init_translate.astype(np.float32).reshape(-1)[:3],
 		init_rot6d.astype(np.float32).reshape(-1)[:6],
 	)
@@ -66,7 +62,6 @@ class ObjectPoseTransformerDecoderHead(nn.Module):
 
 	Predicts:
 	  - object pose in rotation-6D (6D)
-	  - object scale (1D)
 	  - object translation (3D)
 
 	Architecture mirrors the HMR2/TRAM-style cross-attention decoder, but is kept
@@ -77,9 +72,7 @@ class ObjectPoseTransformerDecoderHead(nn.Module):
 		super().__init__()
 		self.cfg = cfg or ObjectPoseHeadConfig()
 
-		init_scale, init_translate, init_rot6d = _load_global_init_params(self.cfg.init_params_path)
-		init_log_scale = np.log(np.clip(init_scale, a_min=1e-8, a_max=None))
-		self.register_buffer("init_log_scale", torch.from_numpy(init_log_scale).unsqueeze(0))  # (1,1)
+		init_translate, init_rot6d = _load_global_init_params(self.cfg.init_params_path)
 		self.register_buffer("init_translate", torch.from_numpy(init_translate).unsqueeze(0))  # (1,3)
 		self.register_buffer("init_pose", torch.from_numpy(init_rot6d).unsqueeze(0))  # (1,6)
 
@@ -98,17 +91,14 @@ class ObjectPoseTransformerDecoderHead(nn.Module):
 		)
 
 		self.decpose = nn.Linear(self.cfg.transformer_dim, 6)
-		self.decscale = nn.Linear(self.cfg.transformer_dim, 1)
 		self.dectranslate = nn.Linear(self.cfg.transformer_dim, 3)
 		nn.init.xavier_uniform_(self.decpose.weight, gain=0.01)
-		nn.init.xavier_uniform_(self.decscale.weight, gain=0.01)
 		nn.init.xavier_uniform_(self.dectranslate.weight, gain=0.01)
 
-	def forward(self, context_tokens: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
-		"""context_tokens: (B, N, C_context) -> (object_pose_6d, object_scale_1, object_translation_3, pred_pose_0)."""
+	def forward(self, context_tokens: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+		"""context_tokens: (B, N, C_context) -> (object_pose_6d, object_translation_3, pred_pose_0)."""
 		B = context_tokens.shape[0]
 		pred_pose = self.init_pose.expand(B, -1)
-		pred_log_scale = self.init_log_scale.expand(B, -1)
 		pred_translate = self.init_translate.expand(B, -1)
 		pred_pose_0 = pred_pose
 
@@ -116,13 +106,11 @@ class ObjectPoseTransformerDecoderHead(nn.Module):
 			token = torch.zeros((B, 1, 1), device=context_tokens.device, dtype=context_tokens.dtype)
 			token_out = self.transformer(token, context=context_tokens).squeeze(1)
 			pred_pose = self.decpose(token_out) + pred_pose
-			pred_log_scale = self.decscale(token_out) + pred_log_scale
 			pred_translate = self.dectranslate(token_out) + pred_translate
 			if iter_idx == 0:
 				pred_pose_0 = pred_pose
 
-		pred_scale = torch.exp(pred_log_scale)
-		return pred_pose, pred_scale, pred_translate, pred_pose_0
+		return pred_pose, pred_translate, pred_pose_0
 
 
 class ObjectPoseHead(nn.Module):
@@ -134,7 +122,6 @@ class ObjectPoseHead(nn.Module):
 
 	Outputs (always):
 	  - object_pose: (B,6) rotation-6D
-	  - object_scale: (B,1)
 	  - object_translation: (B,3)
 
 	No other outputs are produced by this head.
@@ -174,11 +161,10 @@ class ObjectPoseHead(nn.Module):
 				raise ValueError(f"object_latent should be (B,S,C), got {tuple(object_latent.shape)}")
 			context_tokens = torch.cat([object_latent, context_tokens], dim=1)
 
-		object_pose, object_scale, object_translation, pred_pose_0 = self.decoder(context_tokens)
+		object_pose, object_translation, pred_pose_0 = self.decoder(context_tokens)
 
 		outputs: Dict[str, torch.Tensor] = {
 			"object_pose": object_pose,
-			"object_scale": object_scale,
 			"object_translation": object_translation,
 			"pred_pose_0": pred_pose_0,
 		}

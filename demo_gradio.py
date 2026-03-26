@@ -1,691 +1,741 @@
-# Copyright (c) Meta Platforms, Inc. and affiliates.
-# All rights reserved.
-#
-# This source code is licensed under the license found in the
-# LICENSE file in the root directory of this source tree.
-
-import os
-import cv2
-import torch
-import numpy as np
-import gradio as gr
-import sys
-import shutil
-from datetime import datetime
 import glob
-import gc
+import json
+import math
+import os
+import random
+import re
+import struct
+import sys
 import time
+from pathlib import Path
+
+import cv2
+import gradio as gr
+import numpy as np
+import torch
 
 sys.path.append("vggt/")
 
-from visual_util import predictions_to_glb
 from vggt.models.vggt import VGGT
-from vggt.utils.load_fn import load_and_preprocess_images
-from vggt.utils.pose_enc import pose_encoding_to_extri_intri
-from vggt.utils.geometry import unproject_depth_map_to_point_map
+
+os.environ['CUDA_VISIBLE_DEVICES'] = '3'
+
+OBJ_ROOT = Path("/mnt/train-data-4-hdd/yian/6dpose_obj/obj")
+DATA_ROOT = Path("/mnt/train-data-4-hdd/yian/6dpose_obj/0315_fixedCam_1k")
+OUT_IMAGE_ROOT = DATA_ROOT / "out_image"
+OUT_POSE_ROOT = DATA_ROOT / "out_pose"
+OBJECT_IMAGE_ROOT = DATA_ROOT / "object_space_rgb"
+OUT_CAM_PARAM_ROOT = DATA_ROOT / "out_cam_param"
+FIXED_VIEWS = (1, 3, 8, 12, 15, 18)
+NUM_OBJECT_VIEWS = 4
+PROJECTION_POINT_LIMIT = 12000
+MODEL_CKPT_PATH = Path(
+    "/mnt/train-data-4-hdd/yian/6dpose_obj/vggt_objectspc/training/logs/test_0321_object_dataset_AGGREGATOR_ALL_white_random_object_image_2/ckpts/checkpoint_4.pt"
+)
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
-print("Initializing and loading VGGT model...")
-# model = VGGT.from_pretrained("facebook/VGGT-1B")  # another way to load the model
 
-model = VGGT()
-_URL = "https://huggingface.co/facebook/VGGT-1B/resolve/main/model.pt"
-model.load_state_dict(torch.hub.load_state_dict_from_url(_URL))
+def list_runs():
+    return sorted(p.name for p in OUT_IMAGE_ROOT.iterdir() if p.is_dir() and p.name.startswith("run_"))
 
 
-model.eval()
-model = model.to(device)
+def image_path_for_view(run_name: str, view_idx: int) -> str:
+    filename = "Main_Camera.jpg" if view_idx == 0 else f"Main_Camera_({view_idx}).jpg"
+    return str(OUT_IMAGE_ROOT / run_name / filename)
 
 
-# -------------------------------------------------------------------------
-# 1) Core model inference
-# -------------------------------------------------------------------------
-def run_model(target_dir, model) -> dict:
-    """
-    Run the VGGT model on images in the 'target_dir/images' folder and return predictions.
-    """
-    print(f"Processing images from {target_dir}")
+def object_image_glob(object_name: str):
+    return sorted(glob.glob(str(OBJECT_IMAGE_ROOT / object_name / "*_rgb.png")))
 
-    # Device check
-    device = "cuda" if torch.cuda.is_available() else "cpu"
+
+def extract_view_idx(path: str):
+    name = Path(path).name
+    if name == "Main_Camera_rgb.png":
+        return 0
+    match = re.match(r"Main_Camera_\((\d+)\)_rgb\.png$", name)
+    return int(match.group(1)) if match else None
+
+
+def get_available_object_view_indices(object_name: str):
+    view_indices = []
+    for path in object_image_glob(object_name):
+        view_idx = extract_view_idx(path)
+        if view_idx is not None:
+            view_indices.append(view_idx)
+    return sorted(set(view_indices))
+
+
+def object_image_path(object_name: str, view_idx: int):
+    filename = "Main_Camera_rgb.png" if int(view_idx) == 0 else f"Main_Camera_({int(view_idx)})_rgb.png"
+    path = OBJECT_IMAGE_ROOT / object_name / filename
+    if not path.exists():
+        raise FileNotFoundError(f"Missing object image: {path}")
+    return str(path)
+
+
+def object_ply_path(object_name: str) -> Path:
+    dataset_name, obj_id = object_name.split("_obj_")
+    path = OBJ_ROOT / dataset_name / f"obj_{obj_id}.ply"
+    if not path.exists():
+        raise FileNotFoundError(f"Missing object point cloud: {path}")
+    return path
+
+
+def _dataset_scale(name_or_path: str) -> float:
+    s = str(name_or_path).lower()
+    if "ycbv" in s:
+        return 0.002
+    if "handal" in s:
+        return 0.0015
+    if "hope" in s:
+        return 0.003
+    if "rupac" in s:
+        return 0.002
+    return 1.0
+
+
+def camera_param_path(run_name: str, view_idx: int) -> Path:
+    filename = "camera_Main_Camera.npz" if int(view_idx) == 0 else f"camera_Main_Camera_({int(view_idx)}).npz"
+    path = OUT_CAM_PARAM_ROOT / run_name / filename
+    if not path.exists():
+        raise FileNotFoundError(f"Missing camera param file: {path}")
+    return path
+
+
+def load_camera_params(run_name: str, view_idx: int):
+    data = np.load(camera_param_path(run_name, view_idx))
+    K = np.asarray(data["intrinsics.K_flat9"], dtype=np.float32).reshape(3, 3)
+    extrinsic = np.asarray(data["extrinsics.opencv.worldToCamera16"], dtype=np.float32).reshape(4, 4)[:3, :4]
+    width = int(np.asarray(data["image.width"]).reshape(-1)[0])
+    height = int(np.asarray(data["image.height"]).reshape(-1)[0])
+    return K, extrinsic, width, height
+
+
+def load_ply_xyz(path: Path):
+    with path.open("rb") as f:
+        if f.readline().decode("ascii", errors="ignore").strip() != "ply":
+            raise ValueError(f"Not a PLY file: {path}")
+        fmt = None
+        vertex_count = None
+        properties = []
+        in_vertex = False
+        while True:
+            line = f.readline().decode("ascii", errors="ignore")
+            if not line:
+                raise ValueError(f"Unexpected EOF in header: {path}")
+            line = line.strip()
+            if line.startswith("format "):
+                fmt = line.split()[1]
+            elif line.startswith("element vertex "):
+                vertex_count = int(line.split()[-1])
+                in_vertex = True
+            elif line.startswith("element "):
+                in_vertex = False
+            elif line.startswith("property ") and in_vertex:
+                parts = line.split()
+                properties.append((parts[1], parts[2]))
+            elif line == "end_header":
+                break
+        if vertex_count is None:
+            raise ValueError(f"PLY missing vertex count: {path}")
+        xyz = []
+        if fmt == "ascii":
+            for _ in range(vertex_count):
+                parts = f.readline().decode("ascii", errors="ignore").strip().split()
+                xyz.append([float(parts[0]), float(parts[1]), float(parts[2])])
+            return np.asarray(xyz, dtype=np.float32)
+        if fmt != "binary_little_endian":
+            raise ValueError(f"Unsupported PLY format {fmt}: {path}")
+        type_map = {
+            "char": "b", "uchar": "B", "int8": "b", "uint8": "B",
+            "short": "h", "ushort": "H", "int16": "h", "uint16": "H",
+            "int": "i", "uint": "I", "int32": "i", "uint32": "I",
+            "float": "f", "float32": "f", "double": "d", "float64": "d",
+        }
+        fmt_str = "<" + "".join(type_map[t] for t, _ in properties)
+        row_size = struct.calcsize(fmt_str)
+        for _ in range(vertex_count):
+            row = struct.unpack(fmt_str, f.read(row_size))
+            xyz.append([row[0], row[1], row[2]])
+        return np.asarray(xyz, dtype=np.float32)
+
+
+def project_points(points_world: np.ndarray, extrinsic: np.ndarray, intrinsic: np.ndarray):
+    points_cam = points_world @ extrinsic[:, :3].T + extrinsic[:, 3][None, :]
+    z = points_cam[:, 2]
+    valid = z > 1e-6
+    if not np.any(valid):
+        return np.zeros((0, 2), dtype=np.float32), np.zeros((0,), dtype=np.float32)
+    points_cam = points_cam[valid]
+    z = z[valid]
+    uvw = points_cam @ intrinsic.T
+    uv = uvw[:, :2] / uvw[:, 2:3]
+    return uv.astype(np.float32), z.astype(np.float32)
+
+
+def draw_projected_points(image_path: str, uv: np.ndarray, depth: np.ndarray, width: int, height: int):
+    image = cv2.imread(image_path, cv2.IMREAD_COLOR)
+    if image is None:
+        raise FileNotFoundError(f"Unable to read image: {image_path}")
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    if image.shape[1] != width or image.shape[0] != height:
+        image = cv2.resize(image, (width, height), interpolation=cv2.INTER_LINEAR)
+    if uv.shape[0] == 0:
+        return image
+    inside = (
+        (uv[:, 0] >= 0) & (uv[:, 0] < width) &
+        (uv[:, 1] >= 0) & (uv[:, 1] < height)
+    )
+    uv = uv[inside]
+    depth = depth[inside]
+    if uv.shape[0] == 0:
+        return image
+    if uv.shape[0] > PROJECTION_POINT_LIMIT:
+        order = np.linspace(0, uv.shape[0] - 1, PROJECTION_POINT_LIMIT).astype(np.int32)
+        uv = uv[order]
+        depth = depth[order]
+    depth_min = float(depth.min())
+    depth_max = float(depth.max())
+    denom = max(depth_max - depth_min, 1e-6)
+    norm = (depth - depth_min) / denom
+    colors = cv2.applyColorMap((255.0 * (1.0 - norm)).astype(np.uint8), cv2.COLORMAP_JET)
+    overlay = image.copy()
+    for (u, v), color in zip(np.round(uv).astype(np.int32), colors.reshape(-1, 3)):
+        cv2.circle(overlay, (int(u), int(v)), 1, tuple(int(c) for c in color.tolist()), -1)
+    blended = cv2.addWeighted(image, 0.55, overlay, 0.45, 0.0)
+    return blended
+
+
+def build_projection_gallery(run_name: str, object_name: str, pred_translation: np.ndarray, pred_rot6d: np.ndarray):
+    object_points = load_ply_xyz(object_ply_path(object_name))
+    object_points = object_points * float(_dataset_scale(object_name))
+    rot = rot6d_to_matrix(pred_rot6d).astype(np.float32)
+    trans = np.asarray(pred_translation, dtype=np.float32)
+    world_points = object_points @ rot.T + trans[None, :]
+    gallery = []
+    for view_idx in FIXED_VIEWS:
+        image_path = image_path_for_view(run_name, view_idx)
+        K, extrinsic, width, height = load_camera_params(run_name, view_idx)
+        uv, depth = project_points(world_points, extrinsic, K)
+        overlay = draw_projected_points(image_path, uv, depth, width, height)
+        gallery.append((overlay, f"View {view_idx}"))
+    return gallery
+
+
+def compute_bbox_corners(points_obj: np.ndarray):
+    pmin = points_obj.min(axis=0)
+    pmax = points_obj.max(axis=0)
+    return np.asarray([
+        [pmin[0], pmin[1], pmin[2]],
+        [pmax[0], pmin[1], pmin[2]],
+        [pmax[0], pmax[1], pmin[2]],
+        [pmin[0], pmax[1], pmin[2]],
+        [pmin[0], pmin[1], pmax[2]],
+        [pmax[0], pmin[1], pmax[2]],
+        [pmax[0], pmax[1], pmax[2]],
+        [pmin[0], pmax[1], pmax[2]],
+    ], dtype=np.float32)
+
+
+def project_points_with_mask(points_world: np.ndarray, extrinsic: np.ndarray, intrinsic: np.ndarray):
+    points_cam = points_world @ extrinsic[:, :3].T + extrinsic[:, 3][None, :]
+    z = points_cam[:, 2]
+    valid = z > 1e-6
+    uv = np.full((points_world.shape[0], 2), np.nan, dtype=np.float32)
+    if np.any(valid):
+        uvw = points_cam[valid] @ intrinsic.T
+        uv[valid] = (uvw[:, :2] / uvw[:, 2:3]).astype(np.float32)
+    return uv, z.astype(np.float32), valid, points_cam.astype(np.float32)
+
+
+def draw_projected_bbox(
+    image_path: str,
+    uv: np.ndarray,
+    valid: np.ndarray,
+    width: int,
+    height: int,
+    center_uv: np.ndarray,
+    center_valid: bool,
+    axis_uv: np.ndarray,
+    axis_valid: np.ndarray,
+):
+    image = cv2.imread(image_path, cv2.IMREAD_COLOR)
+    if image is None:
+        raise FileNotFoundError(f"Unable to read image: {image_path}")
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    if image.shape[1] != width or image.shape[0] != height:
+        image = cv2.resize(image, (width, height), interpolation=cv2.INTER_LINEAR)
+
+    edges = [
+        (0, 1), (1, 2), (2, 3), (3, 0),
+        (4, 5), (5, 6), (6, 7), (7, 4),
+        (0, 4), (1, 5), (2, 6), (3, 7),
+    ]
+    overlay = image.copy()
+    inside = valid.copy()
+    inside &= (uv[:, 0] >= 0) & (uv[:, 0] < width) & (uv[:, 1] >= 0) & (uv[:, 1] < height)
+    for i, j in edges:
+        if inside[i] and inside[j]:
+            p1 = tuple(np.round(uv[i]).astype(np.int32))
+            p2 = tuple(np.round(uv[j]).astype(np.int32))
+            cv2.line(overlay, p1, p2, (0, 255, 0), 2)
+
+    if center_valid:
+        c = tuple(np.round(center_uv).astype(np.int32))
+        axis_colors = [(255, 64, 64), (0, 255, 255), (255, 215, 0)]
+        for idx, color in enumerate(axis_colors):
+            if axis_valid[idx]:
+                end = tuple(np.round(axis_uv[idx]).astype(np.int32))
+                cv2.arrowedLine(overlay, c, end, color, 3, tipLength=0.18)
+
+    return overlay
+
+
+def build_bbox_projection_gallery(run_name: str, object_name: str, pred_translation: np.ndarray, pred_rot6d: np.ndarray):
+    object_points = load_ply_xyz(object_ply_path(object_name))
+    object_points = object_points * float(_dataset_scale(object_name))
+    bbox_obj = compute_bbox_corners(object_points)
+    rot = rot6d_to_matrix(pred_rot6d).astype(np.float32)
+    trans = np.asarray(pred_translation, dtype=np.float32)
+    bbox_world = bbox_obj @ rot.T + trans[None, :]
+
+    center_obj = np.zeros((1, 3), dtype=np.float32)
+    axis_len = max(np.linalg.norm(bbox_obj.max(axis=0) - bbox_obj.min(axis=0)) * 0.25, 1e-3)
+    axis_obj = np.asarray([
+        [axis_len, 0.0, 0.0],
+        [0.0, axis_len, 0.0],
+        [0.0, 0.0, axis_len],
+    ], dtype=np.float32)
+    center_world = center_obj @ rot.T + trans[None, :]
+    axis_world = axis_obj @ rot.T + trans[None, :]
+
+    gallery = []
+    for view_idx in FIXED_VIEWS:
+        image_path = image_path_for_view(run_name, view_idx)
+        K, extrinsic, width, height = load_camera_params(run_name, view_idx)
+        uv, _, valid, _ = project_points_with_mask(bbox_world, extrinsic, K)
+        center_uv, _, center_valid, _ = project_points_with_mask(center_world, extrinsic, K)
+        axis_uv, _, axis_valid, _ = project_points_with_mask(axis_world, extrinsic, K)
+        center_ok = bool(center_valid[0])
+        axis_ok = np.asarray(axis_valid, dtype=bool)
+        overlay = draw_projected_bbox(
+            image_path,
+            uv,
+            valid,
+            width,
+            height,
+            center_uv[0],
+            center_ok,
+            axis_uv,
+            axis_ok,
+        )
+        gallery.append((overlay, f"View {view_idx}"))
+    return gallery
+
+
+def decode_name(value):
+    if isinstance(value, bytes):
+        return value.decode("utf-8")
+    return str(value)
+
+
+def load_pose_npz(run_name: str):
+    pose_path = OUT_POSE_ROOT / f"{run_name}.npz"
+    data = np.load(pose_path, allow_pickle=True)
+    names = [decode_name(x) for x in data["names"]]
+    positions = np.asarray(data["positions"], dtype=np.float32)
+    rot_quat_wxyz = np.asarray(data["rot_quat_wxyz"], dtype=np.float32)
+    return names, positions, rot_quat_wxyz
+
+
+def get_objects_for_run(run_name: str):
+    names, _, _ = load_pose_npz(run_name)
+    return names
+
+
+def get_scene_images(run_name: str):
+    image_paths = []
+    for view_idx in FIXED_VIEWS:
+        path = image_path_for_view(run_name, view_idx)
+        if not os.path.exists(path):
+            raise FileNotFoundError(f"Missing fixed-view image: {path}")
+        image_paths.append(path)
+    return image_paths
+
+
+def sample_object_view_indices(object_name: str, seed: int):
+    candidates = get_available_object_view_indices(object_name)
+    if len(candidates) < NUM_OBJECT_VIEWS:
+        raise ValueError(f"Object {object_name} only has {len(candidates)} images, need {NUM_OBJECT_VIEWS}.")
+    rng = random.Random(int(seed))
+    return sorted(rng.sample(candidates, NUM_OBJECT_VIEWS))
+
+
+def resolve_object_images(object_name: str, selected_view_indices):
+    if selected_view_indices is None:
+        raise ValueError("selected_view_indices is required")
+    cleaned = [int(v) for v in selected_view_indices]
+    if len(cleaned) != NUM_OBJECT_VIEWS:
+        raise ValueError(f"Please provide exactly {NUM_OBJECT_VIEWS} object view indices.")
+    if len(set(cleaned)) != len(cleaned):
+        raise ValueError("Object view indices must be unique.")
+    return [object_image_path(object_name, v) for v in cleaned]
+
+
+def quat_wxyz_to_matrix(quat):
+    q = np.asarray(quat, dtype=np.float64)
+    norm = np.linalg.norm(q)
+    if norm < 1e-12:
+        return np.eye(3, dtype=np.float64)
+    w, x, y, z = q / norm
+    return np.array([
+        [1 - 2 * (y * y + z * z), 2 * (x * y - z * w), 2 * (x * z + y * w)],
+        [2 * (x * y + z * w), 1 - 2 * (x * x + z * z), 2 * (y * z - x * w)],
+        [2 * (x * z - y * w), 2 * (y * z + x * w), 1 - 2 * (x * x + y * y)],
+    ], dtype=np.float64)
+
+
+def matrix_to_rot6d(matrix):
+    matrix = np.asarray(matrix, dtype=np.float64)
+    # Match training/loss.py: rotation_matrix[..., :, :2].reshape(..., 6)
+    return matrix[:, :2].reshape(-1)
+
+
+def quat_wxyz_to_rot6d(quat):
+    return matrix_to_rot6d(quat_wxyz_to_matrix(quat))
+
+
+def rot6d_to_matrix(rot6d):
+    rot6d = np.asarray(rot6d, dtype=np.float64).reshape(3, 2)
+    x_raw = rot6d[:, 0]
+    y_raw = rot6d[:, 1]
+    x_norm = np.linalg.norm(x_raw)
+    if x_norm < 1e-12:
+        x = np.array([1.0, 0.0, 0.0], dtype=np.float64)
+    else:
+        x = x_raw / x_norm
+    y = y_raw - np.dot(x, y_raw) * x
+    y_norm = np.linalg.norm(y)
+    if y_norm < 1e-12:
+        fallback = np.array([0.0, 1.0, 0.0], dtype=np.float64)
+        y = fallback - np.dot(x, fallback) * x
+        y = y / max(np.linalg.norm(y), 1e-12)
+    else:
+        y = y / y_norm
+    z = np.cross(x, y)
+    z = z / max(np.linalg.norm(z), 1e-12)
+    y = np.cross(z, x)
+    return np.stack([x, y, z], axis=1)
+
+
+def rotation_error_degrees(pred_rot6d, gt_quat_wxyz):
+    r_pred = rot6d_to_matrix(pred_rot6d)
+    r_gt = quat_wxyz_to_matrix(gt_quat_wxyz)
+    rel = r_pred @ r_gt.T
+    trace = np.trace(rel)
+    cos_theta = np.clip((trace - 1.0) / 2.0, -1.0, 1.0)
+    return float(np.degrees(np.arccos(cos_theta)))
+
+
+def translation_error(pred_t, gt_t):
+    pred_t = np.asarray(pred_t, dtype=np.float64)
+    gt_t = np.asarray(gt_t, dtype=np.float64)
+    diff = pred_t - gt_t
+    return {
+        "l2": float(np.linalg.norm(diff)),
+        "abs_xyz": np.abs(diff).tolist(),
+        "signed_xyz": diff.tolist(),
+    }
+
+
+def vector_loss(pred, gt, loss_type="l1"):
+    pred = np.asarray(pred, dtype=np.float64)
+    gt = np.asarray(gt, dtype=np.float64)
+    if loss_type == "l1":
+        return float(np.abs(pred - gt).mean())
+    if loss_type == "l2":
+        return float(np.square(pred - gt).mean())
+    raise ValueError(f"Unknown loss_type: {loss_type}")
+
+
+def build_model():
+    print("Initializing dataset-driven pose-only VGGT model...")
+    model = VGGT(
+        enable_camera=False,
+        enable_point=False,
+        enable_depth=False,
+        enable_track=False,
+        enable_object_point=False,
+        enable_object_srt=True,
+        use_shared_object_latent=False,
+        enable_object_cross_attn=True,
+        object_cross_attn_heads=16,
+    )
+    print(f"Loading checkpoint from local path: {MODEL_CKPT_PATH}")
+    checkpoint = torch.load(MODEL_CKPT_PATH, map_location="cpu")
+    state_dict = checkpoint["model"] if isinstance(checkpoint, dict) and "model" in checkpoint else checkpoint
+    missing, unexpected = model.load_state_dict(state_dict, strict=False)
+    if missing:
+        print(f"Missing keys when loading checkpoint: {missing}")
+    if unexpected:
+        print(f"Unexpected keys when loading checkpoint: {unexpected}")
+    model.eval()
+    return model.to(device)
+
+
+model = build_model()
+RUN_CHOICES = list_runs()
+
+
+def _load_images_to_device(image_paths):
+    images = []
+    for image_path in image_paths:
+        image = cv2.imread(str(image_path), cv2.IMREAD_COLOR)
+        if image is None:
+            raise FileNotFoundError(f"Unable to read image: {image_path}")
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        tensor = torch.from_numpy(np.ascontiguousarray(image)).permute(2, 0, 1).to(torch.float32).div(255.0)
+        images.append(tensor)
+    return torch.stack(images, dim=0).to(device)
+
+
+def parse_view_index_text(view_index_text: str, strict: bool = True):
+    raw = (view_index_text or "").strip()
+    if not raw:
+        return None
+    parts = [part.strip() for part in raw.split(",") if part.strip()]
+    if len(parts) != NUM_OBJECT_VIEWS:
+        if strict:
+            raise ValueError(f"Please enter exactly {NUM_OBJECT_VIEWS} comma-separated object view indices.")
+        return None
+    try:
+        parsed = [int(part) for part in parts]
+    except ValueError:
+        if strict:
+            raise ValueError(
+                f"Object view indices must be integers, got: {view_index_text}"
+            )
+        return None
+    return parsed
+
+
+def format_view_index_text(view_indices):
+    return ", ".join(str(int(v)) for v in view_indices)
+
+
+def describe_selection(run_name: str, object_name: str, seed: int, view_index_text: str):
+    if not run_name:
+        return gr.update(choices=[], value=None), [], [], "", "Please select a run.", [], None, [], None
+    object_choices = get_objects_for_run(run_name)
+    chosen_object = object_name if object_name in object_choices else object_choices[0]
+    available_view_indices = get_available_object_view_indices(chosen_object)
+    parsed_view_indices = parse_view_index_text(view_index_text, strict=False)
+    selected_view_indices = parsed_view_indices if parsed_view_indices is not None else sample_object_view_indices(chosen_object, seed)
+    if any(v not in available_view_indices for v in selected_view_indices):
+        selected_view_indices = sample_object_view_indices(chosen_object, seed)
+    object_paths = resolve_object_images(chosen_object, selected_view_indices)
+    scene_paths = get_scene_images(run_name)
+    selected_text = format_view_index_text(selected_view_indices)
+    message = (
+        f"Run {run_name}: using fixed scene views {FIXED_VIEWS}. "
+        f"Object {chosen_object}: selected object view indices [{selected_text}]. Predicted point-cloud projection will be shown after Generate."
+    )
+    return gr.update(choices=object_choices, value=chosen_object), scene_paths, object_paths, selected_text, message, [], None, [], None
+
+
+def run_inference(run_name: str, object_name: str, seed: int, view_index_text: str):
+    if not run_name:
+        raise ValueError("Please select a run.")
+    if not object_name:
+        raise ValueError("Please select an object.")
     if not torch.cuda.is_available():
         raise ValueError("CUDA is not available. Check your environment.")
 
-    # Move model to device
-    model = model.to(device)
-    model.eval()
+    scene_paths = get_scene_images(run_name)
+    selected_view_indices = parse_view_index_text(view_index_text)
+    if selected_view_indices is None:
+        selected_view_indices = sample_object_view_indices(object_name, seed)
+    object_paths = resolve_object_images(object_name, selected_view_indices)
 
-    # Load and preprocess images
-    image_names = glob.glob(os.path.join(target_dir, "images", "*"))
-    image_names = sorted(image_names)
-    print(f"Found {len(image_names)} images")
-    if len(image_names) == 0:
-        raise ValueError("No images found. Check your upload.")
+    scene_images = _load_images_to_device(scene_paths)
+    object_images = _load_images_to_device(object_paths)
 
-    images = load_and_preprocess_images(image_names).to(device)
-    print(f"Preprocessed images shape: {images.shape}")
-
-    # Run inference
-    print("Running inference...")
     dtype = torch.bfloat16 if torch.cuda.get_device_capability()[0] >= 8 else torch.float16
-
+    start_time = time.time()
     with torch.no_grad():
         with torch.cuda.amp.autocast(dtype=dtype):
-            predictions = model(images)
+            predictions = model(scene_images, object_images=object_images)
+    elapsed = time.time() - start_time
 
-    # Convert pose encoding to extrinsic and intrinsic matrices
-    print("Converting pose encoding to extrinsic and intrinsic matrices...")
-    extrinsic, intrinsic = pose_encoding_to_extri_intri(predictions["pose_enc"], images.shape[-2:])
-    predictions["extrinsic"] = extrinsic
-    predictions["intrinsic"] = intrinsic
+    pred_pose = predictions["object_pose"].detach().cpu().numpy()[0]
+    pred_translation = predictions["object_translation"].detach().cpu().numpy()[0]
 
-    # Convert tensors to numpy
-    for key in predictions.keys():
-        if isinstance(predictions[key], torch.Tensor):
-            predictions[key] = predictions[key].cpu().numpy().squeeze(0)  # remove batch dimension
-    predictions['pose_enc_list'] = None # remove pose_enc_list
+    names, positions, rot_quat_wxyz = load_pose_npz(run_name)
+    obj_idx = names.index(object_name)
+    gt_translation = positions[obj_idx]
+    gt_quat = rot_quat_wxyz[obj_idx]
+    gt_rot6d = quat_wxyz_to_rot6d(gt_quat)
 
-    # Generate world points from depth map
-    print("Computing world points from depth map...")
-    depth_map = predictions["depth"]  # (S, H, W, 1)
-    world_points = unproject_depth_map_to_point_map(depth_map, predictions["extrinsic"], predictions["intrinsic"])
-    predictions["world_points_from_depth"] = world_points
+    rot_err_deg = rotation_error_degrees(pred_pose, gt_quat)
+    trans_err = translation_error(pred_translation, gt_translation)
+    loss_object_pose = vector_loss(pred_pose, gt_rot6d, loss_type="l1")
+    loss_object_translation = vector_loss(pred_translation, gt_translation, loss_type="l1")
 
-    # Clean up
-    torch.cuda.empty_cache()
-    return predictions
+    projection_gallery = build_projection_gallery(run_name, object_name, pred_translation, pred_pose)
+    bbox_gallery = build_bbox_projection_gallery(run_name, object_name, pred_translation, pred_pose)
 
+    result = {
+        "run": run_name,
+        "object_name": object_name,
+        "seed": int(seed),
+        "scene_views": list(FIXED_VIEWS),
+        "object_view_indices": [int(v) for v in selected_view_indices],
+        "scene_image_paths": scene_paths,
+        "object_image_paths": object_paths,
+        "prediction": {
+            "object_pose_rot6d": pred_pose.tolist(),
+            "object_translation": pred_translation.tolist(),
+        },
+        "ground_truth": {
+            "translation": gt_translation.tolist(),
+            "rotation_rot6d": gt_rot6d.tolist(),
+        },
+        "errors": {
+            "rotation_deg": rot_err_deg,
+            "translation_abs_xyz": trans_err["abs_xyz"],
+            "translation_signed_xyz": trans_err["signed_xyz"],
+        },
+        "losses": {
+            "loss_object_pose": loss_object_pose,
+            "loss_object_translation": loss_object_translation,
+        },
+        "timing": {
+            "inference_seconds": elapsed,
+        },
+    }
 
-# -------------------------------------------------------------------------
-# 2) Handle uploaded video/images --> produce target_dir + images
-# -------------------------------------------------------------------------
-def handle_uploads(input_video, input_images):
-    """
-    Create a new 'target_dir' + 'images' subfolder, and place user-uploaded
-    images or extracted frames from video into it. Return (target_dir, image_paths).
-    """
-    start_time = time.time()
-    gc.collect()
-    torch.cuda.empty_cache()
+    output_dir = Path("pose_eval_outputs") / run_name
+    output_dir.mkdir(parents=True, exist_ok=True)
+    output_path = output_dir / f"{object_name}_seed{int(seed)}.json"
+    output_path.write_text(json.dumps(result, indent=2), encoding="utf-8")
 
-    # Create a unique folder name
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
-    target_dir = f"input_images_{timestamp}"
-    target_dir_images = os.path.join(target_dir, "images")
-
-    # Clean up if somehow that folder already exists
-    if os.path.exists(target_dir):
-        shutil.rmtree(target_dir)
-    os.makedirs(target_dir)
-    os.makedirs(target_dir_images)
-
-    image_paths = []
-
-    # --- Handle images ---
-    if input_images is not None:
-        for file_data in input_images:
-            if isinstance(file_data, dict) and "name" in file_data:
-                file_path = file_data["name"]
-            else:
-                file_path = file_data
-            dst_path = os.path.join(target_dir_images, os.path.basename(file_path))
-            shutil.copy(file_path, dst_path)
-            image_paths.append(dst_path)
-
-    # --- Handle video ---
-    if input_video is not None:
-        if isinstance(input_video, dict) and "name" in input_video:
-            video_path = input_video["name"]
-        else:
-            video_path = input_video
-
-        vs = cv2.VideoCapture(video_path)
-        fps = vs.get(cv2.CAP_PROP_FPS)
-        frame_interval = int(fps * 1)  # 1 frame/sec
-
-        count = 0
-        video_frame_num = 0
-        while True:
-            gotit, frame = vs.read()
-            if not gotit:
-                break
-            count += 1
-            if count % frame_interval == 0:
-                image_path = os.path.join(target_dir_images, f"{video_frame_num:06}.png")
-                cv2.imwrite(image_path, frame)
-                image_paths.append(image_path)
-                video_frame_num += 1
-
-    # Sort final images for gallery
-    image_paths = sorted(image_paths)
-
-    end_time = time.time()
-    print(f"Files copied to {target_dir_images}; took {end_time - start_time:.3f} seconds")
-    return target_dir, image_paths
-
-
-# -------------------------------------------------------------------------
-# 3) Update gallery on upload
-# -------------------------------------------------------------------------
-def update_gallery_on_upload(input_video, input_images):
-    """
-    Whenever user uploads or changes files, immediately handle them
-    and show in the gallery. Return (target_dir, image_paths).
-    If nothing is uploaded, returns "None" and empty list.
-    """
-    if not input_video and not input_images:
-        return None, None, None, None
-    target_dir, image_paths = handle_uploads(input_video, input_images)
-    return None, target_dir, image_paths, "Upload complete. Click 'Reconstruct' to begin 3D processing."
-
-
-# -------------------------------------------------------------------------
-# 4) Reconstruction: uses the target_dir plus any viz parameters
-# -------------------------------------------------------------------------
-def gradio_demo(
-    target_dir,
-    conf_thres=3.0,
-    frame_filter="All",
-    mask_black_bg=False,
-    mask_white_bg=False,
-    show_cam=True,
-    mask_sky=False,
-    prediction_mode="Pointmap Regression",
-):
-    """
-    Perform reconstruction using the already-created target_dir/images.
-    """
-    if not os.path.isdir(target_dir) or target_dir == "None":
-        return None, "No valid target directory found. Please upload first.", None, None
-
-    start_time = time.time()
-    gc.collect()
-    torch.cuda.empty_cache()
-
-    # Prepare frame_filter dropdown
-    target_dir_images = os.path.join(target_dir, "images")
-    all_files = sorted(os.listdir(target_dir_images)) if os.path.isdir(target_dir_images) else []
-    all_files = [f"{i}: {filename}" for i, filename in enumerate(all_files)]
-    frame_filter_choices = ["All"] + all_files
-
-    print("Running run_model...")
-    with torch.no_grad():
-        predictions = run_model(target_dir, model)
-
-    # Save predictions
-    prediction_save_path = os.path.join(target_dir, "predictions.npz")
-    np.savez(prediction_save_path, **predictions)
-
-    # Handle None frame_filter
-    if frame_filter is None:
-        frame_filter = "All"
-
-    # Build a GLB file name
-    glbfile = os.path.join(
-        target_dir,
-        f"glbscene_{conf_thres}_{frame_filter.replace('.', '_').replace(':', '').replace(' ', '_')}_maskb{mask_black_bg}_maskw{mask_white_bg}_cam{show_cam}_sky{mask_sky}_pred{prediction_mode.replace(' ', '_')}.glb",
+    log_msg = (
+        f"Done. run={run_name}, object={object_name}, seed={seed}, views={format_view_index_text(selected_view_indices)}, "
+        f"rot_err={rot_err_deg:.4f} deg, loss_object_translation={loss_object_translation:.6f}, "
+        f"loss_object_pose={loss_object_pose:.6f}, time={elapsed:.2f}s"
     )
-
-    # Convert predictions to GLB
-    glbscene = predictions_to_glb(
-        predictions,
-        conf_thres=conf_thres,
-        filter_by_frames=frame_filter,
-        mask_black_bg=mask_black_bg,
-        mask_white_bg=mask_white_bg,
-        show_cam=show_cam,
-        mask_sky=mask_sky,
-        target_dir=target_dir,
-        prediction_mode=prediction_mode,
-    )
-    glbscene.export(file_obj=glbfile)
-
-    # Cleanup
-    del predictions
-    gc.collect()
-    torch.cuda.empty_cache()
-
-    end_time = time.time()
-    print(f"Total time: {end_time - start_time:.2f} seconds (including IO)")
-    log_msg = f"Reconstruction Success ({len(all_files)} frames). Waiting for visualization."
-
-    return glbfile, log_msg, gr.Dropdown(choices=frame_filter_choices, value=frame_filter, interactive=True)
+    projection_viewer = projection_gallery[0][0] if projection_gallery else None
+    bbox_viewer = bbox_gallery[0][0] if bbox_gallery else None
+    return log_msg, scene_paths, object_paths, format_view_index_text(selected_view_indices), projection_gallery, projection_viewer, bbox_gallery, bbox_viewer
 
 
-# -------------------------------------------------------------------------
-# 5) Helper functions for UI resets + re-visualization
-# -------------------------------------------------------------------------
-def clear_fields():
-    """
-    Clears the 3D viewer, the stored target_dir, and empties the gallery.
-    """
+def refresh_from_run(run_name: str, seed: int, view_index_text: str):
+    return describe_selection(run_name, None, seed, view_index_text)
+
+
+def refresh_from_object(run_name: str, object_name: str, seed: int, view_index_text: str):
+    return describe_selection(run_name, object_name, seed, view_index_text)
+
+
+def refresh_from_seed(run_name: str, object_name: str, seed: int, view_index_text: str):
+    return describe_selection(run_name, object_name, seed, view_index_text)
+
+
+def clear_outputs():
+    return "Select a run and object, then click Generate.", [], None, [], None
+
+
+def select_gallery_image(gallery, evt: gr.SelectData):
+    if gallery is None:
+        return None
+    if isinstance(gallery, list) and 0 <= evt.index < len(gallery):
+        item = gallery[evt.index]
+        if isinstance(item, tuple):
+            return item[0]
+        return item
     return None
 
 
-def update_log():
-    """
-    Display a quick log message while waiting.
-    """
-    return "Loading and Reconstructing..."
-
-
-def update_visualization(
-    target_dir, conf_thres, frame_filter, mask_black_bg, mask_white_bg, show_cam, mask_sky, prediction_mode, is_example
-):
-    """
-    Reload saved predictions from npz, create (or reuse) the GLB for new parameters,
-    and return it for the 3D viewer. If is_example == "True", skip.
-    """
-
-    # If it's an example click, skip as requested
-    if is_example == "True":
-        return None, "No reconstruction available. Please click the Reconstruct button first."
-
-    if not target_dir or target_dir == "None" or not os.path.isdir(target_dir):
-        return None, "No reconstruction available. Please click the Reconstruct button first."
-
-    predictions_path = os.path.join(target_dir, "predictions.npz")
-    if not os.path.exists(predictions_path):
-        return None, f"No reconstruction available at {predictions_path}. Please run 'Reconstruct' first."
-
-    key_list = [
-        "pose_enc",
-        "depth",
-        "depth_conf",
-        "world_points",
-        "world_points_conf",
-        "images",
-        "extrinsic",
-        "intrinsic",
-        "world_points_from_depth",
-    ]
-
-    loaded = np.load(predictions_path)
-    predictions = {key: np.array(loaded[key]) for key in key_list}
-
-    glbfile = os.path.join(
-        target_dir,
-        f"glbscene_{conf_thres}_{frame_filter.replace('.', '_').replace(':', '').replace(' ', '_')}_maskb{mask_black_bg}_maskw{mask_white_bg}_cam{show_cam}_sky{mask_sky}_pred{prediction_mode.replace(' ', '_')}.glb",
-    )
-
-    if not os.path.exists(glbfile):
-        glbscene = predictions_to_glb(
-            predictions,
-            conf_thres=conf_thres,
-            filter_by_frames=frame_filter,
-            mask_black_bg=mask_black_bg,
-            mask_white_bg=mask_white_bg,
-            show_cam=show_cam,
-            mask_sky=mask_sky,
-            target_dir=target_dir,
-            prediction_mode=prediction_mode,
-        )
-        glbscene.export(file_obj=glbfile)
-
-    return glbfile, "Updating Visualization"
-
-
-# -------------------------------------------------------------------------
-# Example images
-# -------------------------------------------------------------------------
-
-great_wall_video = "examples/videos/great_wall.mp4"
-colosseum_video = "examples/videos/Colosseum.mp4"
-room_video = "examples/videos/room.mp4"
-kitchen_video = "examples/videos/kitchen.mp4"
-fern_video = "examples/videos/fern.mp4"
-single_cartoon_video = "examples/videos/single_cartoon.mp4"
-single_oil_painting_video = "examples/videos/single_oil_painting.mp4"
-pyramid_video = "examples/videos/pyramid.mp4"
-
-
-# -------------------------------------------------------------------------
-# 6) Build Gradio UI
-# -------------------------------------------------------------------------
 theme = gr.themes.Ocean()
-theme.set(
-    checkbox_label_background_fill_selected="*button_primary_background_fill",
-    checkbox_label_text_color_selected="*button_primary_text_color",
-)
 
-with gr.Blocks(
-    theme=theme,
-    css="""
-    .custom-log * {
-        font-style: italic;
-        font-size: 22px !important;
-        background-image: linear-gradient(120deg, #0ea5e9 0%, #6ee7b7 60%, #34d399 100%);
-        -webkit-background-clip: text;
-        background-clip: text;
-        font-weight: bold !important;
-        color: transparent !important;
-        text-align: center !important;
-    }
-    
-    .example-log * {
-        font-style: italic;
-        font-size: 16px !important;
-        background-image: linear-gradient(120deg, #0ea5e9 0%, #6ee7b7 60%, #34d399 100%);
-        -webkit-background-clip: text;
-        background-clip: text;
-        color: transparent !important;
-    }
-    
-    #my_radio .wrap {
-        display: flex;
-        flex-wrap: nowrap;
-        justify-content: center;
-        align-items: center;
-    }
-
-    #my_radio .wrap label {
-        display: flex;
-        width: 50%;
-        justify-content: center;
-        align-items: center;
-        margin: 0;
-        padding: 10px 0;
-        box-sizing: border-box;
-    }
-    """,
-) as demo:
-    # Instead of gr.State, we use a hidden Textbox:
-    is_example = gr.Textbox(label="is_example", visible=False, value="None")
-    num_images = gr.Textbox(label="num_images", visible=False, value="None")
-
+with gr.Blocks(theme=theme) as demo:
     gr.HTML(
         """
-    <h1>🏛️ VGGT: Visual Geometry Grounded Transformer</h1>
-    <p>
-    <a href="https://github.com/facebookresearch/vggt">🐙 GitHub Repository</a> |
-    <a href="#">Project Page</a>
-    </p>
-
-    <div style="font-size: 16px; line-height: 1.5;">
-    <p>Upload a video or a set of images to create a 3D reconstruction of a scene or object. VGGT takes these images and generates a 3D point cloud, along with estimated camera poses.</p>
-
-    <h3>Getting Started:</h3>
-    <ol>
-        <li><strong>Upload Your Data:</strong> Use the "Upload Video" or "Upload Images" buttons on the left to provide your input. Videos will be automatically split into individual frames (one frame per second).</li>
-        <li><strong>Preview:</strong> Your uploaded images will appear in the gallery on the left.</li>
-        <li><strong>Reconstruct:</strong> Click the "Reconstruct" button to start the 3D reconstruction process.</li>
-        <li><strong>Visualize:</strong> The 3D reconstruction will appear in the viewer on the right. You can rotate, pan, and zoom to explore the model, and download the GLB file. Note the visualization of 3D points may be slow for a large number of input images.</li>
-        <li>
-        <strong>Adjust Visualization (Optional):</strong>
-        After reconstruction, you can fine-tune the visualization using the options below
-        <details style="display:inline;">
-            <summary style="display:inline;">(<strong>click to expand</strong>):</summary>
-            <ul>
-            <li><em>Confidence Threshold:</em> Adjust the filtering of points based on confidence.</li>
-            <li><em>Show Points from Frame:</em> Select specific frames to display in the point cloud.</li>
-            <li><em>Show Camera:</em> Toggle the display of estimated camera positions.</li>
-            <li><em>Filter Sky / Filter Black Background:</em> Remove sky or black-background points.</li>
-            <li><em>Select a Prediction Mode:</em> Choose between "Depthmap and Camera Branch" or "Pointmap Branch."</li>
-            </ul>
-        </details>
-        </li>
-    </ol>
-    <p><strong style="color: #0ea5e9;">Please note:</strong> <span style="color: #0ea5e9; font-weight: bold;">VGGT typically reconstructs a scene in less than 1 second. However, visualizing 3D points may take tens of seconds due to third-party rendering, which are independent of VGGT's processing time. </span></p>
-    </div>
-    """
+        <h1>VGGT Object Pose Evaluation</h1>
+        <p>Select a dataset run and object. The demo uses fixed scene views <code>(1, 3, 8, 12, 15, 18)</code>,
+        samples 4 object reference images from <code>object_space_rgb</code>, runs pose inference, compares against GT from <code>out_pose</code>,
+        and also projects the predicted object point cloud back to the fixed scene images using <code>out_cam_param</code>.</p>
+        """
     )
-
-    target_dir_output = gr.Textbox(label="Target Dir", visible=False, value="None")
 
     with gr.Row():
+        with gr.Column(scale=1):
+            run_dropdown = gr.Dropdown(choices=RUN_CHOICES, label="Run", value=RUN_CHOICES[0] if RUN_CHOICES else None)
+            object_dropdown = gr.Dropdown(choices=[], label="Object", value=None)
+            seed_input = gr.Number(label="Random Seed For 4 Object Views", value=42, precision=0)
+            object_view_indices_input = gr.Textbox(label="Object View Indices", value="", placeholder="e.g. 1, 3, 8, 12")
+            refresh_btn = gr.Button("Resample Object Views")
+            generate_btn = gr.Button("Generate", variant="primary")
+            clear_btn = gr.Button("Clear Output")
+            log_output = gr.Markdown("Select a run and object, then click Generate.")
         with gr.Column(scale=2):
-            input_video = gr.Video(label="Upload Video", interactive=True)
-            input_images = gr.File(file_count="multiple", label="Upload Images", interactive=True)
+            with gr.Tabs():
+                with gr.Tab("Input Views"):
+                    scene_gallery = gr.Gallery(label="Scene Fixed Views", columns=3, height="520px", object_fit="contain")
+                    object_gallery = gr.Gallery(label="Sampled Object Views", columns=4, height="260px", object_fit="contain")
+                with gr.Tab("Projection"):
+                    projection_gallery = gr.Gallery(label="Pred Point Cloud Projection", columns=3, height="320px", object_fit="contain")
+                    projection_viewer = gr.Image(label="Projection Viewer", height=900, interactive=False)
+                with gr.Tab("Bounding Box"):
+                    bbox_gallery = gr.Gallery(label="Pred Bounding Box Projection", columns=3, height="320px", object_fit="contain")
+                    bbox_viewer = gr.Image(label="Bounding Box Viewer", height=900, interactive=False)
 
-            image_gallery = gr.Gallery(
-                label="Preview",
-                columns=4,
-                height="300px",
-                show_download_button=True,
-                object_fit="contain",
-                preview=True,
-            )
-
-        with gr.Column(scale=4):
-            with gr.Column():
-                gr.Markdown("**3D Reconstruction (Point Cloud and Camera Poses)**")
-                log_output = gr.Markdown(
-                    "Please upload a video or images, then click Reconstruct.", elem_classes=["custom-log"]
-                )
-                reconstruction_output = gr.Model3D(height=520, zoom_speed=0.5, pan_speed=0.5)
-
-            with gr.Row():
-                submit_btn = gr.Button("Reconstruct", scale=1, variant="primary")
-                clear_btn = gr.ClearButton(
-                    [input_video, input_images, reconstruction_output, log_output, target_dir_output, image_gallery],
-                    scale=1,
-                )
-
-            with gr.Row():
-                prediction_mode = gr.Radio(
-                    ["Depthmap and Camera Branch", "Pointmap Branch"],
-                    label="Select a Prediction Mode",
-                    value="Depthmap and Camera Branch",
-                    scale=1,
-                    elem_id="my_radio",
-                )
-
-            with gr.Row():
-                conf_thres = gr.Slider(minimum=0, maximum=100, value=50, step=0.1, label="Confidence Threshold (%)")
-                frame_filter = gr.Dropdown(choices=["All"], value="All", label="Show Points from Frame")
-                with gr.Column():
-                    show_cam = gr.Checkbox(label="Show Camera", value=True)
-                    mask_sky = gr.Checkbox(label="Filter Sky", value=False)
-                    mask_black_bg = gr.Checkbox(label="Filter Black Background", value=False)
-                    mask_white_bg = gr.Checkbox(label="Filter White Background", value=False)
-
-    # ---------------------- Examples section ----------------------
-    examples = [
-        [colosseum_video, "22", None, 20.0, False, False, True, False, "Depthmap and Camera Branch", "True"],
-        [pyramid_video, "30", None, 35.0, False, False, True, False, "Depthmap and Camera Branch", "True"],
-        [single_cartoon_video, "1", None, 15.0, False, False, True, False, "Depthmap and Camera Branch", "True"],
-        [single_oil_painting_video, "1", None, 20.0, False, False, True, True, "Depthmap and Camera Branch", "True"],
-        [room_video, "8", None, 5.0, False, False, True, False, "Depthmap and Camera Branch", "True"],
-        [kitchen_video, "25", None, 50.0, False, False, True, False, "Depthmap and Camera Branch", "True"],
-        [fern_video, "20", None, 45.0, False, False, True, False, "Depthmap and Camera Branch", "True"],
-    ]
-
-    def example_pipeline(
-        input_video,
-        num_images_str,
-        input_images,
-        conf_thres,
-        mask_black_bg,
-        mask_white_bg,
-        show_cam,
-        mask_sky,
-        prediction_mode,
-        is_example_str,
-    ):
-        """
-        1) Copy example images to new target_dir
-        2) Reconstruct
-        3) Return model3D + logs + new_dir + updated dropdown + gallery
-        We do NOT return is_example. It's just an input.
-        """
-        target_dir, image_paths = handle_uploads(input_video, input_images)
-        # Always use "All" for frame_filter in examples
-        frame_filter = "All"
-        glbfile, log_msg, dropdown = gradio_demo(
-            target_dir, conf_thres, frame_filter, mask_black_bg, mask_white_bg, show_cam, mask_sky, prediction_mode
-        )
-        return glbfile, log_msg, target_dir, dropdown, image_paths
-
-    gr.Markdown("Click any row to load an example.", elem_classes=["example-log"])
-
-    gr.Examples(
-        examples=examples,
-        inputs=[
-            input_video,
-            num_images,
-            input_images,
-            conf_thres,
-            mask_black_bg,
-            mask_white_bg,
-            show_cam,
-            mask_sky,
-            prediction_mode,
-            is_example,
-        ],
-        outputs=[reconstruction_output, log_output, target_dir_output, frame_filter, image_gallery],
-        fn=example_pipeline,
-        cache_examples=False,
-        examples_per_page=50,
+    demo.load(
+        fn=lambda: describe_selection(RUN_CHOICES[0], None, 42, "") if RUN_CHOICES else (gr.update(choices=[], value=None), [], [], "", "No runs found.", [], None, [], None),
+        inputs=[],
+        outputs=[object_dropdown, scene_gallery, object_gallery, object_view_indices_input, log_output, projection_gallery, projection_viewer, bbox_gallery, bbox_viewer],
     )
 
-    # -------------------------------------------------------------------------
-    # "Reconstruct" button logic:
-    #  - Clear fields
-    #  - Update log
-    #  - gradio_demo(...) with the existing target_dir
-    #  - Then set is_example = "False"
-    # -------------------------------------------------------------------------
-    submit_btn.click(fn=clear_fields, inputs=[], outputs=[reconstruction_output]).then(
-        fn=update_log, inputs=[], outputs=[log_output]
-    ).then(
-        fn=gradio_demo,
-        inputs=[
-            target_dir_output,
-            conf_thres,
-            frame_filter,
-            mask_black_bg,
-            mask_white_bg,
-            show_cam,
-            mask_sky,
-            prediction_mode,
-        ],
-        outputs=[reconstruction_output, log_output, frame_filter],
-    ).then(
-        fn=lambda: "False", inputs=[], outputs=[is_example]  # set is_example to "False"
+    run_dropdown.change(
+        fn=refresh_from_run,
+        inputs=[run_dropdown, seed_input, object_view_indices_input],
+        outputs=[object_dropdown, scene_gallery, object_gallery, object_view_indices_input, log_output, projection_gallery, projection_viewer, bbox_gallery, bbox_viewer],
     )
-
-    # -------------------------------------------------------------------------
-    # Real-time Visualization Updates
-    # -------------------------------------------------------------------------
-    conf_thres.change(
-        update_visualization,
-        [
-            target_dir_output,
-            conf_thres,
-            frame_filter,
-            mask_black_bg,
-            mask_white_bg,
-            show_cam,
-            mask_sky,
-            prediction_mode,
-            is_example,
-        ],
-        [reconstruction_output, log_output],
+    object_dropdown.change(
+        fn=refresh_from_object,
+        inputs=[run_dropdown, object_dropdown, seed_input, object_view_indices_input],
+        outputs=[object_dropdown, scene_gallery, object_gallery, object_view_indices_input, log_output, projection_gallery, projection_viewer, bbox_gallery, bbox_viewer],
     )
-    frame_filter.change(
-        update_visualization,
-        [
-            target_dir_output,
-            conf_thres,
-            frame_filter,
-            mask_black_bg,
-            mask_white_bg,
-            show_cam,
-            mask_sky,
-            prediction_mode,
-            is_example,
-        ],
-        [reconstruction_output, log_output],
+    seed_input.change(
+        fn=refresh_from_seed,
+        inputs=[run_dropdown, object_dropdown, seed_input, object_view_indices_input],
+        outputs=[object_dropdown, scene_gallery, object_gallery, object_view_indices_input, log_output, projection_gallery, projection_viewer, bbox_gallery, bbox_viewer],
     )
-    mask_black_bg.change(
-        update_visualization,
-        [
-            target_dir_output,
-            conf_thres,
-            frame_filter,
-            mask_black_bg,
-            mask_white_bg,
-            show_cam,
-            mask_sky,
-            prediction_mode,
-            is_example,
-        ],
-        [reconstruction_output, log_output],
+    refresh_btn.click(
+        fn=lambda run_name, object_name, seed: describe_selection(run_name, object_name, seed, ""),
+        inputs=[run_dropdown, object_dropdown, seed_input],
+        outputs=[object_dropdown, scene_gallery, object_gallery, object_view_indices_input, log_output, projection_gallery, projection_viewer, bbox_gallery, bbox_viewer],
     )
-    mask_white_bg.change(
-        update_visualization,
-        [
-            target_dir_output,
-            conf_thres,
-            frame_filter,
-            mask_black_bg,
-            mask_white_bg,
-            show_cam,
-            mask_sky,
-            prediction_mode,
-            is_example,
-        ],
-        [reconstruction_output, log_output],
+    generate_btn.click(
+        fn=run_inference,
+        inputs=[run_dropdown, object_dropdown, seed_input, object_view_indices_input],
+        outputs=[log_output, scene_gallery, object_gallery, object_view_indices_input, projection_gallery, projection_viewer, bbox_gallery, bbox_viewer],
     )
-    show_cam.change(
-        update_visualization,
-        [
-            target_dir_output,
-            conf_thres,
-            frame_filter,
-            mask_black_bg,
-            mask_white_bg,
-            show_cam,
-            mask_sky,
-            prediction_mode,
-            is_example,
-        ],
-        [reconstruction_output, log_output],
+    clear_btn.click(
+        fn=clear_outputs,
+        inputs=[],
+        outputs=[log_output, projection_gallery, projection_viewer, bbox_gallery, bbox_viewer],
     )
-    mask_sky.change(
-        update_visualization,
-        [
-            target_dir_output,
-            conf_thres,
-            frame_filter,
-            mask_black_bg,
-            mask_white_bg,
-            show_cam,
-            mask_sky,
-            prediction_mode,
-            is_example,
-        ],
-        [reconstruction_output, log_output],
+    projection_gallery.select(
+        fn=select_gallery_image,
+        inputs=[projection_gallery],
+        outputs=[projection_viewer],
     )
-    prediction_mode.change(
-        update_visualization,
-        [
-            target_dir_output,
-            conf_thres,
-            frame_filter,
-            mask_black_bg,
-            mask_white_bg,
-            show_cam,
-            mask_sky,
-            prediction_mode,
-            is_example,
-        ],
-        [reconstruction_output, log_output],
-    )
-
-    # -------------------------------------------------------------------------
-    # Auto-update gallery whenever user uploads or changes their files
-    # -------------------------------------------------------------------------
-    input_video.change(
-        fn=update_gallery_on_upload,
-        inputs=[input_video, input_images],
-        outputs=[reconstruction_output, target_dir_output, image_gallery, log_output],
-    )
-    input_images.change(
-        fn=update_gallery_on_upload,
-        inputs=[input_video, input_images],
-        outputs=[reconstruction_output, target_dir_output, image_gallery, log_output],
+    bbox_gallery.select(
+        fn=select_gallery_image,
+        inputs=[bbox_gallery],
+        outputs=[bbox_viewer],
     )
 
     demo.queue(max_size=20).launch(show_error=True, share=True)

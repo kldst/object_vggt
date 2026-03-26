@@ -204,6 +204,10 @@ class Trainer:
         """Loads a checkpoint from the given path to resume training."""
         logging.info(f"Resuming training from {ckpt_path} (rank {self.rank})")
 
+        load_optimizer_state = bool(getattr(self.checkpoint_conf, "load_optimizer_state", True))
+        load_training_state = bool(getattr(self.checkpoint_conf, "load_training_state", True))
+        load_scaler_state = bool(getattr(self.checkpoint_conf, "load_scaler_state", load_optimizer_state))
+
         with g_pathmgr.open(ckpt_path, "rb") as f:
             checkpoint = torch.load(f, map_location="cpu")
         
@@ -216,19 +220,48 @@ class Trainer:
             logging.info(f"Model state loaded. Missing keys: {missing or 'None'}. Unexpected keys: {unexpected or 'None'}.")
 
         # Load optimizer state if available and in training mode
-        if "optimizer" in checkpoint:
+        if load_optimizer_state and "optimizer" in checkpoint:
             logging.info(f"Loading optimizer state dict (rank {self.rank})")
-            self.optims.optimizer.load_state_dict(checkpoint["optimizer"])
+            optimizer_state = checkpoint["optimizer"]
+            if not isinstance(self.optims, (list, tuple)):
+                raise TypeError(
+                    f"Expected self.optims to be a list/tuple of optimizer wrappers, got {type(self.optims).__name__}."
+                )
+
+            if isinstance(optimizer_state, list):
+                if len(optimizer_state) != len(self.optims):
+                    raise ValueError(
+                        "Checkpoint optimizer state count does not match constructed optimizers: "
+                        f"{len(optimizer_state)} != {len(self.optims)}"
+                    )
+                for optim_wrapper, state_dict in zip(self.optims, optimizer_state):
+                    optim_wrapper.optimizer.load_state_dict(state_dict)
+            else:
+                if len(self.optims) != 1:
+                    raise ValueError(
+                        "Checkpoint contains a single optimizer state dict, but the trainer constructed "
+                        f"{len(self.optims)} optimizers."
+                    )
+                self.optims[0].optimizer.load_state_dict(optimizer_state)
+        elif "optimizer" in checkpoint:
+            logging.info("Skipping optimizer state load; optimizer hyperparameters will follow the current config.")
 
         # Load training progress
-        if "epoch" in checkpoint:
-            self.epoch = checkpoint["epoch"]
-        self.steps = checkpoint["steps"] if "steps" in checkpoint else {"train": 0, "val": 0}
-        self.ckpt_time_elapsed = checkpoint.get("time_elapsed", 0)
+        if load_training_state:
+            if "epoch" in checkpoint:
+                self.epoch = checkpoint["epoch"]
+            elif "prev_epoch" in checkpoint:
+                self.epoch = checkpoint["prev_epoch"]
+            self.steps = checkpoint["steps"] if "steps" in checkpoint else {"train": 0, "val": 0}
+            self.ckpt_time_elapsed = checkpoint.get("time_elapsed", 0)
+        else:
+            logging.info("Skipping training progress load; epoch, steps, and timers will start from the current config.")
 
         # Load AMP scaler state if available
-        if self.optim_conf.amp.enabled and "scaler" in checkpoint:
+        if self.optim_conf.amp.enabled and load_scaler_state and "scaler" in checkpoint:
             self.scaler.load_state_dict(checkpoint["scaler"])
+        elif self.optim_conf.amp.enabled and "scaler" in checkpoint and not load_scaler_state:
+            logging.info("Skipping AMP scaler state load; scaler will be freshly initialized.")
 
     def _setup_device(self, device: str):
         """Sets up the device for training (CPU or CUDA)."""
@@ -251,6 +284,8 @@ class Trainer:
         self.tb_writer = instantiate(self.logging_conf.tensorboard_writer, _recursive_=False)
         self.model = instantiate(self.model_conf, _recursive_=False)
         self.loss = instantiate(self.loss_conf, _recursive_=False)
+        if hasattr(self.loss, "debug_force_model_output_to_ground_truth"):
+            self.loss.debug_force_model_output_to_ground_truth = self.force_model_output_to_ground_truth
         self.gradient_clipper = instantiate(self.optim_conf.gradient_clip)
         self.scaler = torch.cuda.amp.GradScaler(enabled=self.optim_conf.amp.enabled)
 
@@ -746,7 +781,7 @@ class Trainer:
         """
         tensor_keys = [
             "images", "depths", "extrinsics", "intrinsics", 
-            "cam_points", "world_points", "point_masks", 
+            "cam_points", "world_points", "point_masks", "object_masks",
         ]        
         string_keys = ["seq_name"]
         
@@ -799,7 +834,10 @@ class Trainer:
             A dictionary containing the computed losses.
         """
         # Forward pass
-        y_hat = model(images=batch["images"])
+        y_hat = model(
+            scene_images=batch["images"],
+            object_images=batch.get("object_images"),
+        )
         if self.force_model_output_to_ground_truth:
             y_hat = self._override_predictions_with_ground_truth(y_hat, batch, phase)
         

@@ -110,17 +110,34 @@ class ComposedDataset(Dataset, ABC):
         images = torch.from_numpy(np.stack(batch["images"]).astype(np.float32)).contiguous()
         # Normalize images from [0, 255] to [0, 1]
         images = images.permute(0,3,1,2).to(torch.get_default_dtype()).div(255)
+        object_images = None
+        if "object_images" in batch:
+            object_images = torch.from_numpy(np.stack(batch["object_images"]).astype(np.float32)).contiguous()
+            object_images = object_images.permute(0, 3, 1, 2).to(torch.get_default_dtype()).div(255)
 
         # Convert other data to tensors with appropriate types
-        depths = torch.from_numpy(np.stack(batch["depths"]).astype(np.float32))
         extrinsics = torch.from_numpy(np.stack(batch["extrinsics"]).astype(np.float32))
         intrinsics = torch.from_numpy(np.stack(batch["intrinsics"]).astype(np.float32))
-        cam_points = torch.from_numpy(np.stack(batch["cam_points"]).astype(np.float32))
-        world_points = torch.from_numpy(np.stack(batch["world_points"]).astype(np.float32))
+        depths = None
+        cam_points = None
+        world_points = None
+        point_masks = None
+        object_masks = None
+        if "depths" in batch:
+            depths = torch.from_numpy(np.stack(batch["depths"]).astype(np.float32))
+        if "cam_points" in batch:
+            cam_points = torch.from_numpy(np.stack(batch["cam_points"]).astype(np.float32))
+        if "world_points" in batch:
+            world_points = torch.from_numpy(np.stack(batch["world_points"]).astype(np.float32))
         if self.map_xyz_bfloat16:
-            cam_points = cam_points.to(torch.bfloat16)
-            world_points = world_points.to(torch.bfloat16)
-        point_masks = torch.from_numpy(np.stack(batch["point_masks"])) # Mask indicating valid depths / world points / cam points per frame
+            if cam_points is not None:
+                cam_points = cam_points.to(torch.bfloat16)
+            if world_points is not None:
+                world_points = world_points.to(torch.bfloat16)
+        if "point_masks" in batch:
+            point_masks = torch.from_numpy(np.stack(batch["point_masks"])) # Mask indicating valid depths / world points / cam points per frame
+        if "object_masks" in batch:
+            object_masks = torch.from_numpy(np.stack(batch["object_masks"]).astype(bool))
         ids = torch.from_numpy(batch["ids"])    # Frame indices sampled from the original sequence
 
 
@@ -140,13 +157,21 @@ class ComposedDataset(Dataset, ABC):
             "seq_name": seq_name,
             "ids": ids,
             "images": images,
-            "depths": depths,
             "extrinsics": extrinsics,
             "intrinsics": intrinsics,
-            "cam_points": cam_points,
-            "world_points": world_points,
-            "point_masks": point_masks,
         }
+        if depths is not None:
+            sample["depths"] = depths
+        if cam_points is not None:
+            sample["cam_points"] = cam_points
+        if world_points is not None:
+            sample["world_points"] = world_points
+        if point_masks is not None:
+            sample["point_masks"] = point_masks
+        if object_masks is not None:
+            sample["object_masks"] = object_masks
+        if object_images is not None:
+            sample["object_images"] = object_images
 
         # Optional fields for custom datasets (e.g. 6d pose training).
         optional_float_array_keys = [
@@ -154,7 +179,10 @@ class ComposedDataset(Dataset, ABC):
         ]
         for key in optional_float_array_keys:
             if key in batch:
-                sample[key] = torch.from_numpy(np.asarray(batch[key]).astype(np.float32))
+                if torch.is_tensor(batch[key]):
+                    sample[key] = batch[key]
+                else:
+                    sample[key] = torch.from_numpy(np.asarray(batch[key]).astype(np.float32))
 
         optional_int_array_keys = ["camera_indices"]
         for key in optional_int_array_keys:

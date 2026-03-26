@@ -24,7 +24,18 @@ class MultitaskLoss(torch.nn.Module):
     - Point loss
     - Tracking loss (not cleaned yet, dirty code is at the bottom of this file)
     """
-    def __init__(self, camera=None, depth=None, point=None, track=None, object_point=None, object_srt=None, **kwargs):
+    def __init__(
+        self,
+        camera=None,
+        depth=None,
+        point=None,
+        track=None,
+        object_point=None,
+        object_mask=None,
+        object_srt=None,
+        debug_force_model_output_to_ground_truth=False,
+        **kwargs,
+    ):
         super().__init__()
         # Loss configuration dictionaries for each task
         self.camera = camera
@@ -32,7 +43,9 @@ class MultitaskLoss(torch.nn.Module):
         self.point = point
         self.track = track
         self.object_point = object_point
+        self.object_mask = object_mask
         self.object_srt = object_srt
+        self.debug_force_model_output_to_ground_truth = bool(debug_force_model_output_to_ground_truth)
 
     def forward(self, predictions, batch) -> torch.Tensor:
         """
@@ -73,7 +86,12 @@ class MultitaskLoss(torch.nn.Module):
 
         # Object-space point reconstruction loss
         if "object_points" in predictions and self.object_point is not None:
-            object_point_loss_dict = compute_object_point_loss(predictions, batch, **self.object_point)
+            object_point_loss_dict = compute_object_point_loss(
+                predictions,
+                batch,
+                debug_force_model_output_to_ground_truth=self.debug_force_model_output_to_ground_truth,
+                **self.object_point,
+            )
             object_point_loss = (
                 object_point_loss_dict["loss_conf_object_point"]
                 + object_point_loss_dict["loss_reg_object_point"]
@@ -83,13 +101,27 @@ class MultitaskLoss(torch.nn.Module):
             total_loss = total_loss + object_point_loss
             loss_dict.update(object_point_loss_dict)
 
+        if "object_mask_logits" in predictions and self.object_mask is not None:
+            object_mask_loss_dict = compute_object_mask_loss(
+                predictions,
+                batch,
+                **self.object_mask,
+            )
+            total_loss = total_loss + object_mask_loss_dict["loss_object_mask"] * self.object_mask["weight"]
+            loss_dict.update(object_mask_loss_dict)
+
         # Tracking loss - not cleaned yet, dirty code is at the bottom of this file
         if "track" in predictions:
             raise NotImplementedError("Track loss is not cleaned up yet")
 
         # 6D object SRT loss
         if "object_pose" in predictions and self.object_srt is not None:
-            object_srt_loss_dict = compute_object_srt_loss(predictions, batch, **self.object_srt)
+            object_srt_loss_dict = compute_object_srt_loss(
+                predictions,
+                batch,
+                debug_force_model_output_to_ground_truth=self.debug_force_model_output_to_ground_truth,
+                **self.object_srt,
+            )
             total_loss = total_loss + object_srt_loss_dict["loss_object_srt"] * self.object_srt["weight"]
             loss_dict.update(object_srt_loss_dict)
         
@@ -119,9 +151,9 @@ def compute_object_srt_loss(
     batch,
     loss_type="l1",
     weight_pose=1.0,
-    weight_scale=1.0,
     weight_translation=1.0,
     init_w=1.0,
+    debug_force_model_output_to_ground_truth=False,
     **kwargs,
 ):
     """
@@ -129,32 +161,34 @@ def compute_object_srt_loss(
 
     Required prediction keys:
       - object_pose: (B, 6)
-      - object_scale: (B, 1) or (B,)
       - object_translation: (B, 3)
     Optional prediction key:
       - pred_pose_0: (B, 6), first-step pose for init supervision
 
     Required batch keys:
       - object_rotation: (B, 3, 3)
-      - object_scale: (B, 1) or (B,)
       - object_translation: (B, 3)
     Optional batch key:
       - has_object: (B,) bool mask
     """
     pred_pose = predictions["object_pose"]
-    pred_scale = predictions["object_scale"]
     pred_translation = predictions["object_translation"]
     pred_pose_0 = predictions.get("pred_pose_0", None)
 
     gt_rot = batch["object_rotation"]
     gt_pose = _rotation_matrix_to_rot6d(gt_rot)
-    gt_scale = batch["object_scale"]
     gt_translation = batch["object_translation"]
 
-    if gt_scale.dim() == 1:
-        gt_scale = gt_scale.unsqueeze(-1)
-    if pred_scale.dim() == 1:
-        pred_scale = pred_scale.unsqueeze(-1)
+    if debug_force_model_output_to_ground_truth and not getattr(
+        compute_object_srt_loss, "_dtype_logged_once", False
+    ):
+        print(
+            "[DebugDType][object_srt] "
+            f"pred_pose={pred_pose.dtype}, gt_pose={gt_pose.dtype}, "
+            f"pred_translation={pred_translation.dtype}, gt_translation={gt_translation.dtype}",
+            flush=True,
+        )
+        compute_object_srt_loss._dtype_logged_once = True
 
     has_object = batch.get("has_object", None)
     if has_object is not None:
@@ -164,21 +198,17 @@ def compute_object_srt_loss(
             return {
                 "loss_object_srt": dummy,
                 "loss_object_pose": dummy,
-                "loss_object_scale": dummy,
                 "loss_object_translation": dummy,
                 "loss_object_pose_init": dummy,
             }
         pred_pose = pred_pose[valid_mask]
-        pred_scale = pred_scale[valid_mask]
         pred_translation = pred_translation[valid_mask]
         gt_pose = gt_pose[valid_mask]
-        gt_scale = gt_scale[valid_mask]
         gt_translation = gt_translation[valid_mask]
         if pred_pose_0 is not None:
             pred_pose_0 = pred_pose_0[valid_mask]
 
     loss_pose = _vector_loss(pred_pose, gt_pose, loss_type=loss_type)
-    loss_scale = _vector_loss(pred_scale, gt_scale, loss_type=loss_type)
     loss_translation = _vector_loss(pred_translation, gt_translation, loss_type=loss_type)
 
     if pred_pose_0 is not None:
@@ -188,7 +218,6 @@ def compute_object_srt_loss(
 
     total = (
         weight_pose * loss_pose
-        + weight_scale * loss_scale
         + weight_translation * loss_translation
         + float(init_w) * loss_pose_init
     )
@@ -196,9 +225,64 @@ def compute_object_srt_loss(
     return {
         "loss_object_srt": total,
         "loss_object_pose": loss_pose,
-        "loss_object_scale": loss_scale,
         "loss_object_translation": loss_translation,
         "loss_object_pose_init": loss_pose_init,
+    }
+
+
+def compute_object_mask_loss(
+    predictions,
+    batch,
+    bce_weight=1.0,
+    dice_weight=1.0,
+    pos_weight=1.0,
+    eps=1e-6,
+    **kwargs,
+):
+    pred_logits = predictions["object_mask_logits"]
+    gt_mask = batch.get("object_masks", batch.get("point_masks"))
+    if gt_mask is None:
+        dummy = (pred_logits * 0).mean()
+        return {
+            "loss_object_mask": dummy,
+            "loss_object_mask_bce": dummy,
+            "loss_object_mask_dice": dummy,
+        }
+
+    gt_mask = gt_mask.to(dtype=pred_logits.dtype)
+    if gt_mask.shape != pred_logits.shape:
+        raise ValueError(
+            f"object mask shape mismatch: pred={tuple(pred_logits.shape)} gt={tuple(gt_mask.shape)}"
+        )
+
+    has_object = batch.get("has_object", None)
+    if has_object is not None:
+        valid_mask = has_object.bool()
+        if valid_mask.sum() == 0:
+            dummy = (pred_logits * 0).mean()
+            return {
+                "loss_object_mask": dummy,
+                "loss_object_mask_bce": dummy,
+                "loss_object_mask_dice": dummy,
+            }
+        pred_logits = pred_logits[valid_mask]
+        gt_mask = gt_mask[valid_mask]
+
+    pos_weight_tensor = torch.as_tensor(float(pos_weight), device=pred_logits.device, dtype=pred_logits.dtype)
+    loss_bce = F.binary_cross_entropy_with_logits(pred_logits, gt_mask, pos_weight=pos_weight_tensor)
+
+    pred_prob = torch.sigmoid(pred_logits)
+    reduce_dims = tuple(range(1, pred_prob.dim()))
+    intersection = (pred_prob * gt_mask).sum(dim=reduce_dims)
+    union = pred_prob.sum(dim=reduce_dims) + gt_mask.sum(dim=reduce_dims)
+    loss_dice = 1.0 - ((2.0 * intersection + eps) / (union + eps))
+    loss_dice = loss_dice.mean()
+
+    total = float(bce_weight) * loss_bce + float(dice_weight) * loss_dice
+    return {
+        "loss_object_mask": total,
+        "loss_object_mask_bce": loss_bce,
+        "loss_object_mask_dice": loss_dice,
     }
 
 
@@ -409,6 +493,7 @@ def compute_object_point_loss(
     alpha=0.2,
     gradient_loss_fn=None,
     valid_range=-1,
+    debug_force_model_output_to_ground_truth=False,
     **kwargs,
 ):
     """
@@ -424,6 +509,17 @@ def compute_object_point_loss(
     gt_points_mask = batch["point_masks"]
 
     gt_points = check_and_fix_inf_nan(gt_points_raw, "gt_object_points", 1000)
+
+    if debug_force_model_output_to_ground_truth and not getattr(
+        compute_object_point_loss, "_dtype_logged_once", False
+    ):
+        print(
+            "[DebugDType][object_point] "
+            f"pred_points={pred_points.dtype}, gt_points={gt_points.dtype}, "
+            f"pred_points_conf={pred_points_conf.dtype}, mask={gt_points_mask.dtype}",
+            flush=True,
+        )
+        compute_object_point_loss._dtype_logged_once = True
 
     # Debug diagnostics for GT-vs-pred mismatch after check_and_fix_inf_nan().
 

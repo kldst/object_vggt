@@ -12,16 +12,55 @@ from vggt.models.aggregator import Aggregator
 from vggt.heads.camera_head import CameraHead
 from vggt.heads.dpt_head import DPTHead
 from vggt.heads.obj_dpt_head import OBJ_DPTHead
+from vggt.heads.object_mask_head import ObjectMaskHead
 from vggt.heads.track_head import TrackHead
 from vggt.heads.object_pose_head import ObjectPoseHead
+
+class ObjectTokenCrossAttentionBlock(nn.Module):
+    def __init__(self, query_dim: int, context_dim: int, num_heads: int, mlp_ratio: float = 4.0):
+        super().__init__()
+        self.query_norm = nn.LayerNorm(query_dim)
+        self.context_norm = nn.LayerNorm(context_dim)
+        self.cross_attn = nn.MultiheadAttention(
+            embed_dim=query_dim,
+            num_heads=num_heads,
+            kdim=context_dim,
+            vdim=context_dim,
+            batch_first=True,
+        )
+        hidden_dim = int(query_dim * mlp_ratio)
+        self.mlp_norm = nn.LayerNorm(query_dim)
+        self.mlp = nn.Sequential(
+            nn.Linear(query_dim, hidden_dim),
+            nn.GELU(),
+            nn.Linear(hidden_dim, query_dim),
+        )
+
+    def forward(self, query_tokens: torch.Tensor, context_tokens: torch.Tensor) -> torch.Tensor:
+        context_tokens = self.context_norm(context_tokens)
+        attn_out, _ = self.cross_attn(
+            self.query_norm(query_tokens),
+            context_tokens,
+            context_tokens,
+            need_weights=False,
+        )
+        query_tokens = query_tokens + attn_out
+        query_tokens = query_tokens + self.mlp(self.mlp_norm(query_tokens))
+        return query_tokens
+
 
 class VGGT(nn.Module, PyTorchModelHubMixin):
     def __init__(self, img_size=518, patch_size=14, embed_dim=1024,
                  enable_camera=True, enable_point=True, enable_depth=True, enable_track=True,
-                 enable_object_point=True, enable_object_srt=True, use_shared_object_latent=False):
+                 enable_object_point=True, enable_object_mask=False, enable_object_srt=True, use_shared_object_latent=False,
+                 enable_object_cross_attn=True, object_cross_attn_heads=16):
         super().__init__()
 
-        self.aggregator = Aggregator(img_size=img_size, patch_size=patch_size, embed_dim=embed_dim)
+        self.aggregator = Aggregator(
+            img_size=img_size,
+            patch_size=patch_size,
+            embed_dim=embed_dim,
+        )
         self.use_shared_object_latent = bool(use_shared_object_latent)
         self.shared_object_latent = None
         if self.use_shared_object_latent:
@@ -29,11 +68,22 @@ class VGGT(nn.Module, PyTorchModelHubMixin):
             self.shared_object_latent = nn.Parameter(torch.zeros(1, 1, 2 * embed_dim))
             nn.init.normal_(self.shared_object_latent, std=1e-6)
 
+        self.enable_object_cross_attn = bool(enable_object_cross_attn)
+        self.object_token_cross_attn = (
+            ObjectTokenCrossAttentionBlock(
+                query_dim=2 * embed_dim,
+                context_dim=2 * embed_dim,
+                num_heads=object_cross_attn_heads,
+                mlp_ratio=4.0,
+            )
+            if self.enable_object_cross_attn
+            else None
+        )
+
         self.camera_head = CameraHead(dim_in=2 * embed_dim) if enable_camera else None
         self.point_head = DPTHead(dim_in=2 * embed_dim, output_dim=4, activation="inv_log", conf_activation="expp1") if enable_point else None
         self.depth_head = DPTHead(dim_in=2 * embed_dim, output_dim=2, activation="exp", conf_activation="expp1") if enable_depth else None
         self.track_head = TrackHead(dim_in=2 * embed_dim, patch_size=patch_size) if enable_track else None
-        #* 6d pose
         self.object_pt_head = (
             OBJ_DPTHead(
                 dim_in=2 * embed_dim,
@@ -45,15 +95,59 @@ class VGGT(nn.Module, PyTorchModelHubMixin):
             if enable_object_point
             else None
         )
+        self.object_mask_head = (
+            ObjectMaskHead(
+                dim_in=2 * embed_dim,
+                patch_size=patch_size,
+                use_object_latent=self.use_shared_object_latent,
+            )
+            if enable_object_mask
+            else None
+        )
         self.object_srt_head = ObjectPoseHead(dim_in=2 * embed_dim,) if enable_object_srt else None
 
-    def forward(self, images: torch.Tensor, query_points: torch.Tensor = None):
+    def _ensure_batched_images(self, images: torch.Tensor):
+        if images is None:
+            return None
+        if len(images.shape) == 4:
+            images = images.unsqueeze(0)
+        return images
+
+    def _encode_object_tokens(self, object_images: torch.Tensor):
+        object_aggregated_tokens_list, object_patch_start_idx = self.aggregator(object_images)
+        object_tokens = object_aggregated_tokens_list[-1][:, :, object_patch_start_idx:, :]
+        return object_tokens, object_aggregated_tokens_list, object_patch_start_idx
+
+    def _apply_object_cross_attention(self, aggregated_tokens_list, object_patch_tokens, patch_start_idx):
+        if self.object_token_cross_attn is None or object_patch_tokens is None:
+            return aggregated_tokens_list
+
+        B, S_obj, P_obj, C_obj = object_patch_tokens.shape
+        object_context = object_patch_tokens.reshape(B, S_obj * P_obj, C_obj)
+        fused_tokens_list = list(aggregated_tokens_list)
+        tokens = fused_tokens_list[-1]                        # 只取最後 aggregator output 做 cross attentation
+        special_tokens = tokens[:, :, :patch_start_idx, :]
+        scene_patch_tokens = tokens[:, :, patch_start_idx:, :]
+        if scene_patch_tokens.numel() == 0:
+            return fused_tokens_list
+
+        B_scene, S_scene, P_scene, C_scene = scene_patch_tokens.shape
+        scene_query = scene_patch_tokens.reshape(B_scene, S_scene * P_scene, C_scene)
+        fused_scene_patch_tokens = self.object_token_cross_attn(scene_query, object_context)
+        fused_scene_patch_tokens = fused_scene_patch_tokens.view(B_scene, S_scene, P_scene, C_scene)
+        fused_tokens_list[-1] = torch.cat([special_tokens, fused_scene_patch_tokens], dim=2)
+        return fused_tokens_list
+
+    def forward(self, scene_images: torch.Tensor, object_images: torch.Tensor = None, query_points: torch.Tensor = None):
         """
         Forward pass of the VGGT model.
 
         Args:
-            images (torch.Tensor): Input images with shape [S, 3, H, W] or [B, S, 3, H, W], in range [0, 1].
-                B: batch size, S: sequence length, 3: RGB channels, H: height, W: width
+            scene_images (torch.Tensor): Scene images with shape [S, 3, H, W] or [B, S, 3, H, W].
+            object_images (torch.Tensor, optional): Object crop images with shape [S_obj, 3, H, W]
+                or [B, S_obj, 3, H, W]. They are encoded by the full aggregator, and the
+                final-layer object patch tokens are used as key/value tokens for cross-attention
+                over scene patch tokens.
             query_points (torch.Tensor, optional): Query points for tracking, in pixel coordinates.
                 Shape: [N, 2] or [B, N, 2], where N is the number of query points.
                 Default: None
@@ -70,24 +164,32 @@ class VGGT(nn.Module, PyTorchModelHubMixin):
                 - object_pose (torch.Tensor): Object rotation in 6D representation with shape [B, 6]
                 - object_scale (torch.Tensor): Object scale with shape [B, 1]
                 - object_translation (torch.Tensor): Object translation with shape [B, 3]
-                - images (torch.Tensor): Original input images, preserved for visualization
+                - images (torch.Tensor): Original scene images, preserved for visualization
 
                 If query_points is provided, also includes:
                 - track (torch.Tensor): Point tracks with shape [B, S, N, 2] (from the last iteration), in pixel coordinates
                 - vis (torch.Tensor): Visibility scores for tracked points with shape [B, S, N]
                 - conf (torch.Tensor): Confidence scores for tracked points with shape [B, S, N]
-        """        
-        # If without batch dimension, add it
-        if len(images.shape) == 4:
-            images = images.unsqueeze(0)
-            
+        """
+        scene_images = self._ensure_batched_images(scene_images)
+        object_images = self._ensure_batched_images(object_images)
+
         if query_points is not None and len(query_points.shape) == 2:
             query_points = query_points.unsqueeze(0)
 
-        aggregated_tokens_list, patch_start_idx = self.aggregator(images)
+        aggregated_tokens_list, patch_start_idx = self.aggregator(scene_images)
+        object_patch_tokens = None
+        if object_images is not None:
+            object_patch_tokens, _, _ = self._encode_object_tokens(object_images)
+            aggregated_tokens_list = self._apply_object_cross_attention(
+                aggregated_tokens_list,
+                object_patch_tokens,
+                patch_start_idx,
+            )
+
         object_latent = None
         if self.shared_object_latent is not None:
-            B, S = images.shape[:2]
+            B, S = scene_images.shape[:2]
             object_latent = self.shared_object_latent.expand(B, S, -1)
 
         predictions = {}
@@ -100,14 +202,14 @@ class VGGT(nn.Module, PyTorchModelHubMixin):
                 
             if self.depth_head is not None:
                 depth, depth_conf = self.depth_head(
-                    aggregated_tokens_list, images=images, patch_start_idx=patch_start_idx
+                    aggregated_tokens_list, images=scene_images, patch_start_idx=patch_start_idx
                 )
                 predictions["depth"] = depth
                 predictions["depth_conf"] = depth_conf
 
             if self.point_head is not None:
                 pts3d, pts3d_conf = self.point_head(
-                    aggregated_tokens_list, images=images, patch_start_idx=patch_start_idx
+                    aggregated_tokens_list, images=scene_images, patch_start_idx=patch_start_idx
                 )
                 predictions["world_points"] = pts3d
                 predictions["world_points_conf"] = pts3d_conf
@@ -115,12 +217,22 @@ class VGGT(nn.Module, PyTorchModelHubMixin):
             if self.object_pt_head is not None:
                 object_pts3d, object_pts3d_conf = self.object_pt_head(
                     aggregated_tokens_list,
-                    images=images,
+                    images=scene_images,
                     patch_start_idx=patch_start_idx,
                     object_latent=object_latent,
                 )
                 predictions["object_points"] = object_pts3d
                 predictions["object_points_conf"] = object_pts3d_conf
+
+            if self.object_mask_head is not None:
+                predictions.update(
+                    self.object_mask_head(
+                        aggregated_tokens_list,
+                        images=scene_images,
+                        patch_start_idx=patch_start_idx,
+                        object_latent=object_latent,
+                    )
+                )
 
             if self.object_srt_head is not None:
                 predictions.update(
@@ -133,13 +245,15 @@ class VGGT(nn.Module, PyTorchModelHubMixin):
 
         if self.track_head is not None and query_points is not None:
             track_list, vis, conf = self.track_head(
-                aggregated_tokens_list, images=images, patch_start_idx=patch_start_idx, query_points=query_points
+                aggregated_tokens_list, images=scene_images, patch_start_idx=patch_start_idx, query_points=query_points
             )
             predictions["track"] = track_list[-1]  # track of the last iteration
             predictions["vis"] = vis
             predictions["conf"] = conf
 
         if not self.training:
-            predictions["images"] = images  # store the images for visualization during inference
+            predictions["images"] = scene_images
+            if object_patch_tokens is not None:
+                predictions["object_patch_tokens"] = object_patch_tokens
 
         return predictions

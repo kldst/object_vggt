@@ -1,19 +1,20 @@
 defaults:
   - default_dataset
 
-# torchrun --master_port=29600 --nproc_per_node=1 launch.py  --config default_object
+# torchrun --master_port=29100 --nproc_per_node=1 launch.py  --config default_object
 
-exp_name: test_0223_object_small_dataset
+exp_name: test_0326_object_dataset_mask_test
 img_size: 518
 num_workers: 8
-seed_value: 42
+seed_value: 30
 accum_steps: 1    # We did not use gradient accumulation in our training, while if you suffer from OOM, you can try to use it.
 patch_size: 14
-val_epoch_freq: 5
-max_img_per_gpu: 24
+val_epoch_freq: 1
+max_img_per_gpu: 36
 
-limit_train_batches: 10000
-limit_val_batches: 1
+limit_train_batches:  18 # sample 幾次 (一次 per gpu / img num)
+# limit_train_batches:  100
+limit_val_batches: 15
 
 debug:
   force_model_output_to_ground_truth: False
@@ -28,16 +29,22 @@ data:
       img_size: ${img_size}
       patch_size: ${patch_size}
       debug: False
-      map_xyz_bfloat16: True
+      map_xyz_bfloat16: False
       repeat_batch: False
-      img_nums: [4, 6]
+      img_nums: [6, 6]
     dataset:
       _target_: data.composed_dataset.ComposedDataset
       dataset_configs:
-        - _target_: data.datasets.6dpose.SixDPoseDataset
+        - _target_: data.datasets.6dpose_dino.SixDPoseDataset
           split: train
-          AUTOMATIC_DATASET_DIR: /mnt/train-data-4-hdd/yian/6dpose_obj/automatic_dataset
-          only_run_name: run_0000
+          DATA_ROOT: /mnt/train-data-4-hdd/yian/6dpose_obj/0316_fixedCam_1k
+          MASK_ROOT: /mnt/train-data-4-hdd/yian/6dpose_obj/0316_fixedCam_1k/out_mask
+          OBJECT_IMAGE_ROOT: /mnt/train-data-4-hdd/yian/6dpose_obj/0315_fixedCam_1k/object_space_rgb
+          selected_views: [1, 3, 8, 12, 15, 18]
+          num_object_views: 4
+          load_point_map: false
+          only_run_start: null
+          only_run_end: null
   val:
     _target_: data.dynamic_dataloader.DynamicTorchDataset
     num_workers: ${num_workers}
@@ -46,15 +53,21 @@ data:
       img_size: ${img_size}
       patch_size: ${patch_size}
       debug: False
-      map_xyz_bfloat16: True
-      img_nums: [4, 6]
+      map_xyz_bfloat16: False
+      img_nums: [6, 6]
     dataset:
       _target_: data.composed_dataset.ComposedDataset
       dataset_configs:
-        - _target_: data.datasets.6dpose.SixDPoseDataset
-          split: train
-          AUTOMATIC_DATASET_DIR: /mnt/train-data-4-hdd/yian/6dpose_obj/automatic_dataset
-          only_run_name: run_0000
+        - _target_: data.datasets.6dpose_dino.SixDPoseDataset
+          split: val
+          DATA_ROOT: /mnt/train-data-4-hdd/yian/6dpose_obj/0316_fixedCam_testing
+          MASK_ROOT: /mnt/train-data-4-hdd/yian/6dpose_obj/0316_fixedCam_testing/out_mask
+          OBJECT_IMAGE_ROOT: /mnt/train-data-4-hdd/yian/6dpose_obj/0316_fixedCam_testing/object_space_rgb
+          selected_views: [1, 3, 8, 12, 15, 18]
+          num_object_views: 4
+          load_point_map: false
+          only_run_start: null
+          only_run_end: null
 
 
 logging:
@@ -71,32 +84,30 @@ logging:
     train:
       keys_to_log:
         - loss_objective
-        - loss_conf_object_point
-        - loss_reg_object_point
-        - loss_grad_object_point
-        - loss_object_srt
-        - loss_object_pose
-        - loss_object_scale
-        - loss_object_translation
-        - loss_object_pose_init
+        # - loss_conf_object_point
+        # - loss_reg_object_point
+        # - loss_grad_object_point
+        - loss_object_mask
+        - loss_object_mask_bce
+        - loss_object_mask_dice
     val:
       keys_to_log:
         - loss_objective
-        - loss_conf_object_point
-        - loss_reg_object_point
-        - loss_grad_object_point
-        - loss_object_srt
-        - loss_object_pose
-        - loss_object_scale
-        - loss_object_translation
-        - loss_object_pose_init
+        # - loss_conf_object_point
+        # - loss_reg_object_point
+        # - loss_grad_object_point
+        - loss_object_mask
+        - loss_object_mask_bce
+        - loss_object_mask_dice
 
 
 
 checkpoint:
   save_dir: logs/${exp_name}/ckpts
-  save_freq: 5
+  save_freq: 10
   resume_checkpoint_path: /mnt/train-data-4-hdd/yian/vggt_old/model/model.pt
+  load_training_state: True
+  load_scaler_state: True
   strict: False
 
 
@@ -106,19 +117,18 @@ loss:
   depth: null
   point: null
   track: null
-  object_point:
-    weight: 1.0
-    gamma: 1.0
-    alpha: 0.2
-    gradient_loss_fn: "normal"
-    valid_range: -1
-  # object_srt:
+  # object_point:
   #   weight: 1.0
-  #   loss_type: "l1"
-  #   weight_pose: 5.0
-  #   weight_scale: 1.0
-  #   weight_translation: 1.0
-  #   init_w: 1.0
+  #   gamma: 1.0
+  #   alpha: 0.2
+  #   gradient_loss_fn: "normal"
+  #   valid_range: -1
+  object_mask:
+    weight: 1.0
+    bce_weight: 1.0
+    dice_weight: 1.0
+    pos_weight: 2.0
+  object_srt: null
 
 
 
@@ -147,12 +157,15 @@ optim:
       - module_name: ["aggregator"]
         max_norm: 1.0   # feel free to reduce this if you see instabilities
         norm_type: 2
-      - module_name: ["object_pt_head"]
-        max_norm: 1.0   # feel free to reduce this if you see instabilities
+      - module_name: ["object_token_cross_attn"]
+        max_norm: 1.0
         norm_type: 2
-      # - module_name: ["object_srt_head"]
+      # - module_name: ["object_pt_head"]
       #   max_norm: 1.0   # feel free to reduce this if you see instabilities
       #   norm_type: 2
+      - module_name: ["object_mask_head"]
+        max_norm: 1.0
+        norm_type: 2
   options:
     lr:
       - scheduler:
@@ -164,7 +177,7 @@ optim:
             - _target_: fvcore.common.param_scheduler.CosineParamScheduler
               start_value: 1e-4
               end_value: 1e-8
-          lengths: [0.05, 0.95]
+          lengths: [0.01, 0.99]
           interval_scaling: ['rescaled', 'rescaled']
     weight_decay:
       - scheduler:
@@ -172,9 +185,7 @@ optim:
           value: 0.05
 
 
-
-
-max_epochs: 20
+max_epochs: 100
 
 model:
   _target_: vggt.models.vggt.VGGT
@@ -182,9 +193,12 @@ model:
   enable_depth: False
   enable_point: False
   enable_track: False
-  enable_object_point: True
+  enable_object_point: False
+  enable_object_mask: True
   enable_object_srt: False
   use_shared_object_latent: False # set False to switch back to the original version (no shared latent)
+  enable_object_cross_attn: True
+  object_cross_attn_heads: 16
 
 
 distributed:

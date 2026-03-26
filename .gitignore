@@ -151,3 +151,4 @@ training/logs/
 .pixi
 *.egg-info
 
+model
