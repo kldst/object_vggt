@@ -31,8 +31,8 @@ class SixDPoseDataset(BaseDataset):
         OBJECT_INPUT_ROOT: Optional[str] = None,
         OBJECT_IMAGE_ROOT: Optional[str] = None,
         MASK_ROOT: Optional[str] = None,
-        len_train: int = 111, # 資料量
-        len_test: int = 95,    # 資料量
+        len_train: int = 3000, # 資料量
+        len_test: int = 300,    # 資料量
         verify_files: bool = True,
         only_run_name: str = "",
         only_run_names: Optional[List[str]] = None,
@@ -64,7 +64,7 @@ class SixDPoseDataset(BaseDataset):
         self.object_root = object_root
         self.map_root = osp.join(DATA_ROOT, "cam_decoded_map")
         self.pose_root = osp.join(DATA_ROOT, "out_pose")
-        self.mask_root = MASK_ROOT or osp.join(DATA_ROOT, "out_mask")
+        self.mask_root = MASK_ROOT
 
         self.verify_files = bool(verify_files)
         self.load_point_map = bool(load_point_map)
@@ -100,7 +100,8 @@ class SixDPoseDataset(BaseDataset):
             checked_roots = [f"scene={self.scene_root}", f"object={self.object_root}", f"pose={self.pose_root}"]
             if self.load_point_map:
                 checked_roots.append(f"map={self.map_root}")
-            checked_roots.append(f"mask={self.mask_root}")
+            if self.mask_root is not None:
+                checked_roots.append(f"mask={self.mask_root}")
             raise RuntimeError(
                 "No valid 6dpose_dino samples found. "
                 f"Checked roots: {', '.join(checked_roots)}"
@@ -197,7 +198,7 @@ class SixDPoseDataset(BaseDataset):
         for cam_idx in self.selected_views:
             if not osp.isfile(self._resolve_scene_image_path(run_name, cam_idx)):
                 return False
-            if not osp.isfile(self._resolve_mask_path(run_name, object_name, cam_idx)):
+            if self.mask_root is not None and not osp.isfile(self._resolve_mask_path(run_name, object_name, cam_idx)):
                 return False
             if self.load_point_map and not osp.isfile(self._resolve_map_path(run_name, object_name, cam_idx)):
                 return False
@@ -314,7 +315,7 @@ class SixDPoseDataset(BaseDataset):
         cam_points = [] if self.load_point_map else None
         world_points = [] if self.load_point_map else None
         point_masks = [] if self.load_point_map else None
-        object_masks = []
+        object_masks = [] if self.mask_root is not None else None
         extrinsics = []
         intrinsics = []
         original_sizes = []
@@ -324,8 +325,10 @@ class SixDPoseDataset(BaseDataset):
             scene_image = read_image_cv2(scene_image_path)
             if scene_image is None:
                 raise FileNotFoundError(f"Failed to read scene image: {scene_image_path}")
-            object_mask_path = self._resolve_mask_path(run_name, object_name, cam_idx)
-            object_mask = self._read_mask(object_mask_path)
+            object_mask = None
+            if self.mask_root is not None:
+                object_mask_path = self._resolve_mask_path(run_name, object_name, cam_idx)
+                object_mask = self._read_mask(object_mask_path)
 
             if self.load_point_map:
                 map_path = self._resolve_map_path(run_name, object_name, cam_idx)
@@ -350,7 +353,7 @@ class SixDPoseDataset(BaseDataset):
             else:
                 h_map, w_map = scene_image.shape[:2]
 
-            if scene_image.shape[:2] != object_mask.shape[:2]:
+            if object_mask is not None and scene_image.shape[:2] != object_mask.shape[:2]:
                 raise ValueError(
                     f"Scene image/mask shape mismatch for {scene_image_path}: "
                     f"image={scene_image.shape[:2]}, mask={object_mask.shape[:2]}"
@@ -362,7 +365,8 @@ class SixDPoseDataset(BaseDataset):
             )
 
             scene_images.append(scene_image)
-            object_masks.append(object_mask)
+            if object_masks is not None:
+                object_masks.append(object_mask)
             if self.load_point_map:
                 depths.append(depth)
                 cam_points.append(map_xyz)
@@ -394,11 +398,12 @@ class SixDPoseDataset(BaseDataset):
             "object_original_sizes": object_original_sizes,
             "camera_indices": np.array(camera_indices, dtype=np.int64),
             "object_cam_indices": np.array(object_cam_indices, dtype=np.int64),
-            "object_masks": object_masks,
             "object_name": object_name,
             "run_name": run_name,
             "skip_normalization": True,
         }
+        if object_masks is not None:
+            batch["object_masks"] = object_masks
         if self.load_point_map:
             batch.update({
                 "depths": depths,

@@ -9,7 +9,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.utils.checkpoint import checkpoint
-from typing import Optional, Tuple, Union, List, Dict, Any
+from typing import Optional, Tuple, Union, List, Dict, Any, Callable
 
 from vggt.layers import PatchEmbed
 from vggt.layers.block import Block
@@ -181,7 +181,15 @@ class Aggregator(nn.Module):
             if hasattr(self.patch_embed, "mask_token"):
                 self.patch_embed.mask_token.requires_grad_(False)
 
-    def forward(self, images: torch.Tensor) -> Tuple[List[torch.Tensor], int]:
+    def forward(
+        self,
+        images: torch.Tensor,
+        *,
+        layer_postprocessor: Optional[Callable[[int, torch.Tensor, int], torch.Tensor]] = None,
+        return_layer_tokens: bool = False,
+        layer_token_indices: Optional[List[int]] = None,
+        collect_output_list: bool = True,
+    ) -> Tuple[List[torch.Tensor], int]:
         """
         Args:
             images (torch.Tensor): Input images with shape [B, S, 3, H, W], in range [0, 1].
@@ -192,21 +200,50 @@ class Aggregator(nn.Module):
                 The list of outputs from the attention blocks,
                 and the patch_start_idx indicating where patch tokens begin.
         """
+        B, S, _, H, W = images.shape
+        patch_tokens = self.embed_images(images)
+        return self.forward_from_patch_tokens(
+            patch_tokens,
+            batch_size=B,
+            seq_len=S,
+            height=H,
+            width=W,
+            layer_postprocessor=layer_postprocessor,
+            return_layer_tokens=return_layer_tokens,
+            layer_token_indices=layer_token_indices,
+            collect_output_list=collect_output_list,
+        )
+
+    def embed_images(self, images: torch.Tensor) -> torch.Tensor:
         B, S, C_in, H, W = images.shape
 
         if C_in != 3:
             raise ValueError(f"Expected 3 input channels, got {C_in}")
 
-        # Normalize images and reshape for patch embed
         images = (images - self._resnet_mean) / self._resnet_std
-
-        # Reshape to [B*S, C, H, W] for patch embedding
         images = images.view(B * S, C_in, H, W)
         patch_tokens = self.patch_embed(images)
 
         if isinstance(patch_tokens, dict):
             patch_tokens = patch_tokens["x_norm_patchtokens"]
 
+        return patch_tokens
+
+    def forward_from_patch_tokens(
+        self,
+        patch_tokens: torch.Tensor,
+        *,
+        batch_size: int,
+        seq_len: int,
+        height: int,
+        width: int,
+        layer_postprocessor: Optional[Callable[[int, torch.Tensor, int], torch.Tensor]] = None,
+        return_layer_tokens: bool = False,
+        layer_token_indices: Optional[List[int]] = None,
+        collect_output_list: bool = True,
+    ) -> Tuple[List[torch.Tensor], int]:
+        B = batch_size
+        S = seq_len
         _, P, C = patch_tokens.shape
 
         # Expand camera and register tokens to match batch size and sequence length
@@ -218,13 +255,13 @@ class Aggregator(nn.Module):
 
         pos = None
         if self.rope is not None:
-            pos = self.position_getter(B * S, H // self.patch_size, W // self.patch_size, device=images.device)
+            pos = self.position_getter(B * S, height // self.patch_size, width // self.patch_size, device=patch_tokens.device)
 
         if self.patch_start_idx > 0:
             # do not use position embedding for special tokens (camera and register tokens)
             # so set pos to 0 for the special tokens
             pos = pos + 1
-            pos_special = torch.zeros(B * S, self.patch_start_idx, 2).to(images.device).to(pos.dtype)
+            pos_special = torch.zeros(B * S, self.patch_start_idx, 2).to(patch_tokens.device).to(pos.dtype)
             pos = torch.cat([pos_special, pos], dim=1)
 
         # update P because we added special tokens
@@ -232,29 +269,89 @@ class Aggregator(nn.Module):
 
         frame_idx = 0
         global_idx = 0
-        output_list = []
+        output_list = [] if collect_output_list else None
+        selected_layer_indices = None if layer_token_indices is None else set(int(idx) for idx in layer_token_indices)
+        layer_tokens = {} if selected_layer_indices is not None else []
+        logical_layer_idx = 0
+        last_attn_type = self.aa_order[-1]
 
         for _ in range(self.aa_block_num):
-            for attn_type in self.aa_order:
-                if attn_type == "frame":
-                    tokens, frame_idx, frame_intermediates = self._process_frame_attention(
-                        tokens, B, S, P, C, frame_idx, pos=pos
-                    )
-                elif attn_type == "global":
-                    tokens, global_idx, global_intermediates = self._process_global_attention(
-                        tokens, B, S, P, C, global_idx, pos=pos
-                    )
-                else:
-                    raise ValueError(f"Unknown attention type: {attn_type}")
+            for _ in range(self.aa_block_size):
+                frame_tokens = None
+                global_tokens = None
 
-            for i in range(len(frame_intermediates)):
-                # concat frame and global intermediates, [B x S x P x 2C]
-                concat_inter = torch.cat([frame_intermediates[i], global_intermediates[i]], dim=-1)
-                output_list.append(concat_inter)
+                for attn_type in self.aa_order:
+                    if attn_type == "frame":
+                        if tokens.shape != (B * S, P, C):
+                            tokens = tokens.reshape(B, S, P, C).reshape(B * S, P, C)
 
-        del concat_inter
-        del frame_intermediates
-        del global_intermediates
+                        frame_pos = pos
+                        if frame_pos is not None and frame_pos.shape != (B * S, P, 2):
+                            frame_pos = frame_pos.reshape(B, S, P, 2).reshape(B * S, P, 2)
+
+                        if self.training:
+                            tokens = checkpoint(
+                                self.frame_blocks[frame_idx], tokens, frame_pos, use_reentrant=self.use_reentrant
+                            )
+                        else:
+                            tokens = self.frame_blocks[frame_idx](tokens, pos=frame_pos)
+                        frame_idx += 1
+                        frame_tokens = tokens.reshape(B, S, P, C)
+                    elif attn_type == "global":
+                        if tokens.shape != (B, S * P, C):
+                            tokens = tokens.reshape(B, S, P, C).reshape(B, S * P, C)
+
+                        global_pos = pos
+                        if global_pos is not None and global_pos.shape != (B, S * P, 2):
+                            global_pos = global_pos.reshape(B, S, P, 2).reshape(B, S * P, 2)
+
+                        if self.training:
+                            tokens = checkpoint(
+                                self.global_blocks[global_idx], tokens, global_pos, use_reentrant=self.use_reentrant
+                            )
+                        else:
+                            tokens = self.global_blocks[global_idx](tokens, pos=global_pos)
+                        global_idx += 1
+                        global_tokens = tokens.reshape(B, S, P, C)
+                    else:
+                        raise ValueError(f"Unknown attention type: {attn_type}")
+
+                if frame_tokens is None and global_tokens is None:
+                    raise RuntimeError("Aggregator step produced no tokens")
+                if frame_tokens is None:
+                    frame_tokens = global_tokens
+                if global_tokens is None:
+                    global_tokens = frame_tokens
+
+                current_tokens = global_tokens if last_attn_type == "global" else frame_tokens
+                if layer_postprocessor is not None:
+                    current_tokens = layer_postprocessor(logical_layer_idx, current_tokens, self.patch_start_idx)
+                    if current_tokens.shape != (B, S, P, C):
+                        raise ValueError(
+                            f"layer_postprocessor must return shape {(B, S, P, C)}, got {tuple(current_tokens.shape)}"
+                        )
+                    if last_attn_type == "global":
+                        global_tokens = current_tokens
+                        tokens = current_tokens.reshape(B, S * P, C)
+                    else:
+                        frame_tokens = current_tokens
+                        tokens = current_tokens.reshape(B * S, P, C)
+
+                if collect_output_list:
+                    output_list.append(torch.cat([frame_tokens, global_tokens], dim=-1))
+
+                if return_layer_tokens and (
+                    selected_layer_indices is None or logical_layer_idx in selected_layer_indices
+                ):
+                    if selected_layer_indices is None:
+                        layer_tokens.append(current_tokens)
+                    else:
+                        layer_tokens[logical_layer_idx] = current_tokens
+
+                logical_layer_idx += 1
+
+        if return_layer_tokens:
+            return output_list, self.patch_start_idx, layer_tokens
         return output_list, self.patch_start_idx
 
     def _process_frame_attention(self, tokens, B, S, P, C, frame_idx, pos=None):

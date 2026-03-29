@@ -288,6 +288,9 @@ class Trainer:
             self.loss.debug_force_model_output_to_ground_truth = self.force_model_output_to_ground_truth
         self.gradient_clipper = instantiate(self.optim_conf.gradient_clip)
         self.scaler = torch.cuda.amp.GradScaler(enabled=self.optim_conf.amp.enabled)
+        self.keep_frozen_aggregator_train_mode = bool(
+            getattr(self.optim_conf, "keep_frozen_aggregator_train_mode", False)
+        )
 
         # Freeze specified model parameters if any
         if getattr(self.optim_conf, "frozen_module_names", None):
@@ -323,6 +326,22 @@ class Trainer:
             logging.info(f"Model summary saved to {model_summary_path}")
 
         logging.info("Successfully initialized training components.")
+
+    def _unwrap_model(self) -> nn.Module:
+        if isinstance(self.model, torch.nn.parallel.DistributedDataParallel):
+            return self.model.module
+        return self.model
+
+    def _set_frozen_aggregator_train_mode_if_needed(self) -> None:
+        if not self.keep_frozen_aggregator_train_mode:
+            return
+
+        model = self._unwrap_model()
+        if not hasattr(model, "aggregator"):
+            return
+
+        for module in model.aggregator.modules():
+            module.training = True
 
     def _setup_dataloaders(self):
         """Initializes train and validation datasets and dataloaders."""
@@ -584,6 +603,7 @@ class Trainer:
         )
 
         self.model.train()
+        self._set_frozen_aggregator_train_mode_if_needed()
         end = time.time()
 
         iters_per_epoch = len(train_loader)

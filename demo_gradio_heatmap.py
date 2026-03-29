@@ -18,7 +18,7 @@ from vggt.models.vggt import VGGT
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "3"
 
-DATA_ROOT = Path("/mnt/train-data-4-hdd/yian/6dpose_obj/0315_fixedCam_1k")
+DATA_ROOT = Path("/mnt/train-data-4-hdd/yian/6dpose_obj/0327_fixedCam_1k")
 OUT_IMAGE_ROOT = DATA_ROOT / "out_image"
 OUT_POSE_ROOT = DATA_ROOT / "out_pose"
 OBJECT_IMAGE_ROOT = DATA_ROOT / "object_space_rgb"
@@ -26,7 +26,7 @@ FIXED_VIEWS = (1, 3, 8, 12, 15, 18)
 NUM_OBJECT_VIEWS = 4
 MODEL_CKPT_PATH = Path(
     "/mnt/train-data-4-hdd/yian/6dpose_obj/vggt_objectspc/training/logs/"
-    "test_0321_object_dataset_AGGREGATOR_ALL_white_random_object_image/ckpts/checkpoint_19.pt"
+    "test_0327_object_dataset_mask_test_1k/ckpts/checkpoint_10.pt"
 )
 
 device = "cuda" if torch.cuda.is_available() else "cpu"

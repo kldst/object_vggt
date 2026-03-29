@@ -21,16 +21,17 @@ from vggt.models.vggt import VGGT
 os.environ['CUDA_VISIBLE_DEVICES'] = '3'
 
 OBJ_ROOT = Path("/mnt/train-data-4-hdd/yian/6dpose_obj/obj")
-DATA_ROOT = Path("/mnt/train-data-4-hdd/yian/6dpose_obj/0315_fixedCam_1k")
+DATA_ROOT = Path("/mnt/train-data-4-hdd/yian/6dpose_obj/0315_fixedCam_test")
 OUT_IMAGE_ROOT = DATA_ROOT / "out_image"
 OUT_POSE_ROOT = DATA_ROOT / "out_pose"
-OBJECT_IMAGE_ROOT = DATA_ROOT / "object_space_rgb"
+# OBJECT_IMAGE_ROOT = DATA_ROOT / "object_space_rgb"
+OBJECT_IMAGE_ROOT = Path("/mnt/train-data-4-hdd/yian/6dpose_obj/0315_fixedCam_1k/object_space_rgb")
 OUT_CAM_PARAM_ROOT = DATA_ROOT / "out_cam_param"
 FIXED_VIEWS = (1, 3, 8, 12, 15, 18)
 NUM_OBJECT_VIEWS = 4
 PROJECTION_POINT_LIMIT = 12000
 MODEL_CKPT_PATH = Path(
-    "/mnt/train-data-4-hdd/yian/6dpose_obj/vggt_objectspc/training/logs/test_0321_object_dataset_AGGREGATOR_ALL_white_random_object_image_2/ckpts/checkpoint_4.pt"
+    "/mnt/train-data-4-hdd/yian/6dpose_obj/vggt_objectspc/training/logs/test_0321_object_dataset_AGGREGATOR_ALL_white_random_object_image/ckpts/checkpoint_19.pt"
 )
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
