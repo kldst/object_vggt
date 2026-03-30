@@ -21,7 +21,7 @@ class SixDPoseDataset(BaseDataset):
     """Multi-view object-conditioned 6D pose dataset with fixed object-space views."""
 
     FIXED_VIEWS = (1, 3, 8, 12, 15, 18)
-    FIXED_OBJECT_VIEWS = (1, 5, 10, 15)
+    FIXED_OBJECT_VIEWS = (1, 3, 8, 12)
 
     def __init__(
         self,
@@ -31,8 +31,8 @@ class SixDPoseDataset(BaseDataset):
         OBJECT_INPUT_ROOT: Optional[str] = None,
         OBJECT_IMAGE_ROOT: Optional[str] = None,
         MASK_ROOT: Optional[str] = None,
-        len_train: int = 3000, # 資料量
-        len_test: int = 300,    # 資料量
+        len_train: int = 30120, # 資料量
+        len_test: int = 2514,    # 資料量
         verify_files: bool = True,
         only_run_name: str = "",
         only_run_names: Optional[List[str]] = None,

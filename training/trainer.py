@@ -281,7 +281,10 @@ class Trainer:
         self.steps = {'train': 0, 'val': 0}
 
         # Instantiate components from configs
-        self.tb_writer = instantiate(self.logging_conf.tensorboard_writer, _recursive_=False)
+        if bool(getattr(self.logging_conf, "use_wandb", False)):
+            self.tb_writer = instantiate(self.logging_conf.wandb_writer, _recursive_=False)
+        else:
+            self.tb_writer = instantiate(self.logging_conf.tensorboard_writer, _recursive_=False)
         self.model = instantiate(self.model_conf, _recursive_=False)
         self.loss = instantiate(self.loss_conf, _recursive_=False)
         if hasattr(self.loss, "debug_force_model_output_to_ground_truth"):

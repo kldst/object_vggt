@@ -89,7 +89,8 @@ class VGGT(nn.Module, PyTorchModelHubMixin):
                  enable_multi_layer_object_prototype_cross_attn=False,
                  object_prototype_layer_indices=(4, 11, 17, 23),
                  object_prototype_num_tokens=4,
-                 object_prototype_object_encoder_no_grad=False):
+                 object_prototype_object_encoder_no_grad=False,
+                 enable_global_pool_scene_object_pose_head=False):
         super().__init__()
 
         self.aggregator = Aggregator(
@@ -107,6 +108,7 @@ class VGGT(nn.Module, PyTorchModelHubMixin):
         self.enable_object_cross_attn = bool(enable_object_cross_attn)
         self.enable_pre_aggregator_object_cross_attn = bool(enable_pre_aggregator_object_cross_attn)
         self.enable_multi_layer_object_prototype_cross_attn = bool(enable_multi_layer_object_prototype_cross_attn)
+        self.enable_global_pool_scene_object_pose_head = bool(enable_global_pool_scene_object_pose_head)
         self.object_prototype_layer_indices = tuple(int(idx) for idx in object_prototype_layer_indices)
         self.object_prototype_num_tokens = int(object_prototype_num_tokens)
         self.object_prototype_object_encoder_no_grad = bool(object_prototype_object_encoder_no_grad)
@@ -181,7 +183,14 @@ class VGGT(nn.Module, PyTorchModelHubMixin):
             if enable_object_mask
             else None
         )
-        self.object_srt_head = ObjectPoseHead(dim_in=2 * embed_dim,) if enable_object_srt else None
+        self.object_srt_head = (
+            ObjectPoseHead(
+                dim_in=2 * embed_dim,
+                use_global_scene_object_concat=self.enable_global_pool_scene_object_pose_head,
+            )
+            if enable_object_srt
+            else None
+        )
 
     def _ensure_batched_images(self, images: torch.Tensor):
         if images is None:
@@ -357,7 +366,12 @@ class VGGT(nn.Module, PyTorchModelHubMixin):
             query_points = query_points.unsqueeze(0)
 
         object_patch_tokens = None
-        if self.enable_pre_aggregator_object_cross_attn and object_images is not None:
+        if self.enable_global_pool_scene_object_pose_head:
+            aggregated_tokens_list, patch_start_idx = self.aggregator(scene_images)
+            if object_images is None:
+                raise ValueError("object_images must be provided when enable_global_pool_scene_object_pose_head=True")
+            object_patch_tokens, _, _ = self._encode_object_tokens(object_images)
+        elif self.enable_pre_aggregator_object_cross_attn and object_images is not None:
             fused_scene_patch_tokens, object_patch_tokens = self._apply_pre_aggregator_object_cross_attention(
                 scene_images,
                 object_images,
@@ -394,6 +408,8 @@ class VGGT(nn.Module, PyTorchModelHubMixin):
             aggregated_tokens_list, patch_start_idx = self.aggregator(scene_images)
 
         if (
+            not self.enable_global_pool_scene_object_pose_head
+            and
             object_images is not None
             and not self.enable_pre_aggregator_object_cross_attn
             and not self.enable_multi_layer_object_prototype_cross_attn
@@ -460,6 +476,7 @@ class VGGT(nn.Module, PyTorchModelHubMixin):
                         aggregated_tokens_list,
                         patch_start_idx=patch_start_idx,
                         object_latent=object_latent,
+                        object_tokens=object_patch_tokens,
                     )
                 )
 

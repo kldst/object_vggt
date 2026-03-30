@@ -133,19 +133,36 @@ class ObjectPoseHead(nn.Module):
 		dim_in: int,
 		object_pose_cfg: Optional[ObjectPoseHeadConfig] = None,
 		context_pool: str = "flatten",  # mean over patch tokens per view
+		use_global_scene_object_concat: bool = False,
 	):
 		super().__init__()
 		self.context_pool = context_pool
-		self.decoder = ObjectPoseTransformerDecoderHead(context_dim=dim_in, cfg=object_pose_cfg)
+		self.use_global_scene_object_concat = bool(use_global_scene_object_concat)
+		decoder_context_dim = 2 * dim_in if self.use_global_scene_object_concat else dim_in
+		self.decoder = ObjectPoseTransformerDecoderHead(context_dim=decoder_context_dim, cfg=object_pose_cfg)
 
 	def forward(
 		self,
 		aggregated_tokens_list,
 		patch_start_idx: int,
 		object_latent: Optional[torch.Tensor] = None,
+		object_tokens: Optional[torch.Tensor] = None,
 	) -> Dict[str, torch.Tensor]:
 		tokens = aggregated_tokens_list[-1]  # (B,S,N,C)
 		patch_tokens = tokens[:, :, patch_start_idx:, :]  # (B,S,P,C)
+
+		if self.use_global_scene_object_concat:
+			if object_tokens is None:
+				raise ValueError("object_tokens must be provided when use_global_scene_object_concat=True")
+			scene_global = patch_tokens.mean(dim=(1, 2))
+			object_global = object_tokens.mean(dim=(1, 2))
+			context_tokens = torch.cat([scene_global, object_global], dim=-1).unsqueeze(1)
+			object_pose, object_translation, pred_pose_0 = self.decoder(context_tokens)
+			return {
+				"object_pose": object_pose,
+				"object_translation": object_translation,
+				"pred_pose_0": pred_pose_0,
+			}
 
 		if self.context_pool == "mean":
 			context = patch_tokens.mean(dim=2)  # (B,S,C)
@@ -171,4 +188,8 @@ class ObjectPoseHead(nn.Module):
 		return outputs
 
 
-__all__ = ["ObjectPoseHead", "ObjectPoseTransformerDecoderHead", "ObjectPoseHeadConfig"]
+__all__ = [
+	"ObjectPoseHead",
+	"ObjectPoseTransformerDecoderHead",
+	"ObjectPoseHeadConfig",
+]
