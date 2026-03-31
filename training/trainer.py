@@ -253,6 +253,7 @@ class Trainer:
             elif "prev_epoch" in checkpoint:
                 self.epoch = checkpoint["prev_epoch"]
             self.steps = checkpoint["steps"] if "steps" in checkpoint else {"train": 0, "val": 0}
+            self.global_step = checkpoint.get("global_step", sum(self.steps.values()))
             self.ckpt_time_elapsed = checkpoint.get("time_elapsed", 0)
         else:
             logging.info("Skipping training progress load; epoch, steps, and timers will start from the current config.")
@@ -279,6 +280,7 @@ class Trainer:
         logging.info("Setting up components: Model, Loss, Logger, etc.")
         self.epoch = 0
         self.steps = {'train': 0, 'val': 0}
+        self.global_step = 0
 
         # Instantiate components from configs
         if bool(getattr(self.logging_conf, "use_wandb", False)):
@@ -402,6 +404,7 @@ class Trainer:
         checkpoint_content = {
             "prev_epoch": epoch,
             "steps": self.steps,
+            "global_step": self.global_step,
             "time_elapsed": self.time_elapsed_meter.val,
             "optimizer": [optim.optimizer.state_dict() for optim in self.optims],
         }
@@ -707,12 +710,12 @@ class Trainer:
                             self.tb_writer.log(
                                 os.path.join("Optim", f"{optim_prefix}", option),
                                 param_group[option],
-                                self.steps[phase],
+                                self.global_step,
                             )
                 self.tb_writer.log(
                     os.path.join("Optim", "where"),
                     self.where,
-                    self.steps[phase],
+                    self.global_step,
                 )
 
             # Clipping gradients and detecting diverging gradients
@@ -913,10 +916,12 @@ class Trainer:
         # Combine all data for logging
         log_data = {**y_hat, **loss_dict, **batch}
 
-        self._update_and_log_scalars(log_data, phase, self.steps[phase], loss_meters)
-        self._log_tb_visuals(log_data, phase, self.steps[phase])
+        log_step = self.global_step
+        self._update_and_log_scalars(log_data, phase, log_step, loss_meters)
+        self._log_tb_visuals(log_data, phase, log_step)
 
         self.steps[phase] += 1
+        self.global_step += 1
         return loss_dict
 
     def _override_predictions_with_ground_truth(self, predictions: Mapping, batch: Mapping, phase: str) -> Dict[str, Any]:
