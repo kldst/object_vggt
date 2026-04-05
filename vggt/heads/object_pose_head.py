@@ -190,11 +190,6 @@ class ObjectPoseHead(nn.Module):
 			context_parts.append(object_latent.unsqueeze(2))
 		context_parts.append(scene_context)
 
-		object_context = self._flatten_object_tokens(object_tokens)
-		if object_context is not None:
-			object_context = object_context.unsqueeze(1).expand(-1, S, -1, -1)
-			context_parts.append(object_context)
-
 		context_tokens = torch.cat(context_parts, dim=2).reshape(B * S, -1, C)
 
 		object_pose, object_translation, pred_pose_0 = self.decoder(context_tokens)

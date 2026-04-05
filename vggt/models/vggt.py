@@ -476,7 +476,6 @@ class VGGT(nn.Module, PyTorchModelHubMixin):
                         aggregated_tokens_list,
                         patch_start_idx=patch_start_idx,
                         object_latent=object_latent,
-                        object_tokens=object_patch_tokens,
                     )
                 )
 

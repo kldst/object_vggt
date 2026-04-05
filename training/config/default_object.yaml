@@ -1,7 +1,7 @@
 defaults:
   - default_dataset
 
-# torchrun --master_port=29200 --nproc_per_node=1 launch.py  --config default_object
+# torchrun --master_port=29100 --nproc_per_node=1 launch.py  --config default_object
 
 exp_name: test_0405_object_dataset_1k_diff_object_diff_pose_multi_16_reference_pose
 img_size: 518
@@ -38,9 +38,9 @@ data:
       dataset_configs:
         - _target_: data.datasets.6dpose_camerapose.SixDPoseDataset
           split: train
-          DATA_ROOT: /mnt/train-data-4-hdd/yian/6dpose_obj/0327_fixedCam_1k
-          OBJECT_IMAGE_ROOT: /mnt/train-data-4-hdd/yian/6dpose_obj/0327_fixedCam_1k/object_space_rgb
-          CAMERA_POSE_ROOT: /mnt/train-data-4-hdd/yian/6dpose_obj/0327_fixedCam_1k/camera_pose
+          DATA_ROOT: /mnt/train-data-4-hdd/yian/6dpose_obj/0327_fixedCam_1k_reference
+          OBJECT_IMAGE_ROOT: /mnt/train-data-4-hdd/yian/6dpose_obj/0327_fixedCam_1k_reference/object_space_rgb
+          CAMERA_POSE_ROOT: /mnt/train-data-4-hdd/yian/6dpose_obj/0327_fixedCam_1k_reference/camera_pose
           selected_views: [1, 3, 8, 12]
           num_object_views: 4
           only_run_start: null
@@ -60,9 +60,9 @@ data:
       dataset_configs:
         - _target_: data.datasets.6dpose_camerapose.SixDPoseDataset
           split: val
-          DATA_ROOT: /mnt/train-data-4-hdd/yian/6dpose_obj/0327_fixedCam_1k
-          OBJECT_IMAGE_ROOT: /mnt/train-data-4-hdd/yian/6dpose_obj/0327_fixedCam_1k/object_space_rgb
-          CAMERA_POSE_ROOT: /mnt/train-data-4-hdd/yian/6dpose_obj/0327_fixedCam_1k/camera_pose
+          DATA_ROOT: /mnt/train-data-4-hdd/yian/6dpose_obj/0327_fixedCam_1k_reference
+          OBJECT_IMAGE_ROOT: /mnt/train-data-4-hdd/yian/6dpose_obj/0327_fixedCam_1k_reference/object_space_rgb
+          CAMERA_POSE_ROOT: /mnt/train-data-4-hdd/yian/6dpose_obj/0327_fixedCam_1k_reference/camera_pose
           selected_views: [1, 3, 8, 12]
           num_object_views: 4
           only_run_start: null
