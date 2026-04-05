@@ -146,6 +146,21 @@ def _vector_loss(pred: torch.Tensor, gt: torch.Tensor, loss_type: str = "l1") ->
     raise ValueError(f"Unknown loss_type: {loss_type}")
 
 
+def _match_target_shape(pred: torch.Tensor, gt: torch.Tensor, name: str) -> torch.Tensor:
+    """
+    Broadcast object-pose targets to the prediction shape.
+
+    Supports both legacy sample-level GT (B, ...) and per-view GT (B, S, ...).
+    """
+    if pred.shape == gt.shape:
+        return gt
+
+    if pred.dim() == gt.dim() + 1 and pred.shape[0] == gt.shape[0] and pred.shape[2:] == gt.shape[1:]:
+        return gt.unsqueeze(1).expand(-1, pred.shape[1], *gt.shape[1:])
+
+    raise ValueError(f"{name} shape mismatch: pred={tuple(pred.shape)} gt={tuple(gt.shape)}")
+
+
 def compute_object_srt_loss(
     predictions,
     batch,
@@ -160,16 +175,16 @@ def compute_object_srt_loss(
     Compute 6D object SRT loss.
 
     Required prediction keys:
-      - object_pose: (B, 6)
-      - object_translation: (B, 3)
+      - object_pose: (B, S, 6) or legacy (B, 6)
+      - object_translation: (B, S, 3) or legacy (B, 3)
     Optional prediction key:
-      - pred_pose_0: (B, 6), first-step pose for init supervision
+      - pred_pose_0: (B, S, 6) or legacy (B, 6), first-step pose for init supervision
 
     Required batch keys:
-      - object_rotation: (B, 3, 3)
-      - object_translation: (B, 3)
+      - object_rotation: (B, S, 3, 3) or legacy (B, 3, 3)
+      - object_translation: (B, S, 3) or legacy (B, 3)
     Optional batch key:
-      - has_object: (B,) bool mask
+      - has_object: (B,) or (B, S) bool mask
     """
     pred_pose = predictions["object_pose"]
     pred_translation = predictions["object_translation"]
@@ -178,6 +193,10 @@ def compute_object_srt_loss(
     gt_rot = batch["object_rotation"]
     gt_pose = _rotation_matrix_to_rot6d(gt_rot)
     gt_translation = batch["object_translation"]
+    gt_pose = _match_target_shape(pred_pose, gt_pose, "object_pose")
+    gt_translation = _match_target_shape(pred_translation, gt_translation, "object_translation")
+    if pred_pose_0 is not None:
+        _match_target_shape(pred_pose_0, gt_pose, "pred_pose_0")
 
     if debug_force_model_output_to_ground_truth and not getattr(
         compute_object_srt_loss, "_dtype_logged_once", False
@@ -193,6 +212,12 @@ def compute_object_srt_loss(
     has_object = batch.get("has_object", None)
     if has_object is not None:
         valid_mask = has_object.bool()
+        if pred_pose.dim() == valid_mask.dim() + 1:
+            valid_mask = valid_mask.unsqueeze(1).expand(-1, pred_pose.shape[1], *valid_mask.shape[1:])
+        if pred_pose.shape[:-1] != valid_mask.shape:
+            raise ValueError(
+                f"has_object shape mismatch: pred={tuple(pred_pose.shape)} valid_mask={tuple(valid_mask.shape)}"
+            )
         if valid_mask.sum() == 0:
             dummy = (pred_pose * 0).mean()
             return {

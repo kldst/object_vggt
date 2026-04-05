@@ -121,8 +121,8 @@ class ObjectPoseHead(nn.Module):
 	  - patch_start_idx: where patch tokens start
 
 	Outputs (always):
-	  - object_pose: (B,6) rotation-6D
-	  - object_translation: (B,3)
+	  - object_pose: (B,S,6) rotation-6D
+	  - object_translation: (B,S,3)
 
 	No other outputs are produced by this head.
 	"""
@@ -141,6 +141,15 @@ class ObjectPoseHead(nn.Module):
 		decoder_context_dim = 2 * dim_in if self.use_global_scene_object_concat else dim_in
 		self.decoder = ObjectPoseTransformerDecoderHead(context_dim=decoder_context_dim, cfg=object_pose_cfg)
 
+	@staticmethod
+	def _flatten_object_tokens(object_tokens: Optional[torch.Tensor]) -> Optional[torch.Tensor]:
+		if object_tokens is None:
+			return None
+		if object_tokens.dim() != 4:
+			raise ValueError(f"object_tokens should be (B,S_obj,P_obj,C), got {tuple(object_tokens.shape)}")
+		B, S_obj, P_obj, C = object_tokens.shape
+		return object_tokens.reshape(B, S_obj * P_obj, C)
+
 	def forward(
 		self,
 		aggregated_tokens_list,
@@ -149,41 +158,51 @@ class ObjectPoseHead(nn.Module):
 		object_tokens: Optional[torch.Tensor] = None,
 	) -> Dict[str, torch.Tensor]:
 		tokens = aggregated_tokens_list[-1]  # (B,S,N,C)
+		camera_tokens = tokens[:, :, :1, :]  # (B,S,1,C)
 		patch_tokens = tokens[:, :, patch_start_idx:, :]  # (B,S,P,C)
+		B, S, _, C = patch_tokens.shape
 
 		if self.use_global_scene_object_concat:
 			if object_tokens is None:
 				raise ValueError("object_tokens must be provided when use_global_scene_object_concat=True")
-			scene_global = patch_tokens.mean(dim=(1, 2))
+			scene_global = patch_tokens.mean(dim=2)  # (B,S,C)
 			object_global = object_tokens.mean(dim=(1, 2))
-			context_tokens = torch.cat([scene_global, object_global], dim=-1).unsqueeze(1)
+			object_global = object_global.unsqueeze(1).expand(-1, S, -1)
+			context_tokens = torch.cat([scene_global, object_global], dim=-1).reshape(B * S, 1, -1)
 			object_pose, object_translation, pred_pose_0 = self.decoder(context_tokens)
 			return {
-				"object_pose": object_pose,
-				"object_translation": object_translation,
-				"pred_pose_0": pred_pose_0,
+				"object_pose": object_pose.reshape(B, S, -1),
+				"object_translation": object_translation.reshape(B, S, -1),
+				"pred_pose_0": pred_pose_0.reshape(B, S, -1),
 			}
 
 		if self.context_pool == "mean":
-			context = patch_tokens.mean(dim=2)  # (B,S,C)
+			scene_context = patch_tokens.mean(dim=2, keepdim=True)  # (B,S,1,C)
 		elif self.context_pool == "flatten":
-			B, S, P, C = patch_tokens.shape
-			context = patch_tokens.reshape(B, S * P, C)
+			scene_context = patch_tokens
 		else:
 			raise ValueError(f"Unknown context_pool: {self.context_pool}")
 
-		context_tokens = context
+		context_parts = [camera_tokens]
 		if object_latent is not None:
 			if object_latent.dim() != 3:
 				raise ValueError(f"object_latent should be (B,S,C), got {tuple(object_latent.shape)}")
-			context_tokens = torch.cat([object_latent, context_tokens], dim=1)
+			context_parts.append(object_latent.unsqueeze(2))
+		context_parts.append(scene_context)
+
+		object_context = self._flatten_object_tokens(object_tokens)
+		if object_context is not None:
+			object_context = object_context.unsqueeze(1).expand(-1, S, -1, -1)
+			context_parts.append(object_context)
+
+		context_tokens = torch.cat(context_parts, dim=2).reshape(B * S, -1, C)
 
 		object_pose, object_translation, pred_pose_0 = self.decoder(context_tokens)
 
 		outputs: Dict[str, torch.Tensor] = {
-			"object_pose": object_pose,
-			"object_translation": object_translation,
-			"pred_pose_0": pred_pose_0,
+			"object_pose": object_pose.reshape(B, S, -1),
+			"object_translation": object_translation.reshape(B, S, -1),
+			"pred_pose_0": pred_pose_0.reshape(B, S, -1),
 		}
 		return outputs
 

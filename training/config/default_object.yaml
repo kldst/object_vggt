@@ -3,14 +3,14 @@ defaults:
 
 # torchrun --master_port=29200 --nproc_per_node=1 launch.py  --config default_object
 
-exp_name: test_0327_object_dataset_mask_test_1k_same_object_diff_pose_multi_16
+exp_name: test_0405_object_dataset_1k_diff_object_diff_pose_multi_16_reference_pose
 img_size: 518
 num_workers: 8
 seed_value: 30
 accum_steps: 1    # We did not use gradient accumulation in our training, while if you suffer from OOM, you can try to use it.
 patch_size: 14
 val_epoch_freq: 10
-max_img_per_gpu: 72
+max_img_per_gpu: 36
 
 limit_train_batches: 250 # sample 幾次 (一次 per gpu / img num)
 # limit_train_batches:  100
@@ -32,18 +32,17 @@ data:
       debug: False
       map_xyz_bfloat16: False
       repeat_batch: False
-      img_nums: [6, 6]
+      img_nums: [4, 4]
     dataset:
       _target_: data.composed_dataset.ComposedDataset
       dataset_configs:
-        - _target_: data.datasets.6dpose_dino.SixDPoseDataset
+        - _target_: data.datasets.6dpose_camerapose.SixDPoseDataset
           split: train
-          DATA_ROOT: /mnt/train-data-4-hdd/yian/6dpose_obj/0317_fixedCam_10k
-          MASK_ROOT: null
-          OBJECT_IMAGE_ROOT: /mnt/train-data-4-hdd/yian/6dpose_obj/0317_fixedCam_10k/object_space_rgb
-          selected_views: [1, 3, 8, 12, 15, 18]
+          DATA_ROOT: /mnt/train-data-4-hdd/yian/6dpose_obj/0327_fixedCam_1k
+          OBJECT_IMAGE_ROOT: /mnt/train-data-4-hdd/yian/6dpose_obj/0327_fixedCam_1k/object_space_rgb
+          CAMERA_POSE_ROOT: /mnt/train-data-4-hdd/yian/6dpose_obj/0327_fixedCam_1k/camera_pose
+          selected_views: [1, 3, 8, 12]
           num_object_views: 4
-          load_point_map: false
           only_run_start: null
           only_run_end: null
   val:
@@ -55,18 +54,17 @@ data:
       patch_size: ${patch_size}
       debug: False
       map_xyz_bfloat16: False
-      img_nums: [6, 6]
+      img_nums: [4, 4]
     dataset:
       _target_: data.composed_dataset.ComposedDataset
       dataset_configs:
-        - _target_: data.datasets.6dpose_dino.SixDPoseDataset
+        - _target_: data.datasets.6dpose_camerapose.SixDPoseDataset
           split: val
           DATA_ROOT: /mnt/train-data-4-hdd/yian/6dpose_obj/0327_fixedCam_1k
-          MASK_ROOT: null
           OBJECT_IMAGE_ROOT: /mnt/train-data-4-hdd/yian/6dpose_obj/0327_fixedCam_1k/object_space_rgb
-          selected_views: [1, 3, 8, 12, 15, 18]
+          CAMERA_POSE_ROOT: /mnt/train-data-4-hdd/yian/6dpose_obj/0327_fixedCam_1k/camera_pose
+          selected_views: [1, 3, 8, 12]
           num_object_views: 4
-          load_point_map: false
           only_run_start: null
           only_run_end: null
 
