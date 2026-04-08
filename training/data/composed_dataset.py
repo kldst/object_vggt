@@ -175,7 +175,7 @@ class ComposedDataset(Dataset, ABC):
 
         # Optional fields for custom datasets (e.g. 6d pose training).
         optional_float_array_keys = [
-            "object_scale", "object_rotation", "object_translation", "object_srt"
+            "object_scale", "object_rotation", "object_translation", "object_srt", "normalization_scale"
         ]
         for key in optional_float_array_keys:
             if key in batch:
@@ -189,7 +189,7 @@ class ComposedDataset(Dataset, ABC):
             if key in batch:
                 sample[key] = torch.from_numpy(np.asarray(batch[key]).astype(np.int64))
 
-        optional_meta_keys = ["object_name", "run_name", "input_name", "skip_normalization"]
+        optional_meta_keys = ["object_name", "object_id", "run_name", "input_name", "skip_normalization"]
         for key in optional_meta_keys:
             if key in batch:
                 sample[key] = batch[key]

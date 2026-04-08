@@ -12,10 +12,10 @@ patch_size: 14
 val_epoch_freq: 10
 max_img_per_gpu: 72
 
-limit_train_batches: 250 # sample 幾次 (一次 per gpu / img num)
+limit_train_batches: 3872 # sample 幾次 (一次 per gpu / img num)
 # limit_train_batches:  100
 # limit_train_batches:  50
-limit_val_batches: 50
+limit_val_batches: 276
 
 debug:
   force_model_output_to_ground_truth: False
@@ -32,20 +32,20 @@ data:
       debug: False
       map_xyz_bfloat16: False
       repeat_batch: False
-      img_nums: [6, 6]
+      skip_process_batch: True
+      img_nums: [4, 6]
     dataset:
       _target_: data.composed_dataset.ComposedDataset
       dataset_configs:
-        - _target_: data.datasets.6dpose_dino.SixDPoseDataset
+        - _target_: data.datasets.6d_pose_normalize.SixDPoseNormalizeDataset
           split: train
-          DATA_ROOT: /mnt/train-data-4-hdd/yian/6dpose_obj/0317_fixedCam_10k
-          MASK_ROOT: null
-          OBJECT_IMAGE_ROOT: /mnt/train-data-4-hdd/yian/6dpose_obj/0317_fixedCam_10k/object_space_rgb
-          selected_views: [1, 3, 8, 12, 15, 18]
+          DATA_ROOT: /mnt/train-data-4-hdd/yian/freepose/0407_fixedCam_diffpose_15k_google
+          OBJECT_IMAGE_ROOT: /mnt/train-data-4-hdd/yian/freepose/object_space_renders_all
+          selected_views: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
           num_object_views: 4
           load_point_map: false
-          only_run_start: null
-          only_run_end: null
+          only_run_start: run_0000
+          only_run_end: run_14000
   val:
     _target_: data.dynamic_dataloader.DynamicTorchDataset
     num_workers: ${num_workers}
@@ -55,27 +55,27 @@ data:
       patch_size: ${patch_size}
       debug: False
       map_xyz_bfloat16: False
-      img_nums: [6, 6]
+      skip_process_batch: True
+      img_nums: [4, 6]
     dataset:
       _target_: data.composed_dataset.ComposedDataset
       dataset_configs:
-        - _target_: data.datasets.6dpose_dino.SixDPoseDataset
+        - _target_: data.datasets.6d_pose_normalize.SixDPoseNormalizeDataset
           split: val
-          DATA_ROOT: /mnt/train-data-4-hdd/yian/6dpose_obj/0327_fixedCam_1k
-          MASK_ROOT: null
-          OBJECT_IMAGE_ROOT: /mnt/train-data-4-hdd/yian/6dpose_obj/0327_fixedCam_1k/object_space_rgb
-          selected_views: [1, 3, 8, 12, 15, 18]
+          DATA_ROOT: /mnt/train-data-4-hdd/yian/freepose/0407_fixedCam_diffpose_15k_google
+          OBJECT_IMAGE_ROOT: /mnt/train-data-4-hdd/yian/freepose/object_space_renders_all
+          selected_views: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
           num_object_views: 4
           load_point_map: false
-          only_run_start: null
-          only_run_end: null
+          only_run_start: run_14001
+          only_run_end: run_14999
 
 
 logging:
   log_dir: logs/${exp_name}
   use_wandb: True
   log_visuals: False
-  log_freq: 1
+  log_freq: 5
   log_level_primary: DEBUG
   log_level_secondary: WARNING
   all_ranks: False
@@ -103,7 +103,7 @@ logging:
         - loss_object_srt
         - loss_object_pose
         - loss_object_translation
-        - loss_object_pose_init
+        # - loss_object_pose_init
     val:
       keys_to_log:
         - loss_objective
@@ -116,7 +116,7 @@ logging:
         - loss_object_srt
         - loss_object_pose
         - loss_object_translation
-        - loss_object_pose_init
+        # - loss_object_pose_init
 
 
 
@@ -151,7 +151,7 @@ loss:
     loss_type: l1
     weight_pose: 1.0
     weight_translation: 1.0
-    init_w: 1.0
+    # init_w: 1.0  # disabled because loss_object_pose_init is removed
 
 
 
@@ -232,7 +232,7 @@ model:
   enable_multi_layer_object_prototype_cross_attn: True
   enable_global_pool_scene_object_pose_head: False  # when True, scene/object are pooled independently, concatenated, then fed to the original transformer decoder pose head
   object_prototype_layer_indices: [4, 11, 17, 23]
-  object_prototype_num_tokens: 16
+  object_prototype_num_tokens: 32
   object_prototype_object_encoder_no_grad: False
   object_cross_attn_heads: 16
 

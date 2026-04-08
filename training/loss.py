@@ -162,9 +162,6 @@ def compute_object_srt_loss(
     Required prediction keys:
       - object_pose: (B, 6)
       - object_translation: (B, 3)
-    Optional prediction key:
-      - pred_pose_0: (B, 6), first-step pose for init supervision
-
     Required batch keys:
       - object_rotation: (B, 3, 3)
       - object_translation: (B, 3)
@@ -173,7 +170,7 @@ def compute_object_srt_loss(
     """
     pred_pose = predictions["object_pose"]
     pred_translation = predictions["object_translation"]
-    pred_pose_0 = predictions.get("pred_pose_0", None)
+    # pred_pose_0 = predictions.get("pred_pose_0", None)
 
     gt_rot = batch["object_rotation"]
     gt_pose = _rotation_matrix_to_rot6d(gt_rot)
@@ -199,34 +196,34 @@ def compute_object_srt_loss(
                 "loss_object_srt": dummy,
                 "loss_object_pose": dummy,
                 "loss_object_translation": dummy,
-                "loss_object_pose_init": dummy,
+                # "loss_object_pose_init": dummy,
             }
         pred_pose = pred_pose[valid_mask]
         pred_translation = pred_translation[valid_mask]
         gt_pose = gt_pose[valid_mask]
         gt_translation = gt_translation[valid_mask]
-        if pred_pose_0 is not None:
-            pred_pose_0 = pred_pose_0[valid_mask]
+        # if pred_pose_0 is not None:
+        #     pred_pose_0 = pred_pose_0[valid_mask]
 
     loss_pose = _vector_loss(pred_pose, gt_pose, loss_type=loss_type)
     loss_translation = _vector_loss(pred_translation, gt_translation, loss_type=loss_type)
 
-    if pred_pose_0 is not None:
-        loss_pose_init = _vector_loss(pred_pose_0, gt_pose, loss_type=loss_type)
-    else:
-        loss_pose_init = (pred_pose * 0).mean()
+    # if pred_pose_0 is not None:
+    #     loss_pose_init = _vector_loss(pred_pose_0, gt_pose, loss_type=loss_type)
+    # else:
+    #     loss_pose_init = (pred_pose * 0).mean()
 
     total = (
         weight_pose * loss_pose
         + weight_translation * loss_translation
-        + float(init_w) * loss_pose_init
+        # + float(init_w) * loss_pose_init
     )
 
     return {
         "loss_object_srt": total,
         "loss_object_pose": loss_pose,
         "loss_object_translation": loss_translation,
-        "loss_object_pose_init": loss_pose_init,
+        # "loss_object_pose_init": loss_pose_init,
     }
 
 

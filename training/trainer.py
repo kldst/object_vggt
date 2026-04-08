@@ -825,6 +825,9 @@ class Trainer:
         return batch
 
     def _process_batch(self, batch: Mapping):      
+        if bool(getattr(self.data_conf.train.common_config, "skip_process_batch", False)):
+            return batch
+
         if self.data_conf.train.common_config.repeat_batch:
             batch = self._apply_batch_repetition(batch)
 
