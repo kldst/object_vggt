@@ -5,7 +5,7 @@ defaults:
 
 exp_name: test_0327_object_dataset_mask_test_1k_same_object_diff_pose_multi_16
 img_size: 518
-num_workers: 8
+num_workers: 0
 seed_value: 30
 accum_steps: 1    # We did not use gradient accumulation in our training, while if you suffer from OOM, you can try to use it.
 patch_size: 14
@@ -39,8 +39,8 @@ data:
       dataset_configs:
         - _target_: data.datasets.6d_pose_normalize.SixDPoseNormalizeDataset
           split: train
-          DATA_ROOT: /mnt/train-data-4-hdd/yian/freepose/0407_fixedCam_diffpose_15k_google
-          OBJECT_IMAGE_ROOT: /mnt/train-data-4-hdd/yian/freepose/object_space_renders_all
+          DATA_ROOT: /dataset/0407_fixedCam_diffpose_15k_google
+          OBJECT_IMAGE_ROOT: /dataset/object_space_renders_all
           selected_views: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
           num_object_views: 4
           load_point_map: false
@@ -62,8 +62,8 @@ data:
       dataset_configs:
         - _target_: data.datasets.6d_pose_normalize.SixDPoseNormalizeDataset
           split: val
-          DATA_ROOT: /mnt/train-data-4-hdd/yian/freepose/0407_fixedCam_diffpose_15k_google
-          OBJECT_IMAGE_ROOT: /mnt/train-data-4-hdd/yian/freepose/object_space_renders_all
+          DATA_ROOT: /dataset/0407_fixedCam_diffpose_15k_google
+          OBJECT_IMAGE_ROOT: /dataset/object_space_renders_all
           selected_views: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
           num_object_views: 4
           load_point_map: false
@@ -123,7 +123,7 @@ logging:
 checkpoint:
   save_dir: logs/${exp_name}/ckpts
   save_freq: 10
-  resume_checkpoint_path: /mnt/train-data-4-hdd/yian/vggt_old/model/model.pt
+  resume_checkpoint_path: /mnt/train-data-4-hdd/yian/freepose/vggt_model/model.pt
   load_training_state: True
   load_scaler_state: True
   strict: False
@@ -201,14 +201,17 @@ optim:
       - scheduler:
           _target_: fvcore.common.param_scheduler.CompositeParamScheduler
           schedulers:
-            - _target_: fvcore.common.param_scheduler.LinearParamScheduler
-              start_value: 1e-8
-              end_value: 1e-4
+            # - _target_: fvcore.common.param_scheduler.LinearParamScheduler
+            #   start_value: 1e-8
+            #   end_value: 1e-4
+            # - _target_: fvcore.common.param_scheduler.CosineParamScheduler
+            #   start_value: 1e-4
+            #   end_value: 1e-8
             - _target_: fvcore.common.param_scheduler.CosineParamScheduler
               start_value: 1e-4
               end_value: 1e-8
-          lengths: [0.01, 0.99]
-          interval_scaling: ['rescaled', 'rescaled']
+          lengths: [1.0]
+          interval_scaling: ['rescaled']
     weight_decay:
       - scheduler:
           _target_: fvcore.common.param_scheduler.ConstantParamScheduler

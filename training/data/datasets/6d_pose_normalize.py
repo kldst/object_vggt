@@ -392,7 +392,7 @@ class SixDPoseNormalizeDataset(BaseDataset):
         ids: list = None,
         aspect_ratio: float = 1.0,
     ) -> dict:
-        del img_per_seq, seq_name, ids, aspect_ratio
+        del seq_name, ids, aspect_ratio
 
         if self.inside_random and self.training:
             seq_index = random.randint(0, self.sequence_list_len - 1)
