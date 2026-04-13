@@ -109,12 +109,14 @@ class ObjectPoseCameraDecoderHead(nn.Module):
             drop=0,
         )
 
-    def forward(self, context_tokens: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
+    def forward(self, context_tokens: torch.Tensor) -> tuple[list[torch.Tensor], list[torch.Tensor]]:
         batch_size = context_tokens.shape[0]
         pooled_context = self.context_proj(context_tokens).mean(dim=1, keepdim=True)
         pooled_context = self.context_norm(pooled_context)
 
         pred_pose_enc = None
+        pred_quat_list = []
+        pred_translation_list = []
         for _ in range(int(self.cfg.ief_iters)):
             if pred_pose_enc is None:
                 module_input = self.embed_pose(self.empty_pose_tokens.expand(batch_size, 1, -1))
@@ -130,15 +132,15 @@ class ObjectPoseCameraDecoderHead(nn.Module):
             pred_pose_delta = self.pose_branch(self.trunk_norm(pose_tokens))
             pred_pose_enc = pred_pose_delta if pred_pose_enc is None else pred_pose_enc + pred_pose_delta
 
-        activated_pose = activate_pose(
-            pred_pose_enc,
-            trans_act=self.cfg.trans_act,
-            quat_act=self.cfg.quat_act,
-            fl_act="linear",
-        ).squeeze(1)
-        pred_translation = activated_pose[:, :3]
-        pred_quat = activated_pose[:, 3:]
-        return pred_quat, pred_translation
+            activated_pose = activate_pose(
+                pred_pose_enc,
+                trans_act=self.cfg.trans_act,
+                quat_act=self.cfg.quat_act,
+                fl_act="linear",
+            ).squeeze(1)
+            pred_translation_list.append(activated_pose[:, :3])
+            pred_quat_list.append(activated_pose[:, 3:])
+        return pred_quat_list, pred_translation_list
 
 
 class ObjectPoseCameraHead(nn.Module):
@@ -174,10 +176,12 @@ class ObjectPoseCameraHead(nn.Module):
             object_tokens=object_tokens,
             use_global_scene_object_concat=self.use_global_scene_object_concat,
         )
-        object_pose, object_translation = self.decoder(context_tokens)
+        object_pose_list, object_translation_list = self.decoder(context_tokens)
         return {
-            "object_pose": object_pose,
-            "object_translation": object_translation,
+            "object_pose": object_pose_list[-1],
+            "object_translation": object_translation_list[-1],
+            "object_pose_list": object_pose_list,
+            "object_translation_list": object_translation_list,
         }
 
 

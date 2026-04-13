@@ -1,7 +1,7 @@
 defaults:
   - default_dataset
 
-# torchrun --master_port=29200 --nproc_per_node=1 launch.py  --config default_object
+# torchrun --master_port=2:9200 --nproc_per_node=1 launch.py  --config default_object
 
 exp_name: 0413_test_object
 img_size: 518
@@ -154,6 +154,7 @@ loss:
     weight: 1.0
     loss_type: l1
     rotation_loss_type: l1
+    gamma: 0.6
     weight_pose: 1.0
     weight_translation: 1.0
     # init_w: 1.0  # disabled because loss_object_pose_init is removed
