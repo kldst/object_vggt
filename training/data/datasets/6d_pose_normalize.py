@@ -40,7 +40,9 @@ class SixDPoseNormalizeDataset(BaseDataset):
         object_input_views: Optional[List[int]] = None,
         load_point_map: bool = False,
         num_object_views: int = 4,
+        shuffle_selected_views: bool = False,
         scale_by_points: bool = True,
+        use_stride4_scale_estimate: bool = False,
     ):
         super().__init__(common_conf=common_conf)
 
@@ -59,10 +61,12 @@ class SixDPoseNormalizeDataset(BaseDataset):
         self.verify_files = bool(verify_files)
         self.load_point_map = bool(load_point_map)
         self.scale_by_points = bool(scale_by_points)
+        self.use_stride4_scale_estimate = bool(use_stride4_scale_estimate)
 
         self.selected_views = tuple(int(v) for v in (selected_views or self.FIXED_VIEWS))
         self.object_input_views = tuple(int(v) for v in (object_input_views or self.FIXED_OBJECT_VIEWS))
         self.num_object_views = int(num_object_views)
+        self.shuffle_selected_views = bool(shuffle_selected_views)
         if self.num_object_views != len(self.object_input_views):
             raise ValueError(
                 f"num_object_views must match object_input_views length "
@@ -263,6 +267,55 @@ class SixDPoseNormalizeDataset(BaseDataset):
             transformed_world_points,
         )
 
+    @staticmethod
+    def estimate_scale_from_depth_maps_stride(
+        depth_maps: List[np.ndarray],
+        extrinsics: np.ndarray,
+        intrinsics: List[np.ndarray],
+        stride: int = 4,
+    ) -> float:
+        if stride < 1:
+            raise ValueError(f"stride must be >= 1, got {stride}")
+
+        extrinsics = np.asarray(extrinsics, dtype=np.float32)
+        first_R = extrinsics[0, :3, :3]
+        first_t = extrinsics[0, :3, 3]
+
+        dist_sum = 0.0
+        valid_count = 0.0
+        for depth_map, extri, intri in zip(depth_maps, extrinsics, intrinsics):
+            sampled_depth = depth_map[::stride, ::stride]
+            point_mask = sampled_depth > 1e-8
+            if not np.any(point_mask):
+                continue
+
+            ys, xs = np.nonzero(point_mask)
+            depths = sampled_depth[point_mask].astype(np.float32)
+
+            xs = (xs * stride).astype(np.float32)
+            ys = (ys * stride).astype(np.float32)
+            fu, fv = float(intri[0, 0]), float(intri[1, 1])
+            cu, cv = float(intri[0, 2]), float(intri[1, 2])
+
+            cam_points = np.stack(
+                [
+                    (xs - cu) * depths / fu,
+                    (ys - cv) * depths / fv,
+                    depths,
+                ],
+                axis=-1,
+            ).astype(np.float32)
+
+            extri_h = np.eye(4, dtype=np.float32)
+            extri_h[:3, :4] = extri
+            cam_to_world = closed_form_inverse_se3(extri_h[None])[0]
+            world_points = cam_points @ cam_to_world[:3, :3].T + cam_to_world[:3, 3]
+            first_cam_points = world_points @ first_R.T + first_t
+            dist_sum += float(np.linalg.norm(first_cam_points, axis=-1).sum())
+            valid_count += float(first_cam_points.shape[0])
+
+        return float(np.clip(dist_sum / (valid_count + 1e-3), 1e-6, 1e6))
+
     def _list_run_names(self) -> List[str]:
         if not osp.isdir(self.scene_root):
             raise FileNotFoundError(f"Scene root not found: {self.scene_root}")
@@ -410,7 +463,10 @@ class SixDPoseNormalizeDataset(BaseDataset):
                 f"Requested {target_frame_num} views but only {len(available_camera_indices)} are available"
             )
         if self.training or img_per_seq is not None:
-            camera_indices = sorted(random.sample(available_camera_indices, target_frame_num))
+            sampled_camera_indices = random.sample(available_camera_indices, target_frame_num)
+            camera_indices = (
+                sampled_camera_indices if self.shuffle_selected_views else sorted(sampled_camera_indices)
+            )
         else:
             camera_indices = list(available_camera_indices[:target_frame_num])
         object_cam_indices = list(rec["object_cam_indices"])
@@ -419,6 +475,7 @@ class SixDPoseNormalizeDataset(BaseDataset):
         raw_depths = [] if self.load_point_map else None
         raw_cam_points = [] if self.load_point_map else None
         raw_world_points = []
+        raw_depth_maps = []
         point_masks = []
         extrinsics = []
         intrinsics = []
@@ -435,35 +492,71 @@ class SixDPoseNormalizeDataset(BaseDataset):
 
             depth_map = self.read_encoded_depth(depth_path).astype(np.float32)
             extri, intri = self._load_camera(camera_path)
-            world_coords_points, cam_coords_points, point_mask = depth_to_world_coords_points(
-                depth_map, extri, intri
-            )
+            if self.use_stride4_scale_estimate and self.scale_by_points and not self.load_point_map:
+                world_coords_points = None
+                cam_coords_points = None
+                point_mask = depth_map > 1e-8
+            else:
+                world_coords_points, cam_coords_points, point_mask = depth_to_world_coords_points(
+                    depth_map, extri, intri
+                )
 
             scene_images.append(scene_image)
+            raw_depth_maps.append(depth_map)
             if self.load_point_map:
                 raw_depths.append(depth_map)
                 raw_cam_points.append(cam_coords_points.astype(np.float32))
-            raw_world_points.append(world_coords_points.astype(np.float32))
+            if world_coords_points is not None:
+                raw_world_points.append(world_coords_points.astype(np.float32))
             point_masks.append(point_mask.astype(bool))
             extrinsics.append(extri.astype(np.float32))
             intrinsics.append(intri.astype(np.float32))
             original_sizes.append(np.array(scene_image.shape[:2], dtype=np.int32))
 
         extrinsics_np = np.stack(extrinsics).astype(np.float32)
-        (
-            normalized_extrinsics,
-            normalized_object_rotation,
-            normalized_object_translation,
-            avg_scale,
-            normalized_world_points,
-        ) = self.normalize_extrinsics_and_object_pose(
-            extrinsics=extrinsics_np,
-            world_points=raw_world_points,
-            point_masks=point_masks,
-            object_rotation=rec["pose"]["object_rotation"],
-            object_translation=rec["pose"]["object_translation"],
-            scale_by_points=self.scale_by_points,
-        )
+        if self.use_stride4_scale_estimate and self.scale_by_points and not self.load_point_map:
+            avg_scale = self.estimate_scale_from_depth_maps_stride(
+                depth_maps=raw_depth_maps,
+                extrinsics=extrinsics_np,
+                intrinsics=intrinsics,
+                stride=4,
+            )
+            normalized_extrinsics = extrinsics_np.copy()
+            extrinsics_homog = np.concatenate(
+                [
+                    normalized_extrinsics[None, ...],
+                    np.zeros((1, normalized_extrinsics.shape[0], 1, 4), dtype=np.float32),
+                ],
+                axis=-2,
+            )
+            extrinsics_homog[:, :, 3, 3] = 1.0
+            first_cam_inv = closed_form_inverse_se3(extrinsics_homog[:, 0])[0]
+            normalized_extrinsics = np.matmul(extrinsics_homog[0], first_cam_inv[None, ...])[:, :3]
+            normalized_extrinsics[:, :3, 3] = normalized_extrinsics[:, :3, 3] / avg_scale
+
+            first_R = extrinsics_np[0, :3, :3]
+            first_t = extrinsics_np[0, :3, 3]
+            normalized_object_rotation = first_R @ np.asarray(rec["pose"]["object_rotation"], dtype=np.float32)
+            normalized_object_translation = (
+                np.asarray(rec["pose"]["object_translation"], dtype=np.float32) @ first_R.T
+            ) + first_t
+            normalized_object_translation = normalized_object_translation / avg_scale
+            normalized_world_points = []
+        else:
+            (
+                normalized_extrinsics,
+                normalized_object_rotation,
+                normalized_object_translation,
+                avg_scale,
+                normalized_world_points,
+            ) = self.normalize_extrinsics_and_object_pose(
+                extrinsics=extrinsics_np,
+                world_points=raw_world_points,
+                point_masks=point_masks,
+                object_rotation=rec["pose"]["object_rotation"],
+                object_translation=rec["pose"]["object_translation"],
+                scale_by_points=self.scale_by_points,
+            )
 
         object_images = []
         object_original_sizes = []

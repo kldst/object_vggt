@@ -33,17 +33,19 @@ data:
       map_xyz_bfloat16: False
       repeat_batch: False
       skip_process_batch: True
-      img_nums: [4, 6]
+      img_nums: [4, 4]
     dataset:
       _target_: data.composed_dataset.ComposedDataset
       dataset_configs:
         - _target_: data.datasets.6d_pose_normalize.SixDPoseNormalizeDataset
           split: train
-          DATA_ROOT: /dataset/0407_fixedCam_diffpose_15k_google
-          OBJECT_IMAGE_ROOT: /dataset/object_space_renders_all
-          selected_views: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+          DATA_ROOT: /mnt/train-data-4-hdd/yian/freepose/0407_fixedCam_diffpose_15k_google
+          OBJECT_IMAGE_ROOT: /mnt/train-data-4-hdd/yian/freepose/object_space_renders_all
+          selected_views: [1, 5, 10, 15]
           num_object_views: 4
+          shuffle_selected_views: true
           load_point_map: false
+          use_stride4_scale_estimate: false
           only_run_start: run_0000
           only_run_end: run_14000
   val:
@@ -56,24 +58,26 @@ data:
       debug: False
       map_xyz_bfloat16: False
       skip_process_batch: True
-      img_nums: [4, 6]
+      img_nums: [4, 4]
     dataset:
       _target_: data.composed_dataset.ComposedDataset
       dataset_configs:
         - _target_: data.datasets.6d_pose_normalize.SixDPoseNormalizeDataset
           split: val
-          DATA_ROOT: /dataset/0407_fixedCam_diffpose_15k_google
-          OBJECT_IMAGE_ROOT: /dataset/object_space_renders_all
-          selected_views: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+          DATA_ROOT: /mnt/train-data-4-hdd/yian/freepose/0407_fixedCam_diffpose_15k_google
+          OBJECT_IMAGE_ROOT: /mnt/train-data-4-hdd/yian/freepose/object_space_renders_all
+          selected_views: [1, 5, 10, 15]
           num_object_views: 4
+          shuffle_selected_views: true
           load_point_map: false
+          use_stride4_scale_estimate: false
           only_run_start: run_14001
           only_run_end: run_14999
 
 
 logging:
   log_dir: logs/${exp_name}
-  use_wandb: True
+  use_wandb: False
   log_visuals: False
   log_freq: 5
   log_level_primary: DEBUG
