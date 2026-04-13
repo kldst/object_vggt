@@ -14,6 +14,7 @@ from vggt.heads.dpt_head import DPTHead
 from vggt.heads.obj_dpt_head import OBJ_DPTHead
 from vggt.heads.object_mask_head import ObjectMaskHead
 from vggt.heads.track_head import TrackHead
+from vggt.heads.object_pose_camera_head import ObjectPoseCameraHead
 from vggt.heads.object_pose_head import ObjectPoseHead
 
 class ObjectTokenCrossAttentionBlock(nn.Module):
@@ -90,7 +91,9 @@ class VGGT(nn.Module, PyTorchModelHubMixin):
                  object_prototype_layer_indices=(4, 11, 17, 23),
                  object_prototype_num_tokens=4,
                  object_prototype_object_encoder_no_grad=False,
-                 enable_global_pool_scene_object_pose_head=False):
+                 enable_global_pool_scene_object_pose_head=False,
+                 enable_camera_style_object_pose_head=False,
+                 object_pose_cfg=None):
         super().__init__()
 
         self.aggregator = Aggregator(
@@ -109,6 +112,8 @@ class VGGT(nn.Module, PyTorchModelHubMixin):
         self.enable_pre_aggregator_object_cross_attn = bool(enable_pre_aggregator_object_cross_attn)
         self.enable_multi_layer_object_prototype_cross_attn = bool(enable_multi_layer_object_prototype_cross_attn)
         self.enable_global_pool_scene_object_pose_head = bool(enable_global_pool_scene_object_pose_head)
+        self.enable_camera_style_object_pose_head = bool(enable_camera_style_object_pose_head)
+        self.object_pose_cfg = object_pose_cfg
         self.object_prototype_layer_indices = tuple(int(idx) for idx in object_prototype_layer_indices)
         self.object_prototype_num_tokens = int(object_prototype_num_tokens)
         self.object_prototype_object_encoder_no_grad = bool(object_prototype_object_encoder_no_grad)
@@ -184,9 +189,18 @@ class VGGT(nn.Module, PyTorchModelHubMixin):
             else None
         )
         self.object_srt_head = (
-            ObjectPoseHead(
-                dim_in=2 * embed_dim,
-                use_global_scene_object_concat=self.enable_global_pool_scene_object_pose_head,
+            (
+                ObjectPoseCameraHead(
+                    dim_in=2 * embed_dim,
+                    object_pose_cfg=self.object_pose_cfg,
+                    use_global_scene_object_concat=self.enable_global_pool_scene_object_pose_head,
+                )
+                if self.enable_camera_style_object_pose_head
+                else ObjectPoseHead(
+                    dim_in=2 * embed_dim,
+                    object_pose_cfg=self.object_pose_cfg,
+                    use_global_scene_object_concat=self.enable_global_pool_scene_object_pose_head,
+                )
             )
             if enable_object_srt
             else None
