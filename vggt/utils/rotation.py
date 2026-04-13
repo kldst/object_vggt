@@ -135,6 +135,15 @@ def mat_to_quat(matrix: torch.Tensor) -> torch.Tensor:
     return out
 
 
+def mat_to_quat_wxyz(matrix: torch.Tensor) -> torch.Tensor:
+    """
+    Convert rotation matrices to quaternions in WXYZ order, scalar-first.
+    """
+    quat_xyzw = mat_to_quat(matrix)
+    quat_wxyz = quat_xyzw[..., [3, 0, 1, 2]]
+    return standardize_quaternion_wxyz(quat_wxyz)
+
+
 def _sqrt_positive_part(x: torch.Tensor) -> torch.Tensor:
     """
     Returns torch.sqrt(torch.max(0, x))
@@ -162,3 +171,10 @@ def standardize_quaternion(quaternions: torch.Tensor) -> torch.Tensor:
         Standardized quaternions as tensor of shape (..., 4).
     """
     return torch.where(quaternions[..., 3:4] < 0, -quaternions, quaternions)
+
+
+def standardize_quaternion_wxyz(quaternions: torch.Tensor) -> torch.Tensor:
+    """
+    Convert a unit quaternion in WXYZ order to a standard form with non-negative scalar part.
+    """
+    return torch.where(quaternions[..., 0:1] < 0, -quaternions, quaternions)

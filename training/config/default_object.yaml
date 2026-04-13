@@ -3,7 +3,7 @@ defaults:
 
 # torchrun --master_port=29200 --nproc_per_node=1 launch.py  --config default_object
 
-exp_name: test_0327_object_dataset_mask_test_1k_same_object_diff_pose_multi_16
+exp_name: 0413_test_object
 img_size: 518
 num_workers: 0
 seed_value: 30
@@ -15,7 +15,7 @@ max_img_per_gpu: 72
 limit_train_batches: 3872 # sample 幾次 (一次 per gpu / img num)
 # limit_train_batches:  100
 # limit_train_batches:  50
-limit_val_batches: 276
+limit_val_batches: 1
 
 debug:
   force_model_output_to_ground_truth: False
@@ -39,15 +39,15 @@ data:
       dataset_configs:
         - _target_: data.datasets.6d_pose_normalize.SixDPoseNormalizeDataset
           split: train
-          DATA_ROOT: /mnt/train-data-4-hdd/yian/freepose/0407_fixedCam_diffpose_15k_google
-          OBJECT_IMAGE_ROOT: /mnt/train-data-4-hdd/yian/freepose/object_space_renders_all
+          DATA_ROOT: /dataset/0407_fixedCam_diffpose_15k_google
+          OBJECT_IMAGE_ROOT: /dataset/object_space_renders_all
           selected_views: [1, 5, 10, 15]
           num_object_views: 4
-          shuffle_selected_views: true
+          shuffle_selected_views: false
           load_point_map: false
           use_stride4_scale_estimate: false
           only_run_start: run_0000
-          only_run_end: run_14000
+          only_run_end: run_0100
   val:
     _target_: data.dynamic_dataloader.DynamicTorchDataset
     num_workers: ${num_workers}
@@ -64,11 +64,11 @@ data:
       dataset_configs:
         - _target_: data.datasets.6d_pose_normalize.SixDPoseNormalizeDataset
           split: val
-          DATA_ROOT: /mnt/train-data-4-hdd/yian/freepose/0407_fixedCam_diffpose_15k_google
-          OBJECT_IMAGE_ROOT: /mnt/train-data-4-hdd/yian/freepose/object_space_renders_all
+          DATA_ROOT: /dataset/0407_fixedCam_diffpose_15k_google
+          OBJECT_IMAGE_ROOT: /dataset/object_space_renders_all
           selected_views: [1, 5, 10, 15]
           num_object_views: 4
-          shuffle_selected_views: true
+          shuffle_selected_views: false
           load_point_map: false
           use_stride4_scale_estimate: false
           only_run_start: run_14001
@@ -127,7 +127,7 @@ logging:
 checkpoint:
   save_dir: logs/${exp_name}/ckpts
   save_freq: 10
-  resume_checkpoint_path: /mnt/train-data-4-hdd/yian/freepose/vggt_model/model.pt
+  resume_checkpoint_path: /vggt_large_object/model/model.pt
   load_training_state: True
   load_scaler_state: True
   strict: False
@@ -153,7 +153,7 @@ loss:
   object_srt:
     weight: 1.0
     loss_type: l1
-    rotation_loss_type: geodesic
+    rotation_loss_type: l1
     weight_pose: 1.0
     weight_translation: 1.0
     # init_w: 1.0  # disabled because loss_object_pose_init is removed

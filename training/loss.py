@@ -9,7 +9,7 @@ import torch.nn.functional as F
 
 from dataclasses import dataclass
 from vggt.utils.pose_enc import extri_intri_to_pose_encoding
-from vggt.utils.rotation import quat_wxyz_to_mat
+from vggt.utils.rotation import mat_to_quat_wxyz
 from train_utils.general import check_and_fix_inf_nan
 from math import ceil, floor
 
@@ -182,7 +182,7 @@ def compute_object_srt_loss(
     predictions,
     batch,
     loss_type="l1",
-    rotation_loss_type="geodesic",
+    rotation_loss_type="l1",
     weight_pose=1.0,
     weight_translation=1.0,
     init_w=1.0,
@@ -193,7 +193,7 @@ def compute_object_srt_loss(
     Compute object SRT loss.
 
     Required prediction keys:
-      - object_pose: (B, 4) quaternion or (B, 6) rotation-6D
+      - object_pose: (B, 4) quaternion in WXYZ order or (B, 6) rotation-6D
       - object_translation: (B, 3)
     Required batch keys:
       - object_rotation: (B, 3, 3)
@@ -206,6 +206,7 @@ def compute_object_srt_loss(
     # pred_pose_0 = predictions.get("pred_pose_0", None)
 
     gt_rot = batch["object_rotation"]
+    gt_pose = mat_to_quat_wxyz(gt_rot)
     gt_translation = batch["object_translation"]
 
     if debug_force_model_output_to_ground_truth and not getattr(
@@ -213,7 +214,7 @@ def compute_object_srt_loss(
     ):
         print(
             "[DebugDType][object_srt] "
-            f"pred_pose={pred_pose.dtype}, gt_rot={gt_rot.dtype}, "
+            f"pred_pose={pred_pose.dtype}, gt_pose={gt_pose.dtype}, "
             f"pred_translation={pred_translation.dtype}, gt_translation={gt_translation.dtype}",
             flush=True,
         )
@@ -233,17 +234,18 @@ def compute_object_srt_loss(
         pred_pose = pred_pose[valid_mask]
         pred_translation = pred_translation[valid_mask]
         gt_rot = gt_rot[valid_mask]
+        gt_pose = gt_pose[valid_mask]
         gt_translation = gt_translation[valid_mask]
         # if pred_pose_0 is not None:
         #     pred_pose_0 = pred_pose_0[valid_mask]
 
     if pred_pose.shape[-1] == 4:
-        pred_rot = quat_wxyz_to_mat(pred_pose)
+        loss_pose = _vector_loss(pred_pose, gt_pose, loss_type=rotation_loss_type)
     elif pred_pose.shape[-1] == 6:
         pred_rot = _rot6d_to_rotation_matrix(pred_pose)
+        loss_pose = _rotation_loss(pred_rot, gt_rot, loss_type=rotation_loss_type)
     else:
         raise ValueError(f"Unsupported object_pose shape {tuple(pred_pose.shape)}")
-    loss_pose = _rotation_loss(pred_rot, gt_rot, loss_type=rotation_loss_type)
     loss_translation = _vector_loss(pred_translation, gt_translation, loss_type=loss_type)
 
     # if pred_pose_0 is not None:
