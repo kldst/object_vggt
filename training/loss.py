@@ -9,7 +9,7 @@ import torch.nn.functional as F
 
 from dataclasses import dataclass
 from vggt.utils.pose_enc import extri_intri_to_pose_encoding
-from vggt.utils.rotation import mat_to_quat_wxyz
+from vggt.utils.rotation import mat_to_quat_wxyz, quat_wxyz_to_mat
 from train_utils.general import check_and_fix_inf_nan
 from math import ceil, floor
 
@@ -34,6 +34,7 @@ class MultitaskLoss(torch.nn.Module):
         object_point=None,
         object_mask=None,
         object_srt=None,
+        object_relative_pose=None,
         debug_force_model_output_to_ground_truth=False,
         **kwargs,
     ):
@@ -46,6 +47,7 @@ class MultitaskLoss(torch.nn.Module):
         self.object_point = object_point
         self.object_mask = object_mask
         self.object_srt = object_srt
+        self.object_relative_pose = object_relative_pose
         self.debug_force_model_output_to_ground_truth = bool(debug_force_model_output_to_ground_truth)
 
     def forward(self, predictions, batch) -> torch.Tensor:
@@ -125,6 +127,20 @@ class MultitaskLoss(torch.nn.Module):
             )
             total_loss = total_loss + object_srt_loss_dict["loss_object_srt"] * self.object_srt["weight"]
             loss_dict.update(object_srt_loss_dict)
+
+        if "object_pose" in predictions and self.object_relative_pose is not None:
+            object_relative_pose_loss_dict = compute_object_relative_pose_loss(
+                predictions,
+                batch,
+                debug_force_model_output_to_ground_truth=self.debug_force_model_output_to_ground_truth,
+                **self.object_relative_pose,
+            )
+            total_loss = (
+                total_loss
+                + object_relative_pose_loss_dict["loss_object_relative_pose"]
+                * self.object_relative_pose["weight"]
+            )
+            loss_dict.update(object_relative_pose_loss_dict)
         
         loss_dict["objective"] = total_loss
 
@@ -176,6 +192,14 @@ def _rotation_loss(pred_rot: torch.Tensor, gt_rot: torch.Tensor, loss_type: str 
     if loss_type == "l2":
         return ((pred_rot - gt_rot) ** 2).mean()
     raise ValueError(f"Unknown rotation loss type: {loss_type}")
+
+
+def _pose_to_rotation_matrix(pose: torch.Tensor) -> torch.Tensor:
+    if pose.shape[-1] == 4:
+        return quat_wxyz_to_mat(pose)
+    if pose.shape[-1] == 6:
+        return _rot6d_to_rotation_matrix(pose)
+    raise ValueError(f"Unsupported pose shape {tuple(pose.shape)}")
 
 
 def compute_object_srt_loss(
@@ -283,6 +307,96 @@ def compute_object_srt_loss(
         "loss_object_pose": loss_pose,
         "loss_object_translation": loss_translation,
         # "loss_object_pose_init": loss_pose_init,
+    }
+
+
+def compute_object_relative_pose_loss(
+    predictions,
+    batch,
+    loss_type="l1",
+    rotation_loss_type="l1",
+    weight_pose=1.0,
+    weight_translation=1.0,
+    debug_force_model_output_to_ground_truth=False,
+    **kwargs,
+):
+    """
+    Compute per-view relative pose loss from a predicted global object pose and GT normalized cameras.
+
+    Required prediction keys:
+      - object_pose: (B, 4) quaternion in WXYZ order or (B, 6) rotation-6D
+      - object_translation: (B, 3)
+    Required batch keys:
+      - extrinsics: (B, S, 3, 4) normalized world-to-camera extrinsics
+      - object_rotation: (B, 3, 3) normalized global object rotation
+      - object_translation: (B, 3) normalized global object translation
+    """
+    pred_pose = predictions["object_pose"]
+    pred_translation = predictions["object_translation"]
+
+    gt_rot_global = batch["object_rotation"]
+    gt_translation_global = batch["object_translation"]
+    gt_extrinsics = batch["extrinsics"]
+    gt_cam_rot = gt_extrinsics[..., :3]
+    gt_cam_trans = gt_extrinsics[..., :3, 3]
+
+    has_object = batch.get("has_object", None)
+    valid_mask = None
+    if has_object is not None:
+        valid_mask = has_object.bool()
+        if valid_mask.sum() == 0:
+            dummy = (pred_pose * 0).mean()
+            return {
+                "loss_object_relative_pose": dummy,
+                "loss_object_relative_pose_rot": dummy,
+                "loss_object_relative_pose_translation": dummy,
+            }
+        gt_rot_global = gt_rot_global[valid_mask]
+        gt_translation_global = gt_translation_global[valid_mask]
+        gt_cam_rot = gt_cam_rot[valid_mask]
+        gt_cam_trans = gt_cam_trans[valid_mask]
+
+    gt_rel_rot = gt_cam_rot @ gt_rot_global[:, None]
+    gt_rel_quat = mat_to_quat_wxyz(gt_rel_rot)
+    gt_rel_translation = (
+        torch.matmul(gt_cam_rot, gt_translation_global[:, None, :, None]).squeeze(-1).squeeze(-1)
+        + gt_cam_trans
+    )
+
+    if debug_force_model_output_to_ground_truth and not getattr(
+        compute_object_relative_pose_loss, "_dtype_logged_once", False
+    ):
+        print(
+            "[DebugDType][object_relative_pose] "
+            f"pred_pose={pred_pose.dtype}, gt_rel_quat={gt_rel_quat.dtype}, "
+            f"pred_translation={pred_translation.dtype}, gt_rel_translation={gt_rel_translation.dtype}",
+            flush=True,
+        )
+        compute_object_relative_pose_loss._dtype_logged_once = True
+
+    if valid_mask is not None:
+        pred_pose = pred_pose[valid_mask]
+        pred_translation = pred_translation[valid_mask]
+
+    pred_rot_global = _pose_to_rotation_matrix(pred_pose)
+    pred_rel_rot = gt_cam_rot @ pred_rot_global[:, None]
+    pred_rel_translation = (
+        torch.matmul(gt_cam_rot, pred_translation[:, None, :, None]).squeeze(-1).squeeze(-1)
+        + gt_cam_trans
+    )
+
+    if pred_pose.shape[-1] == 4:
+        pred_rel_quat = mat_to_quat_wxyz(pred_rel_rot)
+        loss_pose = _vector_loss(pred_rel_quat, gt_rel_quat, loss_type=rotation_loss_type)
+    else:
+        loss_pose = _rotation_loss(pred_rel_rot, gt_rel_rot, loss_type=rotation_loss_type)
+    loss_translation = _vector_loss(pred_rel_translation, gt_rel_translation, loss_type=loss_type)
+    total = weight_pose * loss_pose + weight_translation * loss_translation
+
+    return {
+        "loss_object_relative_pose": total,
+        "loss_object_relative_pose_rot": loss_pose,
+        "loss_object_relative_pose_translation": loss_translation,
     }
 
 

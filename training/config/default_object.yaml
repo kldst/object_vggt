@@ -43,7 +43,7 @@ data:
           OBJECT_IMAGE_ROOT: /dataset/object_space_renders_all
           selected_views: [1, 5, 10, 15]
           num_object_views: 4
-          shuffle_selected_views: false
+          shuffle_selected_views: true
           load_point_map: false
           use_stride4_scale_estimate: false
           only_run_start: run_0000
@@ -68,7 +68,7 @@ data:
           OBJECT_IMAGE_ROOT: /dataset/object_space_renders_all
           selected_views: [1, 5, 10, 15]
           num_object_views: 4
-          shuffle_selected_views: false
+          shuffle_selected_views: true
           load_point_map: false
           use_stride4_scale_estimate: false
           only_run_start: run_14001
@@ -79,7 +79,7 @@ logging:
   log_dir: logs/${exp_name}
   use_wandb: False
   log_visuals: False
-  log_freq: 5
+  log_freq: 1
   log_level_primary: DEBUG
   log_level_secondary: WARNING
   all_ranks: False
@@ -107,6 +107,9 @@ logging:
         - loss_object_srt
         - loss_object_pose
         - loss_object_translation
+        - loss_object_relative_pose
+        - loss_object_relative_pose_rot
+        - loss_object_relative_pose_translation
         # - loss_object_pose_init
     val:
       keys_to_log:
@@ -120,6 +123,9 @@ logging:
         - loss_object_srt
         - loss_object_pose
         - loss_object_translation
+        - loss_object_relative_pose
+        - loss_object_relative_pose_rot
+        - loss_object_relative_pose_translation
         # - loss_object_pose_init
 
 
@@ -158,6 +164,13 @@ loss:
     weight_pose: 1.0
     weight_translation: 1.0
     # init_w: 1.0  # disabled because loss_object_pose_init is removed
+  object_relative_pose:
+    weight: 1.0
+    loss_type: l1
+    rotation_loss_type: l1
+    gamma: 0.6
+    weight_pose: 1.0
+    weight_translation: 1.0
 
 
 
