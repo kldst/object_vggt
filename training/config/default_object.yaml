@@ -10,12 +10,12 @@ seed_value: 30
 accum_steps: 1    # We did not use gradient accumulation in our training, while if you suffer from OOM, you can try to use it.
 patch_size: 14
 val_epoch_freq: 10
-max_img_per_gpu: 72
+max_img_per_gpu: 80
 
-limit_train_batches: 3872 # sample 幾次 (一次 per gpu / img num)
+limit_train_batches: 700 # sample 幾次 (一次 per gpu / img num)
 # limit_train_batches:  100
 # limit_train_batches:  50
-limit_val_batches: 1
+limit_val_batches: 100
 
 debug:
   force_model_output_to_ground_truth: False
@@ -42,12 +42,13 @@ data:
           DATA_ROOT: /dataset/0407_fixedCam_diffpose_15k_google
           OBJECT_IMAGE_ROOT: /dataset/object_space_renders_all
           selected_views: [1, 5, 10, 15]
+          object_input_views: [1, 3, 8, 12]
           num_object_views: 4
           shuffle_selected_views: true
           load_point_map: false
           use_stride4_scale_estimate: false
           only_run_start: run_0000
-          only_run_end: run_0100
+          only_run_end: run_5000
   val:
     _target_: data.dynamic_dataloader.DynamicTorchDataset
     num_workers: ${num_workers}
@@ -67,6 +68,7 @@ data:
           DATA_ROOT: /dataset/0407_fixedCam_diffpose_15k_google
           OBJECT_IMAGE_ROOT: /dataset/object_space_renders_all
           selected_views: [1, 5, 10, 15]
+          object_input_views: [1, 3, 8, 12]
           num_object_views: 4
           shuffle_selected_views: true
           load_point_map: false
@@ -77,7 +79,7 @@ data:
 
 logging:
   log_dir: logs/${exp_name}
-  use_wandb: False
+  use_wandb: True
   log_visuals: False
   log_freq: 1
   log_level_primary: DEBUG
@@ -107,9 +109,9 @@ logging:
         - loss_object_srt
         - loss_object_pose
         - loss_object_translation
-        - loss_object_relative_pose
-        - loss_object_relative_pose_rot
-        - loss_object_relative_pose_translation
+        # - loss_object_relative_pose
+        # - loss_object_relative_pose_rot
+        # - loss_object_relative_pose_translation
         # - loss_object_pose_init
     val:
       keys_to_log:
@@ -123,9 +125,9 @@ logging:
         - loss_object_srt
         - loss_object_pose
         - loss_object_translation
-        - loss_object_relative_pose
-        - loss_object_relative_pose_rot
-        - loss_object_relative_pose_translation
+        # - loss_object_relative_pose
+        # - loss_object_relative_pose_rot
+        # - loss_object_relative_pose_translation
         # - loss_object_pose_init
 
 
@@ -133,7 +135,7 @@ logging:
 checkpoint:
   save_dir: logs/${exp_name}/ckpts
   save_freq: 10
-  resume_checkpoint_path: /vggt_large_object/model/model.pt
+  resume_checkpoint_path: /mnt/train-data-4-hdd/yian/freepose/vggt_model/model.pt
   load_training_state: True
   load_scaler_state: True
   strict: False
@@ -164,13 +166,13 @@ loss:
     weight_pose: 1.0
     weight_translation: 1.0
     # init_w: 1.0  # disabled because loss_object_pose_init is removed
-  object_relative_pose:
-    weight: 1.0
-    loss_type: l1
-    rotation_loss_type: l1
-    gamma: 0.6
-    weight_pose: 1.0
-    weight_translation: 1.0
+  # object_relative_pose:
+  #   weight: 1.0
+  #   loss_type: l1
+  #   rotation_loss_type: l1
+  #   gamma: 0.6
+  #   weight_pose: 1.0
+  #   weight_translation: 1.0
 
 
 
@@ -203,7 +205,7 @@ optim:
       # - module_name: ["pre_object_token_cross_attn"]
       #   max_norm: 1.0
       #   norm_type: 2
-      - module_name: ["object_token_cross_attn", "object_token_cross_attn_blocks", "object_prototype_poolers"]
+      - module_name: ["object_token_cross_attn", "object_token_cross_attn_blocks", "object_prototype_poolers", "object_view_id_embed"]
         max_norm: 1.0
         norm_type: 2
       # - module_name: ["object_pt_head"]
@@ -220,17 +222,14 @@ optim:
       - scheduler:
           _target_: fvcore.common.param_scheduler.CompositeParamScheduler
           schedulers:
-            # - _target_: fvcore.common.param_scheduler.LinearParamScheduler
-            #   start_value: 1e-8
-            #   end_value: 1e-4
-            # - _target_: fvcore.common.param_scheduler.CosineParamScheduler
-            #   start_value: 1e-4
-            #   end_value: 1e-8
+            - _target_: fvcore.common.param_scheduler.LinearParamScheduler
+              start_value: 1e-6
+              end_value: 1e-4
             - _target_: fvcore.common.param_scheduler.CosineParamScheduler
               start_value: 1e-4
-              end_value: 1e-8
-          lengths: [1.0]
-          interval_scaling: ['rescaled']
+              end_value: 1e-6
+          lengths: [0.05, 0.95]
+          interval_scaling: ['rescaled', 'rescaled']
     weight_decay:
       - scheduler:
           _target_: fvcore.common.param_scheduler.ConstantParamScheduler
@@ -258,6 +257,8 @@ model:
   object_prototype_num_tokens: 32
   object_prototype_object_encoder_no_grad: False
   object_cross_attn_heads: 16
+  use_object_view_identity: True
+  object_view_vocab_size: 20
   object_pose_cfg:
     ief_iters: 4
     pose_encoding_type: absT_quaR

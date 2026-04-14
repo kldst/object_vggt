@@ -808,6 +808,7 @@ class Trainer:
         tensor_keys = [
             "images", "depths", "extrinsics", "intrinsics", 
             "cam_points", "world_points", "point_masks", "object_masks",
+            "object_images", "object_view_ids",
         ]        
         string_keys = ["seq_name"]
         
@@ -866,6 +867,7 @@ class Trainer:
         y_hat = model(
             scene_images=batch["images"],
             object_images=batch.get("object_images"),
+            object_view_ids=batch.get("object_view_ids"),
         )
         if self.force_model_output_to_ground_truth:
             y_hat = self._override_predictions_with_ground_truth(y_hat, batch, phase)

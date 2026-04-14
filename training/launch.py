@@ -11,8 +11,6 @@ from hydra import initialize, compose
 from omegaconf import DictConfig, OmegaConf
 
 
-os.environ['CUDA_VISIBLE_DEVICES'] = '0'
-
 def _prepend_repo_root_to_sys_path():
     repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
     if repo_root not in sys.path:
@@ -43,4 +41,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

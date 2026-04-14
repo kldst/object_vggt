@@ -560,6 +560,7 @@ class SixDPoseNormalizeDataset(BaseDataset):
 
         object_images = []
         object_original_sizes = []
+        object_view_ids = []
         for obj_cam_idx in object_cam_indices:
             object_image_path = self._resolve_object_image_path(object_name, obj_cam_idx)
             object_image = read_image_cv2(object_image_path)
@@ -567,6 +568,7 @@ class SixDPoseNormalizeDataset(BaseDataset):
                 raise FileNotFoundError(f"Failed to read object image: {object_image_path}")
             object_images.append(object_image)
             object_original_sizes.append(np.array(object_image.shape[:2], dtype=np.int32))
+            object_view_ids.append(int(obj_cam_idx))
 
         batch = {
             "seq_name": f"6d_pose_normalize_{run_name}/{object_name}",
@@ -580,6 +582,7 @@ class SixDPoseNormalizeDataset(BaseDataset):
             "object_original_sizes": object_original_sizes,
             "camera_indices": np.array(camera_indices, dtype=np.int64),
             "object_cam_indices": np.array(object_cam_indices, dtype=np.int64),
+            "object_view_ids": np.asarray(object_view_ids, dtype=np.int64),
             "object_name": object_name,
             "object_id": self.object_name_to_object_id(object_name),
             "run_name": run_name,
