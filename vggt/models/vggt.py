@@ -16,6 +16,7 @@ from vggt.heads.object_mask_head import ObjectMaskHead
 from vggt.heads.track_head import TrackHead
 from vggt.heads.object_pose_camera_head import ObjectPoseCameraHead
 from vggt.heads.object_pose_head import ObjectPoseHead
+from vggt.heads.object_pose_query_head import ObjectPoseQueryHead
 
 class ObjectTokenCrossAttentionBlock(nn.Module):
     def __init__(self, query_dim: int, context_dim: int, num_heads: int, mlp_ratio: float = 4.0):
@@ -93,6 +94,7 @@ class VGGT(nn.Module, PyTorchModelHubMixin):
                  object_prototype_object_encoder_no_grad=False,
                  enable_global_pool_scene_object_pose_head=False,
                  enable_camera_style_object_pose_head=False,
+                 enable_query_style_object_pose_head=False,
                  object_pose_cfg=None,
                  use_object_view_identity=False,
                  object_view_vocab_size=32):
@@ -115,6 +117,7 @@ class VGGT(nn.Module, PyTorchModelHubMixin):
         self.enable_multi_layer_object_prototype_cross_attn = bool(enable_multi_layer_object_prototype_cross_attn)
         self.enable_global_pool_scene_object_pose_head = bool(enable_global_pool_scene_object_pose_head)
         self.enable_camera_style_object_pose_head = bool(enable_camera_style_object_pose_head)
+        self.enable_query_style_object_pose_head = bool(enable_query_style_object_pose_head)
         self.object_pose_cfg = object_pose_cfg
         self.use_object_view_identity = bool(use_object_view_identity)
         self.object_view_vocab_size = int(object_view_vocab_size)
@@ -199,16 +202,23 @@ class VGGT(nn.Module, PyTorchModelHubMixin):
         )
         self.object_srt_head = (
             (
-                ObjectPoseCameraHead(
+                ObjectPoseQueryHead(
                     dim_in=2 * embed_dim,
                     object_pose_cfg=self.object_pose_cfg,
-                    use_global_scene_object_concat=self.enable_global_pool_scene_object_pose_head,
                 )
-                if self.enable_camera_style_object_pose_head
-                else ObjectPoseHead(
-                    dim_in=2 * embed_dim,
-                    object_pose_cfg=self.object_pose_cfg,
-                    use_global_scene_object_concat=self.enable_global_pool_scene_object_pose_head,
+                if self.enable_query_style_object_pose_head
+                else (
+                    ObjectPoseCameraHead(
+                        dim_in=2 * embed_dim,
+                        object_pose_cfg=self.object_pose_cfg,
+                        use_global_scene_object_concat=self.enable_global_pool_scene_object_pose_head,
+                    )
+                    if self.enable_camera_style_object_pose_head
+                    else ObjectPoseHead(
+                        dim_in=2 * embed_dim,
+                        object_pose_cfg=self.object_pose_cfg,
+                        use_global_scene_object_concat=self.enable_global_pool_scene_object_pose_head,
+                    )
                 )
             )
             if enable_object_srt
@@ -560,14 +570,22 @@ class VGGT(nn.Module, PyTorchModelHubMixin):
                 )
 
             if self.object_srt_head is not None:
-                predictions.update(
-                    self.object_srt_head(
-                        aggregated_tokens_list,
-                        patch_start_idx=patch_start_idx,
-                        object_latent=object_latent,
-                        object_tokens=object_patch_tokens,
+                if self.enable_query_style_object_pose_head:
+                    predictions.update(
+                        self.object_srt_head(
+                            aggregated_tokens_list,
+                            patch_start_idx=patch_start_idx,
+                        )
                     )
-                )
+                else:
+                    predictions.update(
+                        self.object_srt_head(
+                            aggregated_tokens_list,
+                            patch_start_idx=patch_start_idx,
+                            object_latent=object_latent,
+                            object_tokens=object_patch_tokens,
+                        )
+                    )
 
         if self.track_head is not None and query_points is not None:
             track_list, vis, conf = self.track_head(
