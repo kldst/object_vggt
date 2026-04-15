@@ -27,9 +27,9 @@ class ObjectPoseHeadConfig:
 
 
 def _default_init_params_path() -> Optional[str]:
-	repo_root = Path(__file__).resolve().parents[2]
-	candidate = repo_root / "training" / "data" / "init_6dpose" / "init_6dpose_params.npz"
-	return str(candidate) if candidate.is_file() else None
+    repo_root = Path(__file__).resolve().parents[2]
+    candidate = repo_root / "training" / "data" / "init_6dpose" / "init_6dpose_params_identity_zero_translate.npz"
+    return str(candidate) if candidate.is_file() else None
 
 
 def _load_global_init_params(init_params_path: Optional[str]) -> Tuple[np.ndarray, np.ndarray]:
