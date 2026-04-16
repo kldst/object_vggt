@@ -8,8 +8,8 @@ import torch
 import torch.nn as nn
 
 from vggt.heads.head_act import activate_pose
+from vggt.heads.pose_transformer import TransformerDecoder
 from vggt.layers import Mlp
-from vggt.layers.block import Block
 
 
 @dataclass(frozen=True)
@@ -68,16 +68,15 @@ class ObjectPoseQueryDecoderHead(nn.Module):
         self.context_norm = nn.LayerNorm(hidden_dim)
         self.query_norm = nn.LayerNorm(hidden_dim)
         self.trunk_norm = nn.LayerNorm(hidden_dim)
-        self.trunk = nn.Sequential(
-            *[
-                Block(
-                    dim=hidden_dim,
-                    num_heads=self.cfg.object_num_heads,
-                    mlp_ratio=self.cfg.object_mlp_ratio,
-                    init_values=self.cfg.object_init_values,
-                )
-                for _ in range(self.cfg.object_trunk_depth)
-            ]
+        self.trunk = TransformerDecoder(
+            num_tokens=1,
+            token_dim=hidden_dim,
+            dim=hidden_dim,
+            depth=self.cfg.object_trunk_depth,
+            heads=self.cfg.object_num_heads,
+            mlp_dim=int(hidden_dim * self.cfg.object_mlp_ratio),
+            context_dim=hidden_dim,
+            skip_token_embedding=True,
         )
 
         self.empty_pose_tokens = nn.Parameter(torch.zeros(1, 1, self.target_dim))
@@ -103,9 +102,7 @@ class ObjectPoseQueryDecoderHead(nn.Module):
                 pred_pose_enc = pred_pose_enc.detach()
                 object_query = self.embed_pose(pred_pose_enc)
 
-            query_context_tokens = torch.cat([self.query_norm(object_query), context_tokens], dim=1)
-            query_context_tokens = self.trunk(query_context_tokens)
-            query_out = query_context_tokens[:, :1, :]
+            query_out = self.trunk(self.query_norm(object_query), context=context_tokens)
 
             pred_pose_delta = self.pose_branch(self.trunk_norm(query_out))
             pred_pose_enc = pred_pose_delta if pred_pose_enc is None else pred_pose_enc + pred_pose_delta

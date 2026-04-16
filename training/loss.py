@@ -207,8 +207,6 @@ def compute_object_srt_loss(
     predictions,
     batch,
     loss_type="l1",
-    rotation_loss_type="geodesic",
-    gamma=0.6,
     weight_pose=1.0,
     weight_translation=1.0,
     init_w=1.0,
@@ -216,10 +214,10 @@ def compute_object_srt_loss(
     **kwargs,
 ):
     """
-    Compute object SRT loss.
+    Compute 6D object SRT loss.
 
     Required prediction keys:
-      - object_pose: (B, 4) quaternion in WXYZ order or (B, 6) rotation-6D
+      - object_pose: (B, 6)
       - object_translation: (B, 3)
     Required batch keys:
       - object_rotation: (B, 3, 3)
@@ -227,14 +225,12 @@ def compute_object_srt_loss(
     Optional batch key:
       - has_object: (B,) bool mask
     """
-    pred_pose_list = predictions.get("object_pose_list")
-    pred_translation_list = predictions.get("object_translation_list")
-    if pred_pose_list is None or pred_translation_list is None:
-        pred_pose_list = [predictions["object_pose"]]
-        pred_translation_list = [predictions["object_translation"]]
+    pred_pose = predictions["object_pose"]
+    pred_translation = predictions["object_translation"]
     # pred_pose_0 = predictions.get("pred_pose_0", None)
 
     gt_rot = batch["object_rotation"]
+    gt_pose = _rotation_matrix_to_rot6d(gt_rot)
     gt_translation = batch["object_translation"]
 
     if debug_force_model_output_to_ground_truth and not getattr(
@@ -242,8 +238,8 @@ def compute_object_srt_loss(
     ):
         print(
             "[DebugDType][object_srt] "
-            f"pred_pose={pred_pose_list[-1].dtype}, gt_rot={gt_rot.dtype}, "
-            f"pred_translation={pred_translation_list[-1].dtype}, gt_translation={gt_translation.dtype}",
+            f"pred_pose={pred_pose.dtype}, gt_pose={gt_pose.dtype}, "
+            f"pred_translation={pred_translation.dtype}, gt_translation={gt_translation.dtype}",
             flush=True,
         )
         compute_object_srt_loss._dtype_logged_once = True
@@ -252,38 +248,23 @@ def compute_object_srt_loss(
     if has_object is not None:
         valid_mask = has_object.bool()
         if valid_mask.sum() == 0:
-            dummy = (pred_pose_list[-1] * 0).mean()
+            dummy = (pred_pose * 0).mean()
             return {
                 "loss_object_srt": dummy,
                 "loss_object_pose": dummy,
                 "loss_object_translation": dummy,
                 # "loss_object_pose_init": dummy,
             }
+        pred_pose = pred_pose[valid_mask]
+        pred_translation = pred_translation[valid_mask]
+        gt_pose = gt_pose[valid_mask]
         gt_rot = gt_rot[valid_mask]
         gt_translation = gt_translation[valid_mask]
         # if pred_pose_0 is not None:
         #     pred_pose_0 = pred_pose_0[valid_mask]
 
-    n_stages = len(pred_pose_list)
-    total_loss_pose = 0
-    total_loss_translation = 0
-
-    for stage_idx, (pred_pose_stage, pred_translation_stage) in enumerate(zip(pred_pose_list, pred_translation_list)):
-        stage_weight = gamma ** (n_stages - stage_idx - 1)
-
-        if has_object is not None:
-            pred_pose_stage = pred_pose_stage[valid_mask]
-            pred_translation_stage = pred_translation_stage[valid_mask]
-
-        pred_rot_stage = _pose_to_rotation_matrix(pred_pose_stage)
-        loss_pose_stage = _rotation_loss(pred_rot_stage, gt_rot, loss_type=rotation_loss_type)
-
-        loss_translation_stage = _vector_loss(pred_translation_stage, gt_translation, loss_type=loss_type)
-        total_loss_pose += loss_pose_stage * stage_weight
-        total_loss_translation += loss_translation_stage * stage_weight
-
-    loss_pose = total_loss_pose / n_stages
-    loss_translation = total_loss_translation / n_stages
+    loss_pose = _vector_loss(pred_pose, gt_pose, loss_type=loss_type)
+    loss_translation = _vector_loss(pred_translation, gt_translation, loss_type=loss_type)
 
     # if pred_pose_0 is not None:
     #     loss_pose_init = _vector_loss(pred_pose_0, gt_pose, loss_type=loss_type)

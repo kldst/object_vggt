@@ -27,7 +27,7 @@ class ObjectPoseHeadConfig:
 
 def _default_init_params_path() -> Optional[str]:
     repo_root = Path(__file__).resolve().parents[2]
-    candidate = repo_root / "training" / "data" / "init_6dpose" / "init_6dpose_params.npz"
+    candidate = repo_root / "training" / "data" / "init_6dpose" / "init_6dpose_params_identity_zero_translate.npz"
     return str(candidate) if candidate.is_file() else None
 
 
@@ -119,11 +119,18 @@ class ObjectPoseHead(nn.Module):
         object_pose_cfg: Optional[ObjectPoseHeadConfig] = None,
         context_pool: str = "flatten",
         use_global_scene_object_concat: bool = False,
+        concat_first_camera_token: bool = False,
     ):
         super().__init__()
         self.context_pool = context_pool
         self.use_global_scene_object_concat = bool(use_global_scene_object_concat)
+        self.concat_first_camera_token = bool(concat_first_camera_token)
         decoder_context_dim = 2 * dim_in if self.use_global_scene_object_concat else dim_in
+        self.first_camera_token_proj = (
+            nn.Linear(dim_in, decoder_context_dim)
+            if self.use_global_scene_object_concat and self.concat_first_camera_token
+            else nn.Identity()
+        )
         self.decoder = ObjectPoseTransformerDecoderHead(context_dim=decoder_context_dim, cfg=object_pose_cfg)
 
     def forward(
@@ -134,6 +141,7 @@ class ObjectPoseHead(nn.Module):
         object_tokens: Optional[torch.Tensor] = None,
     ) -> Dict[str, torch.Tensor]:
         tokens = aggregated_tokens_list[-1]  # (B,S,N,C)
+        first_camera_token = tokens[:, 0:1, 0, :] if self.concat_first_camera_token else None
         patch_tokens = tokens[:, :, patch_start_idx:, :]  # (B,S,P,C)
 
         if self.use_global_scene_object_concat:
@@ -141,7 +149,11 @@ class ObjectPoseHead(nn.Module):
                 raise ValueError("object_tokens must be provided when use_global_scene_object_concat=True")
             scene_global = patch_tokens.mean(dim=(1, 2))
             object_global = object_tokens.mean(dim=(1, 2))
-            context_tokens = torch.cat([scene_global, object_global], dim=-1).unsqueeze(1)
+            global_context = torch.cat([scene_global, object_global], dim=-1).unsqueeze(1)
+            context_tokens = global_context
+            if first_camera_token is not None:
+                camera_context = self.first_camera_token_proj(first_camera_token)
+                context_tokens = torch.cat([camera_context, global_context], dim=1)
             object_pose, object_translation = self.decoder(context_tokens)
             return {
                 "object_pose": object_pose,
@@ -157,6 +169,9 @@ class ObjectPoseHead(nn.Module):
             raise ValueError(f"Unknown context_pool: {self.context_pool}")
 
         context_tokens = context
+        if first_camera_token is not None:
+            # print("[CGV LOG] CONCAT CAMERA")
+            context_tokens = torch.cat([first_camera_token, context_tokens], dim=1)
         if object_latent is not None:
             if object_latent.dim() != 3:
                 raise ValueError(f"object_latent should be (B,S,C), got {tuple(object_latent.shape)}")

@@ -93,11 +93,10 @@ class VGGT(nn.Module, PyTorchModelHubMixin):
                  object_prototype_num_tokens=4,
                  object_prototype_object_encoder_no_grad=False,
                  enable_global_pool_scene_object_pose_head=False,
+                 concat_first_camera_token_to_object_pose_head=False,
                  enable_camera_style_object_pose_head=False,
                  enable_query_style_object_pose_head=False,
-                 object_pose_cfg=None,
-                 use_object_view_identity=False,
-                 object_view_vocab_size=32):
+                 object_pose_cfg=None):
         super().__init__()
 
         self.aggregator = Aggregator(
@@ -116,19 +115,13 @@ class VGGT(nn.Module, PyTorchModelHubMixin):
         self.enable_pre_aggregator_object_cross_attn = bool(enable_pre_aggregator_object_cross_attn)
         self.enable_multi_layer_object_prototype_cross_attn = bool(enable_multi_layer_object_prototype_cross_attn)
         self.enable_global_pool_scene_object_pose_head = bool(enable_global_pool_scene_object_pose_head)
+        self.concat_first_camera_token_to_object_pose_head = bool(concat_first_camera_token_to_object_pose_head)
         self.enable_camera_style_object_pose_head = bool(enable_camera_style_object_pose_head)
         self.enable_query_style_object_pose_head = bool(enable_query_style_object_pose_head)
         self.object_pose_cfg = object_pose_cfg
-        self.use_object_view_identity = bool(use_object_view_identity)
-        self.object_view_vocab_size = int(object_view_vocab_size)
         self.object_prototype_layer_indices = tuple(int(idx) for idx in object_prototype_layer_indices)
         self.object_prototype_num_tokens = int(object_prototype_num_tokens)
         self.object_prototype_object_encoder_no_grad = bool(object_prototype_object_encoder_no_grad)
-        self.object_view_id_embed = (
-            nn.Embedding(self.object_view_vocab_size, embed_dim)
-            if self.use_object_view_identity
-            else None
-        )
         self.pre_object_token_cross_attn = (
             ObjectTokenCrossAttentionBlock(
                 query_dim=embed_dim,
@@ -218,6 +211,7 @@ class VGGT(nn.Module, PyTorchModelHubMixin):
                         dim_in=2 * embed_dim,
                         object_pose_cfg=self.object_pose_cfg,
                         use_global_scene_object_concat=self.enable_global_pool_scene_object_pose_head,
+                        concat_first_camera_token=self.concat_first_camera_token_to_object_pose_head,
                     )
                 )
             )
@@ -232,35 +226,9 @@ class VGGT(nn.Module, PyTorchModelHubMixin):
             images = images.unsqueeze(0)
         return images
 
-    def _apply_object_view_id_to_patch_tokens(
-        self,
-        object_patch_tokens: torch.Tensor,
-        object_view_ids: torch.Tensor | None,
-    ) -> torch.Tensor:
-        if self.object_view_id_embed is None or object_view_ids is None:
-            return object_patch_tokens
-
-        if object_view_ids.dim() == 1:
-            object_view_ids = object_view_ids.unsqueeze(0)
-        if object_view_ids.dim() != 2:
-            raise ValueError(
-                f"object_view_ids should be [B, S_obj] or [S_obj], got shape {tuple(object_view_ids.shape)}"
-            )
-        if torch.any(object_view_ids < 0) or torch.any(object_view_ids >= self.object_view_vocab_size):
-            raise ValueError(
-                f"object_view_ids must be within [0, {self.object_view_vocab_size - 1}], "
-                f"got min={int(object_view_ids.min())}, max={int(object_view_ids.max())}"
-            )
-
-        view_id_embed = self.object_view_id_embed(
-            object_view_ids.to(device=object_patch_tokens.device, dtype=torch.long)
-        )
-        return object_patch_tokens + view_id_embed.to(object_patch_tokens.dtype).unsqueeze(2)
-
-    def _encode_object_tokens(self, object_images: torch.Tensor, object_view_ids: torch.Tensor | None = None):
+    def _encode_object_tokens(self, object_images: torch.Tensor):
         B, S, _, H, W = object_images.shape
         object_patch_tokens = self._embed_patch_tokens(object_images)
-        object_patch_tokens = self._apply_object_view_id_to_patch_tokens(object_patch_tokens, object_view_ids)
         object_patch_tokens = object_patch_tokens.reshape(B * S, object_patch_tokens.shape[2], object_patch_tokens.shape[3])
         object_aggregated_tokens_list, object_patch_start_idx = self.aggregator.forward_from_patch_tokens(
             object_patch_tokens,
@@ -272,10 +240,9 @@ class VGGT(nn.Module, PyTorchModelHubMixin):
         object_tokens = object_aggregated_tokens_list[-1][:, :, object_patch_start_idx:, :]
         return object_tokens, object_aggregated_tokens_list, object_patch_start_idx
 
-    def _encode_object_prototypes(self, object_images: torch.Tensor, object_view_ids: torch.Tensor | None = None):
+    def _encode_object_prototypes(self, object_images: torch.Tensor):
         B, S, _, H, W = object_images.shape
         object_patch_tokens = self._embed_patch_tokens(object_images)
-        object_patch_tokens = self._apply_object_view_id_to_patch_tokens(object_patch_tokens, object_view_ids)
         object_patch_tokens = object_patch_tokens.reshape(B * S, object_patch_tokens.shape[2], object_patch_tokens.shape[3])
         selected_layers = self._resolve_object_prototype_layer_indices(self.aggregator.depth)
         requested_layers = tuple(dict.fromkeys((*selected_layers, self.aggregator.depth - 1)))
@@ -320,14 +287,12 @@ class VGGT(nn.Module, PyTorchModelHubMixin):
         self,
         scene_images: torch.Tensor,
         object_images: torch.Tensor,
-        object_view_ids: torch.Tensor | None = None,
     ):
         if self.pre_object_token_cross_attn is None or object_images is None:
             return None, None
 
         scene_patch_tokens = self._embed_patch_tokens(scene_images)
         object_patch_tokens = self._embed_patch_tokens(object_images)
-        object_patch_tokens = self._apply_object_view_id_to_patch_tokens(object_patch_tokens, object_view_ids)
 
         B_scene, S_scene, P_scene, C_scene = scene_patch_tokens.shape
         B_obj, S_obj, P_obj, C_obj = object_patch_tokens.shape
@@ -417,7 +382,6 @@ class VGGT(nn.Module, PyTorchModelHubMixin):
         scene_images: torch.Tensor,
         object_images: torch.Tensor = None,
         query_points: torch.Tensor = None,
-        object_view_ids: torch.Tensor = None,
     ):
         """
         Forward pass of the VGGT model.
@@ -453,8 +417,6 @@ class VGGT(nn.Module, PyTorchModelHubMixin):
         """
         scene_images = self._ensure_batched_images(scene_images)
         object_images = self._ensure_batched_images(object_images)
-        if object_view_ids is not None and object_view_ids.dim() == 1:
-            object_view_ids = object_view_ids.unsqueeze(0)
 
         if query_points is not None and len(query_points.shape) == 2:
             query_points = query_points.unsqueeze(0)
@@ -464,12 +426,11 @@ class VGGT(nn.Module, PyTorchModelHubMixin):
             aggregated_tokens_list, patch_start_idx = self.aggregator(scene_images)
             if object_images is None:
                 raise ValueError("object_images must be provided when enable_global_pool_scene_object_pose_head=True")
-            object_patch_tokens, _, _ = self._encode_object_tokens(object_images, object_view_ids=object_view_ids)
+            object_patch_tokens, _, _ = self._encode_object_tokens(object_images)
         elif self.enable_pre_aggregator_object_cross_attn and object_images is not None:
             fused_scene_patch_tokens, object_patch_tokens = self._apply_pre_aggregator_object_cross_attention(
                 scene_images,
                 object_images,
-                object_view_ids=object_view_ids,
             )
             B, S, _, H, W = scene_images.shape
             fused_scene_patch_tokens = fused_scene_patch_tokens.reshape(
@@ -487,7 +448,6 @@ class VGGT(nn.Module, PyTorchModelHubMixin):
         elif self.enable_multi_layer_object_prototype_cross_attn and object_images is not None:
             object_prototypes_by_idx, object_patch_tokens = self._encode_object_prototypes(
                 object_images,
-                object_view_ids=object_view_ids,
             )
 
             def progressive_object_fusion(layer_idx, scene_layer_tokens, scene_patch_start_idx):
@@ -514,7 +474,6 @@ class VGGT(nn.Module, PyTorchModelHubMixin):
         ):
             object_patch_tokens, object_aggregated_tokens_list, object_patch_start_idx = self._encode_object_tokens(
                 object_images,
-                object_view_ids=object_view_ids,
             )
             aggregated_tokens_list = self._apply_object_cross_attention(
                 aggregated_tokens_list,

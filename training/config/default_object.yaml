@@ -3,14 +3,14 @@ defaults:
 
 # torchrun --master_port=2200 --nproc_per_node=4 launch.py  --config default_object
 
-exp_name: 0415_test_object
+exp_name: 0416_object_shuffle
 img_size: 518
 num_workers: 0
 seed_value: 30
 accum_steps: 1    # We did not use gradient accumulation in our training, while if you suffer from OOM, you can try to use it.
 patch_size: 14
 val_epoch_freq: 10
-max_img_per_gpu: 4
+max_img_per_gpu: 80
 
 limit_train_batches: 108 # sample 幾次 (一次 per gpu / img num)
 # limit_train_batches:  100
@@ -39,8 +39,8 @@ data:
       dataset_configs:
         - _target_: data.datasets.6d_pose_normalize.SixDPoseNormalizeDataset
           split: train
-          DATA_ROOT: /mnt/train-data-4-hdd/yian/freepose/0415_fixedCam_diffpose_25k_google
-          OBJECT_IMAGE_ROOT: /mnt/train-data-4-hdd/yian/freepose/object_space_renders_all
+          DATA_ROOT: /dataset/0415_fixedCam_diffpose_25k_google
+          OBJECT_IMAGE_ROOT: /dataset/object_space_renders_all
           selected_views: [1, 5, 10, 15]
           object_input_views: [1, 3, 8, 12]
           num_object_views: 4
@@ -65,8 +65,8 @@ data:
       dataset_configs:
         - _target_: data.datasets.6d_pose_normalize.SixDPoseNormalizeDataset
           split: val
-          DATA_ROOT: /mnt/train-data-4-hdd/yian/freepose/0415_fixedCam_diffpose_25k_google
-          OBJECT_IMAGE_ROOT: /mnt/train-data-4-hdd/yian/freepose/object_space_renders_all
+          DATA_ROOT: /dataset/0415_fixedCam_diffpose_25k_google
+          OBJECT_IMAGE_ROOT: /dataset/object_space_renders_all
           selected_views: [1, 5, 10, 15]
           object_input_views: [1, 3, 8, 12]
           num_object_views: 4
@@ -79,7 +79,7 @@ data:
 
 logging:
   log_dir: logs/${exp_name}
-  use_wandb: False
+  use_wandb: True
   log_visuals: False
   log_freq: 1
   log_level_primary: DEBUG
@@ -135,7 +135,7 @@ logging:
 checkpoint:
   save_dir: logs/${exp_name}/ckpts
   save_freq: 10
-  resume_checkpoint_path: /mnt/train-data-4-hdd/yian/freepose/vggt_model/model.pt
+  resume_checkpoint_path: /all_data/model/model.pt
   load_training_state: True
   load_scaler_state: True
   strict: False
@@ -161,8 +161,6 @@ loss:
   object_srt:
     weight: 1.0
     loss_type: l1
-    rotation_loss_type: geodesic
-    gamma: 0.6
     weight_pose: 1.0
     weight_translation: 1.0
     # init_w: 1.0  # disabled because loss_object_pose_init is removed
@@ -205,7 +203,7 @@ optim:
       # - module_name: ["pre_object_token_cross_attn"]
       #   max_norm: 1.0
       #   norm_type: 2
-      - module_name: ["object_token_cross_attn", "object_token_cross_attn_blocks", "object_prototype_poolers", "object_view_id_embed"]
+      - module_name: ["object_token_cross_attn", "object_token_cross_attn_blocks", "object_prototype_poolers"]
         max_norm: 1.0
         norm_type: 2
       # - module_name: ["object_pt_head"]
@@ -224,9 +222,9 @@ optim:
           schedulers:
             - _target_: fvcore.common.param_scheduler.LinearParamScheduler
               start_value: 1e-6
-              end_value: 1e-4
+              end_value: 2e-4
             - _target_: fvcore.common.param_scheduler.CosineParamScheduler
-              start_value: 1e-4
+              start_value: 2e-4
               end_value: 1e-6
           lengths: [0.05, 0.95]
           interval_scaling: ['rescaled', 'rescaled']
@@ -252,23 +250,22 @@ model:
   enable_pre_aggregator_object_cross_attn: False
   enable_multi_layer_object_prototype_cross_attn: True
   enable_global_pool_scene_object_pose_head: False  # when True, scene/object are pooled independently, concatenated, then fed to the original transformer decoder pose head
+  concat_first_camera_token_to_object_pose_head: True
   enable_camera_style_object_pose_head: False
-  enable_query_style_object_pose_head: True
+  enable_query_style_object_pose_head: False
   object_prototype_layer_indices: [4, 11, 17, 23]
   object_prototype_num_tokens: 32
   object_prototype_object_encoder_no_grad: False
   object_cross_attn_heads: 16
-  use_object_view_identity: True
-  object_view_vocab_size: 20
-  object_pose_cfg:
-    ief_iters: 4
-    pose_encoding_type: absT_quaR
-    object_trunk_depth: 4
-    object_num_heads: 16
-    object_mlp_ratio: 4
-    object_init_values: 0.01
-    trans_act: linear
-    quat_act: linear
+  # object_pose_cfg:
+  #   ief_iters: 4
+  #   pose_encoding_type: absT_quaR
+  #   object_trunk_depth: 4
+  #   object_num_heads: 16
+  #   object_mlp_ratio: 4
+  #   object_init_values: 0.01
+  #   trans_act: linear
+  #   quat_act: linear
 
 
 distributed:
