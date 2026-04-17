@@ -163,6 +163,7 @@ loss:
     loss_type: l1
     weight_pose: 1.0
     weight_translation: 1.0
+    rotation_loss_type: geodesic
     # init_w: 1.0  # disabled because loss_object_pose_init is removed
   # object_relative_pose:
   #   weight: 1.0
@@ -250,7 +251,7 @@ model:
   enable_pre_aggregator_object_cross_attn: False
   enable_multi_layer_object_prototype_cross_attn: True
   enable_global_pool_scene_object_pose_head: False  # when True, scene/object are pooled independently, concatenated, then fed to the original transformer decoder pose head
-  concat_first_camera_token_to_object_pose_head: True
+  concat_first_camera_token_to_object_pose_head: False
   enable_camera_style_object_pose_head: False
   enable_query_style_object_pose_head: False
   object_prototype_layer_indices: [4, 11, 17, 23]

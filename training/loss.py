@@ -207,6 +207,7 @@ def compute_object_srt_loss(
     predictions,
     batch,
     loss_type="l1",
+    rotation_loss_type="l1",
     weight_pose=1.0,
     weight_translation=1.0,
     init_w=1.0,
@@ -214,10 +215,10 @@ def compute_object_srt_loss(
     **kwargs,
 ):
     """
-    Compute 6D object SRT loss.
+    Compute object SRT loss using matrix-based rotation supervision.
 
     Required prediction keys:
-      - object_pose: (B, 6)
+      - object_pose: (B, 4) quaternion in WXYZ order or (B, 6) rotation-6D
       - object_translation: (B, 3)
     Required batch keys:
       - object_rotation: (B, 3, 3)
@@ -230,7 +231,6 @@ def compute_object_srt_loss(
     # pred_pose_0 = predictions.get("pred_pose_0", None)
 
     gt_rot = batch["object_rotation"]
-    gt_pose = _rotation_matrix_to_rot6d(gt_rot)
     gt_translation = batch["object_translation"]
 
     if debug_force_model_output_to_ground_truth and not getattr(
@@ -238,7 +238,7 @@ def compute_object_srt_loss(
     ):
         print(
             "[DebugDType][object_srt] "
-            f"pred_pose={pred_pose.dtype}, gt_pose={gt_pose.dtype}, "
+            f"pred_pose={pred_pose.dtype}, gt_rot={gt_rot.dtype}, "
             f"pred_translation={pred_translation.dtype}, gt_translation={gt_translation.dtype}",
             flush=True,
         )
@@ -257,19 +257,14 @@ def compute_object_srt_loss(
             }
         pred_pose = pred_pose[valid_mask]
         pred_translation = pred_translation[valid_mask]
-        gt_pose = gt_pose[valid_mask]
         gt_rot = gt_rot[valid_mask]
         gt_translation = gt_translation[valid_mask]
         # if pred_pose_0 is not None:
         #     pred_pose_0 = pred_pose_0[valid_mask]
 
-    loss_pose = _vector_loss(pred_pose, gt_pose, loss_type=loss_type)
+    pred_rot = _pose_to_rotation_matrix(pred_pose)
+    loss_pose = _rotation_loss(pred_rot, gt_rot, loss_type=rotation_loss_type)
     loss_translation = _vector_loss(pred_translation, gt_translation, loss_type=loss_type)
-
-    # if pred_pose_0 is not None:
-    #     loss_pose_init = _vector_loss(pred_pose_0, gt_pose, loss_type=loss_type)
-    # else:
-    #     loss_pose_init = (pred_pose * 0).mean()
 
     total = (
         weight_pose * loss_pose
