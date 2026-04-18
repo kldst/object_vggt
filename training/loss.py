@@ -215,7 +215,7 @@ def compute_object_srt_loss(
     **kwargs,
 ):
     """
-    Compute object SRT loss using matrix-based rotation supervision.
+    Compute object SRT loss using rot6d rotation supervision.
 
     Required prediction keys:
       - object_pose: (B, 4) quaternion in WXYZ order or (B, 6) rotation-6D
@@ -231,6 +231,7 @@ def compute_object_srt_loss(
     # pred_pose_0 = predictions.get("pred_pose_0", None)
 
     gt_rot = batch["object_rotation"]
+    gt_pose_rot6d = _rotation_matrix_to_rot6d(gt_rot)
     gt_translation = batch["object_translation"]
 
     if debug_force_model_output_to_ground_truth and not getattr(
@@ -238,7 +239,7 @@ def compute_object_srt_loss(
     ):
         print(
             "[DebugDType][object_srt] "
-            f"pred_pose={pred_pose.dtype}, gt_rot={gt_rot.dtype}, "
+            f"pred_pose={pred_pose.dtype}, gt_pose_rot6d={gt_pose_rot6d.dtype}, "
             f"pred_translation={pred_translation.dtype}, gt_translation={gt_translation.dtype}",
             flush=True,
         )
@@ -258,12 +259,14 @@ def compute_object_srt_loss(
         pred_pose = pred_pose[valid_mask]
         pred_translation = pred_translation[valid_mask]
         gt_rot = gt_rot[valid_mask]
+        gt_pose_rot6d = gt_pose_rot6d[valid_mask]
         gt_translation = gt_translation[valid_mask]
         # if pred_pose_0 is not None:
         #     pred_pose_0 = pred_pose_0[valid_mask]
 
     pred_rot = _pose_to_rotation_matrix(pred_pose)
-    loss_pose = _rotation_loss(pred_rot, gt_rot, loss_type=rotation_loss_type)
+    pred_pose_rot6d = _rotation_matrix_to_rot6d(pred_rot)
+    loss_pose = _vector_loss(pred_pose_rot6d, gt_pose_rot6d, loss_type=rotation_loss_type)
     loss_translation = _vector_loss(pred_translation, gt_translation, loss_type=loss_type)
 
     total = (

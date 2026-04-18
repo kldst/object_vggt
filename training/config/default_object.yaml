@@ -3,7 +3,7 @@ defaults:
 
 # torchrun --master_port=2200 --nproc_per_node=4 launch.py  --config default_object
 
-exp_name: 0416_object_shuffle
+exp_name: 0416_object_shuffle_query_head
 img_size: 518
 num_workers: 0
 seed_value: 30
@@ -12,10 +12,10 @@ patch_size: 14
 val_epoch_freq: 10
 max_img_per_gpu: 80
 
-limit_train_batches: 108 # sample 幾次 (一次 per gpu / img num)
+limit_train_batches: 160 # sample 幾次 (一次 per gpu / img num)
 # limit_train_batches:  100
 # limit_train_batches:  50
-limit_val_batches: 25
+limit_val_batches: 35
 
 debug:
   force_model_output_to_ground_truth: False
@@ -163,7 +163,7 @@ loss:
     loss_type: l1
     weight_pose: 1.0
     weight_translation: 1.0
-    rotation_loss_type: geodesic
+    # rotation_loss_type: geodesic
     # init_w: 1.0  # disabled because loss_object_pose_init is removed
   # object_relative_pose:
   #   weight: 1.0
@@ -253,7 +253,7 @@ model:
   enable_global_pool_scene_object_pose_head: False  # when True, scene/object are pooled independently, concatenated, then fed to the original transformer decoder pose head
   concat_first_camera_token_to_object_pose_head: False
   enable_camera_style_object_pose_head: False
-  enable_query_style_object_pose_head: False
+  enable_query_style_object_pose_head: True
   object_prototype_layer_indices: [4, 11, 17, 23]
   object_prototype_num_tokens: 32
   object_prototype_object_encoder_no_grad: False
