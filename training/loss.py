@@ -119,12 +119,20 @@ class MultitaskLoss(torch.nn.Module):
 
         # 6D object SRT loss
         if "object_pose" in predictions and self.object_srt is not None:
-            object_srt_loss_dict = compute_object_srt_loss(
-                predictions,
-                batch,
-                debug_force_model_output_to_ground_truth=self.debug_force_model_output_to_ground_truth,
-                **self.object_srt,
-            )
+            if bool(self.object_srt.get("use_iter_loss", False)):
+                object_srt_loss_dict = compute_srt_iter_loss(
+                    predictions,
+                    batch,
+                    debug_force_model_output_to_ground_truth=self.debug_force_model_output_to_ground_truth,
+                    **self.object_srt,
+                )
+            else:
+                object_srt_loss_dict = compute_object_srt_loss(
+                    predictions,
+                    batch,
+                    debug_force_model_output_to_ground_truth=self.debug_force_model_output_to_ground_truth,
+                    **self.object_srt,
+                )
             total_loss = total_loss + object_srt_loss_dict["loss_object_srt"] * self.object_srt["weight"]
             loss_dict.update(object_srt_loss_dict)
 
@@ -280,6 +288,99 @@ def compute_object_srt_loss(
         "loss_object_pose": loss_pose,
         "loss_object_translation": loss_translation,
         # "loss_object_pose_init": loss_pose_init,
+    }
+
+
+def compute_srt_iter_loss(
+    predictions,
+    batch,
+    loss_type="l1",
+    rotation_loss_type="l1",
+    gamma=0.6,
+    weight_pose=1.0,
+    weight_translation=1.0,
+    debug_force_model_output_to_ground_truth=False,
+    **kwargs,
+):
+    """
+    Compute object SRT loss across iterative predictions with stage weighting.
+
+    This mirrors compute_camera_loss: earlier iterations receive a smaller
+    weight, and the final iteration receives full weight. Rotation supervision
+    is always computed in rot6d space.
+    """
+    pred_pose_list = predictions.get("object_pose_list")
+    pred_translation_list = predictions.get("object_translation_list")
+    if pred_pose_list is None or pred_translation_list is None:
+        pred_pose_list = [predictions["object_pose"]]
+        pred_translation_list = [predictions["object_translation"]]
+
+    gt_rot = batch["object_rotation"]
+    gt_pose_rot6d = _rotation_matrix_to_rot6d(gt_rot)
+    gt_translation = batch["object_translation"]
+
+    if debug_force_model_output_to_ground_truth and not getattr(
+        compute_srt_iter_loss, "_dtype_logged_once", False
+    ):
+        print(
+            "[DebugDType][object_srt_iter] "
+            f"pred_pose={pred_pose_list[-1].dtype}, gt_pose_rot6d={gt_pose_rot6d.dtype}, "
+            f"pred_translation={pred_translation_list[-1].dtype}, gt_translation={gt_translation.dtype}",
+            flush=True,
+        )
+        compute_srt_iter_loss._dtype_logged_once = True
+
+    has_object = batch.get("has_object", None)
+    valid_mask = None
+    if has_object is not None:
+        valid_mask = has_object.bool()
+        if valid_mask.sum() == 0:
+            dummy = (pred_pose_list[-1] * 0).mean()
+            return {
+                "loss_object_srt": dummy,
+                "loss_object_pose": dummy,
+                "loss_object_translation": dummy,
+            }
+        gt_pose_rot6d = gt_pose_rot6d[valid_mask]
+        gt_translation = gt_translation[valid_mask]
+
+    n_stages = len(pred_pose_list)
+    total_loss_pose = 0
+    total_loss_translation = 0
+
+    for stage_idx, (pred_pose_stage, pred_translation_stage) in enumerate(
+        zip(pred_pose_list, pred_translation_list)
+    ):
+        stage_weight = gamma ** (n_stages - stage_idx - 1)
+
+        if valid_mask is not None:
+            pred_pose_stage = pred_pose_stage[valid_mask]
+            pred_translation_stage = pred_translation_stage[valid_mask]
+
+        pred_rot_stage = _pose_to_rotation_matrix(pred_pose_stage)
+        pred_pose_rot6d_stage = _rotation_matrix_to_rot6d(pred_rot_stage)
+
+        loss_pose_stage = _vector_loss(
+            pred_pose_rot6d_stage,
+            gt_pose_rot6d,
+            loss_type=rotation_loss_type,
+        )
+        loss_translation_stage = _vector_loss(
+            pred_translation_stage,
+            gt_translation,
+            loss_type=loss_type,
+        )
+        total_loss_pose += loss_pose_stage * stage_weight
+        total_loss_translation += loss_translation_stage * stage_weight
+
+    loss_pose = total_loss_pose / n_stages
+    loss_translation = total_loss_translation / n_stages
+    total = weight_pose * loss_pose + weight_translation * loss_translation
+
+    return {
+        "loss_object_srt": total,
+        "loss_object_pose": loss_pose,
+        "loss_object_translation": loss_translation,
     }
 
 

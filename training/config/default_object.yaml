@@ -3,7 +3,7 @@ defaults:
 
 # torchrun --master_port=2200 --nproc_per_node=4 launch.py  --config default_object
 
-exp_name: 0416_object_shuffle_query_head
+exp_name: 0416_object_shuffle_query_head_v3
 img_size: 518
 num_workers: 0
 seed_value: 30
@@ -135,7 +135,7 @@ logging:
 checkpoint:
   save_dir: logs/${exp_name}/ckpts
   save_freq: 10
-  resume_checkpoint_path: /all_data/model/model.pt
+  resume_checkpoint_path: /omni_vggt/model/model.pt
   load_training_state: True
   load_scaler_state: True
   strict: False
@@ -160,7 +160,9 @@ loss:
   #   pos_weight: 2.0
   object_srt:
     weight: 1.0
+    use_iter_loss: True
     loss_type: l1
+    gamma: 0.6
     weight_pose: 1.0
     weight_translation: 1.0
     # rotation_loss_type: geodesic
