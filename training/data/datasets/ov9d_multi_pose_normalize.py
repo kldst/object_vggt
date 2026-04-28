@@ -222,7 +222,7 @@ class OV9DMultiPoseNormalizeDataset(OV9DPoseNormalizeDataset):
                 mask_path = scene_dir / "mask_visib" / f"{image_id:06d}_000000.png"
                 if not self.verify_files or mask_path.is_file():
                     object_image_ids.append(image_id)
-            if not object_image_ids:
+            if len(object_image_ids) < self.num_object_views:
                 continue
 
             records_by_object_id.setdefault(object_id, []).append(
