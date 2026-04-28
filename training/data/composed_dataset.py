@@ -175,7 +175,7 @@ class ComposedDataset(Dataset, ABC):
 
         # Optional fields for custom datasets (e.g. 6d pose training).
         optional_float_array_keys = [
-            "object_scale", "object_rotation", "object_translation", "object_srt", "normalization_scale"
+            "object_scale", "object_rotation", "object_translation", "object_srt", "normalization_scale", "has_object"
         ]
         for key in optional_float_array_keys:
             if key in batch:

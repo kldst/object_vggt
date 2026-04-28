@@ -33,6 +33,7 @@ class MultitaskLoss(torch.nn.Module):
         object_point=None,
         object_mask=None,
         object_srt=None,
+        object_presence=None,
         debug_force_model_output_to_ground_truth=False,
         **kwargs,
     ):
@@ -45,6 +46,7 @@ class MultitaskLoss(torch.nn.Module):
         self.object_point = object_point
         self.object_mask = object_mask
         self.object_srt = object_srt
+        self.object_presence = object_presence
         self.debug_force_model_output_to_ground_truth = bool(debug_force_model_output_to_ground_truth)
 
     def forward(self, predictions, batch) -> torch.Tensor:
@@ -124,6 +126,19 @@ class MultitaskLoss(torch.nn.Module):
             )
             total_loss = total_loss + object_srt_loss_dict["loss_object_srt"] * self.object_srt["weight"]
             loss_dict.update(object_srt_loss_dict)
+
+        if "object_presence_logits" in predictions and self.object_presence is not None:
+            object_presence_loss_dict = compute_object_presence_loss(
+                predictions,
+                batch,
+                **self.object_presence,
+            )
+            total_loss = (
+                total_loss
+                + object_presence_loss_dict["loss_object_presence"]
+                * self.object_presence["weight"]
+            )
+            loss_dict.update(object_presence_loss_dict)
         
         loss_dict["objective"] = total_loss
 
@@ -191,7 +206,7 @@ def compute_object_srt_loss(
     if has_object is not None:
         valid_mask = has_object.bool()
         if valid_mask.sum() == 0:
-            dummy = (pred_pose * 0).mean()
+            dummy = (pred_pose * 0).mean() + (pred_translation * 0).mean()
             return {
                 "loss_object_srt": dummy,
                 "loss_object_pose": dummy,
@@ -280,6 +295,33 @@ def compute_object_mask_loss(
         "loss_object_mask": total,
         "loss_object_mask_bce": loss_bce,
         "loss_object_mask_dice": loss_dice,
+    }
+
+
+def compute_object_presence_loss(
+    predictions,
+    batch,
+    pos_weight=None,
+    **kwargs,
+):
+    if "has_object" not in batch:
+        raise KeyError("object_presence loss requires batch['has_object']")
+
+    logits = predictions["object_presence_logits"].float().reshape(-1)
+    targets = batch["has_object"].float().reshape(-1)
+    bce_kwargs = {}
+    if pos_weight is not None:
+        bce_kwargs["pos_weight"] = torch.as_tensor(
+            float(pos_weight),
+            device=logits.device,
+            dtype=logits.dtype,
+        )
+    loss_presence = F.binary_cross_entropy_with_logits(logits, targets, **bce_kwargs)
+    pred_binary = (torch.sigmoid(logits) >= 0.5).to(dtype=targets.dtype)
+    acc = (pred_binary == targets).float().mean()
+    return {
+        "loss_object_presence": loss_presence,
+        "acc_object_presence": acc,
     }
 
 
