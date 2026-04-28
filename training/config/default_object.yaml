@@ -39,8 +39,8 @@ data:
       dataset_configs:
         - _target_: data.datasets.ov9d_multi_pose_normalize.OV9DMultiPoseNormalizeDataset
           split: train
-          DATA_ROOT: /mnt/train-data-4-hdd/yian/freepose/ov9d/ov9d
-          SPLIT_JSON: /mnt/train-data-4-hdd/yian/freepose/ov9d/ov9d/splits_multi/train.json
+          DATA_ROOT: /dataset/ov9d
+          SPLIT_JSON: /baseline_ov9d/splits_multi/train.json
           num_scene_views: 4
           num_object_views: 4
           min_view_gap: 5
@@ -65,8 +65,8 @@ data:
       dataset_configs:
         - _target_: data.datasets.ov9d_multi_pose_normalize.OV9DMultiPoseNormalizeDataset
           split: test1
-          DATA_ROOT: /mnt/train-data-4-hdd/yian/freepose/ov9d/ov9d
-          SPLIT_JSON: /mnt/train-data-4-hdd/yian/freepose/ov9d/ov9d/splits_multi/test1.json
+          DATA_ROOT: /dataset/ov9d
+          SPLIT_JSON: /baseline_ov9d/splits_multi/test1.json
           num_scene_views: 4
           num_object_views: 4
           min_view_gap: 5
@@ -79,7 +79,7 @@ data:
 
 logging:
   log_dir: logs/${exp_name}
-  use_wandb: False
+  use_wandb: True
   log_visuals: False
   log_freq: 1
   log_level_primary: DEBUG
@@ -133,7 +133,7 @@ logging:
 checkpoint:
   save_dir: logs/${exp_name}/ckpts
   save_freq: 10
-  resume_checkpoint_path: /mnt/train-data-4-hdd/yian/freepose/object_pretrain_model/checkpoint_60.pt
+  resume_checkpoint_path: /logs/baseline_0417_14000_shuffle_v2/ckpts/checkpoint_60.pt
   load_optimizer_state: False
   load_training_state: False
   load_scaler_state: False
