@@ -1,27 +1,24 @@
 defaults:
   - default_dataset
 
-# torchrun --master_port=29200 --nproc_per_node=1 launch.py  --config default_object
+# torchrun --master_port=29200 --nproc_per_node=1 launch.py --config default_single_object
 
-exp_name: baseline_ov9d_multi_object_pose_v2
+exp_name: baseline_ov9d_single_object_pose_v1
 img_size: 518
 num_workers: 0
-seed_value: 30
-accum_steps: 1    # We did not use gradient accumulation in our training, while if you suffer from OOM, you can try to use it.
+seed_value: 42
+accum_steps: 1
 patch_size: 14
 val_epoch_freq: 10
-max_img_per_gpu: 80
+max_img_per_gpu: 4
 
-limit_train_batches: 122 # sample 幾次 (一次 per gpu / img num)
-# limit_train_batches:  100
-# limit_train_batches:  50
-limit_val_batches: 24
+limit_train_batches: 4
+limit_val_batches: 4
 
 debug:
   force_model_output_to_ground_truth: False
 
 data:
-  # The code for data still looks too complicated. I should refactor this again (do I have time?...)
   train:
     _target_: data.dynamic_dataloader.DynamicTorchDataset
     num_workers: ${num_workers}
@@ -37,10 +34,10 @@ data:
     dataset:
       _target_: data.composed_dataset.ComposedDataset
       dataset_configs:
-        - _target_: data.datasets.ov9d_multi_pose_normalize.OV9DMultiPoseNormalizeDataset
+        - _target_: data.datasets.ov9d_single_pose_normalize.OV9DSinglePoseNormalizeDataset
           split: train
-          DATA_ROOT: /dataset/ov9d
-          SPLIT_JSON: /baseline_ov9d/splits_multi/train.json
+          DATA_ROOT: /mnt/train-data-4-hdd/yian/freepose/ov9d/ov9d
+          SPLIT_JSON: /mnt/train-data-4-hdd/yian/freepose/baseline/single_split/train.json
           num_scene_views: 4
           num_object_views: 4
           min_view_gap: 5
@@ -63,10 +60,10 @@ data:
     dataset:
       _target_: data.composed_dataset.ComposedDataset
       dataset_configs:
-        - _target_: data.datasets.ov9d_multi_pose_normalize.OV9DMultiPoseNormalizeDataset
+        - _target_: data.datasets.ov9d_single_pose_normalize.OV9DSinglePoseNormalizeDataset
           split: test1
-          DATA_ROOT: /dataset/ov9d
-          SPLIT_JSON: /baseline_ov9d/splits_multi/test1.json
+          DATA_ROOT: /mnt/train-data-4-hdd/yian/freepose/ov9d/ov9d
+          SPLIT_JSON: /mnt/train-data-4-hdd/yian/freepose/baseline/single_split/test1.json
           num_scene_views: 4
           num_object_views: 4
           min_view_gap: 5
@@ -79,7 +76,7 @@ data:
 
 logging:
   log_dir: logs/${exp_name}
-  use_wandb: True
+  use_wandb: False
   log_visuals: False
   log_freq: 1
   log_level_primary: DEBUG
@@ -100,40 +97,25 @@ logging:
     train:
       keys_to_log:
         - loss_objective
-        # - loss_conf_object_point
-        # - loss_reg_object_point
-        # - loss_grad_object_point
-        # - loss_object_mask
-        # - loss_object_mask_bce
-        # - loss_object_mask_dice
         - loss_object_srt
         - loss_object_pose
         - loss_object_translation
         - loss_object_presence
         - acc_object_presence
-        # - loss_object_pose_init
     val:
       keys_to_log:
         - loss_objective
-        # - loss_conf_object_point
-        # - loss_reg_object_point
-        # - loss_grad_object_point
-        # - loss_object_mask
-        # - loss_object_mask_bce
-        # - loss_object_mask_dice
         - loss_object_srt
         - loss_object_pose
         - loss_object_translation
         - loss_object_presence
         - acc_object_presence
-        # - loss_object_pose_init
-
 
 
 checkpoint:
   save_dir: logs/${exp_name}/ckpts
   save_freq: 10
-  resume_checkpoint_path: /logs/baseline_0417_14000_shuffle_v2/ckpts/checkpoint_60.pt
+  resume_checkpoint_path: null
   load_optimizer_state: False
   load_training_state: False
   load_scaler_state: False
@@ -146,27 +128,13 @@ loss:
   depth: null
   point: null
   track: null
-  # object_point:
-  #   weight: 1.0
-  #   gamma: 1.0
-  #   alpha: 0.2
-  #   gradient_loss_fn: "normal"
-  #   valid_range: -1
-  # object_mask:
-  #   weight: 1.0
-  #   bce_weight: 1.0
-  #   dice_weight: 1.0
-  #   pos_weight: 2.0
   object_srt:
     weight: 1.0
     loss_type: l1
     weight_pose: 1.0
     weight_translation: 1.0
-    # init_w: 1.0  # disabled because loss_object_pose_init is removed
   object_presence:
     weight: 1.0
-
-
 
 
 optim:
@@ -180,7 +148,7 @@ optim:
     weight_decay: 0.05
 
   frozen_module_names:
-      - "*aggregator*"
+    - "*aggregator*"
 
   amp:
     enabled: True
@@ -188,24 +156,9 @@ optim:
   gradient_clip:
     _target_: train_utils.gradient_clip.GradientClipper
     configs:
-      # - module_name: ["shared_object_latent"]
-      #   max_norm: 1.0
-      #   norm_type: 2
-      # - module_name: ["aggregator"]
-      #   max_norm: 1.0   # feel free to reduce this if you see instabilities
-      #   norm_type: 2
-      # - module_name: ["pre_object_token_cross_attn"]
-      #   max_norm: 1.0
-      #   norm_type: 2
       - module_name: ["object_token_cross_attn", "object_token_cross_attn_blocks", "object_prototype_poolers"]
         max_norm: 1.0
         norm_type: 2
-      # - module_name: ["object_pt_head"]
-      #   max_norm: 1.0   # feel free to reduce this if you see instabilities
-      #   norm_type: 2
-      # - module_name: ["object_mask_head"]
-      #   max_norm: 1.0
-      #   norm_type: 2
       - module_name: ["object_srt_head"]
         max_norm: 1.0
         norm_type: 2
@@ -214,12 +167,6 @@ optim:
       - scheduler:
           _target_: fvcore.common.param_scheduler.CompositeParamScheduler
           schedulers:
-            # - _target_: fvcore.common.param_scheduler.LinearParamScheduler
-            #   start_value: 1e-8
-            #   end_value: 1e-4
-            # - _target_: fvcore.common.param_scheduler.CosineParamScheduler
-            #   start_value: 1e-4
-            #   end_value: 1e-8
             - _target_: fvcore.common.param_scheduler.CosineParamScheduler
               start_value: 1e-4
               end_value: 1e-8
@@ -242,11 +189,11 @@ model:
   enable_object_point: False
   enable_object_mask: False
   enable_object_srt: True
-  use_shared_object_latent: False # set False to switch back to the original version (no shared latent)
+  use_shared_object_latent: False
   enable_object_cross_attn: False
   enable_pre_aggregator_object_cross_attn: False
   enable_multi_layer_object_prototype_cross_attn: True
-  enable_global_pool_scene_object_pose_head: False  # when True, scene/object are pooled independently, concatenated, then fed to the original transformer decoder pose head
+  enable_global_pool_scene_object_pose_head: False
   object_prototype_layer_indices: [4, 11, 17, 23]
   object_prototype_num_tokens: 32
   object_prototype_object_encoder_no_grad: False
@@ -254,16 +201,15 @@ model:
 
 
 distributed:
-  # check https://docs.pytorch.org/docs/stable/generated/torch.nn.parallel.DistributedDataParallel.html for options
   backend: nccl
   comms_dtype: None
   find_unused_parameters: False
   timeout_mins: 30
-  gradient_as_bucket_view: True  # Less memory used
+  gradient_as_bucket_view: True
   bucket_cap_mb: 25
   broadcast_buffers: True
 
 cuda:
-    cudnn_deterministic: False
-    cudnn_benchmark: False
-    allow_tf32: True
+  cudnn_deterministic: False
+  cudnn_benchmark: False
+  allow_tf32: True

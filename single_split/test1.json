@@ -1,0 +1,674 @@
+{
+  "split": "test1",
+  "single_dir": "/mnt/train-data-4-hdd/yian/freepose/ov9d/ov9d/oo3d9dsingle",
+  "unseen_categories": [
+    "bowl",
+    "bumbag",
+    "dumpling",
+    "facial_cream",
+    "handbag",
+    "litchi",
+    "mouse",
+    "pineapple",
+    "teddy_bear",
+    "toy_truck"
+  ],
+  "test1_ratio": 0.4,
+  "min_rgb": 4,
+  "category_count": 10,
+  "seed": 42,
+  "count": 93,
+  "scenes": [
+    {
+      "scene_name": "anise_019_i8gfhuej8l93ojmhxf774t3h6y2q8xsh",
+      "category": "anise",
+      "object_instance": "anise_019",
+      "relative_path": "oo3d9dsingle/anise_019_i8gfhuej8l93ojmhxf774t3h6y2q8xsh",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "anise_020_k8xyngfsu5qsbm20dpb7uxyflb9is68e",
+      "category": "anise",
+      "object_instance": "anise_020",
+      "relative_path": "oo3d9dsingle/anise_020_k8xyngfsu5qsbm20dpb7uxyflb9is68e",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "anise_021_1yzx4xo8vrsm5o3ttyetx7yzjp43ehxo",
+      "category": "anise",
+      "object_instance": "anise_021",
+      "relative_path": "oo3d9dsingle/anise_021_1yzx4xo8vrsm5o3ttyetx7yzjp43ehxo",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "anise_022_7akmamvtkez7lg4tl3uz7erugtmjc1j0",
+      "category": "anise",
+      "object_instance": "anise_022",
+      "relative_path": "oo3d9dsingle/anise_022_7akmamvtkez7lg4tl3uz7erugtmjc1j0",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "anise_023_nxm3pn0fo3lu0lce1vjtj4nqdoouindj",
+      "category": "anise",
+      "object_instance": "anise_023",
+      "relative_path": "oo3d9dsingle/anise_023_nxm3pn0fo3lu0lce1vjtj4nqdoouindj",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "anise_024_v6z26cp5l5gx5mi397b9msvr7pzh9p2p",
+      "category": "anise",
+      "object_instance": "anise_024",
+      "relative_path": "oo3d9dsingle/anise_024_v6z26cp5l5gx5mi397b9msvr7pzh9p2p",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "anise_025_k44rz7l5qn3u3384nv2bz7kfdxqodez0",
+      "category": "anise",
+      "object_instance": "anise_025",
+      "relative_path": "oo3d9dsingle/anise_025_k44rz7l5qn3u3384nv2bz7kfdxqodez0",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "anise_026_a3xua7rgvenex4lwnx8h8bznr82ogwjb",
+      "category": "anise",
+      "object_instance": "anise_026",
+      "relative_path": "oo3d9dsingle/anise_026_a3xua7rgvenex4lwnx8h8bznr82ogwjb",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "anise_027_yf5cjcvj4pgf4aeb7g31gigyd3fwnuso",
+      "category": "anise",
+      "object_instance": "anise_027",
+      "relative_path": "oo3d9dsingle/anise_027_yf5cjcvj4pgf4aeb7g31gigyd3fwnuso",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "anise_028_5hj1osgeb3adludivevtkrunjob0dvr9",
+      "category": "anise",
+      "object_instance": "anise_028",
+      "relative_path": "oo3d9dsingle/anise_028_5hj1osgeb3adludivevtkrunjob0dvr9",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "anise_029_ftmygokenvjd3xph19snec0kfqc7aerl",
+      "category": "anise",
+      "object_instance": "anise_029",
+      "relative_path": "oo3d9dsingle/anise_029_ftmygokenvjd3xph19snec0kfqc7aerl",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "antique_018_zc9mat6g2n4ms18w84n29t3w1t3ery2q",
+      "category": "antique",
+      "object_instance": "antique_018",
+      "relative_path": "oo3d9dsingle/antique_018_zc9mat6g2n4ms18w84n29t3w1t3ery2q",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "antique_019_0en0h84n6swndvb2d2m1cyocamriv435",
+      "category": "antique",
+      "object_instance": "antique_019",
+      "relative_path": "oo3d9dsingle/antique_019_0en0h84n6swndvb2d2m1cyocamriv435",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "antique_020_scpgvhjdbrnqpjxf9hgorudycdp9fzpo",
+      "category": "antique",
+      "object_instance": "antique_020",
+      "relative_path": "oo3d9dsingle/antique_020_scpgvhjdbrnqpjxf9hgorudycdp9fzpo",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "antique_021_o3o87k8qnp27d1svcqsz45mpuh5b3nty",
+      "category": "antique",
+      "object_instance": "antique_021",
+      "relative_path": "oo3d9dsingle/antique_021_o3o87k8qnp27d1svcqsz45mpuh5b3nty",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "apple_040_mkbfpdix7hnikmryoseg049r5626rxuh",
+      "category": "apple",
+      "object_instance": "apple_040",
+      "relative_path": "oo3d9dsingle/apple_040_mkbfpdix7hnikmryoseg049r5626rxuh",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "apple_042_sp3c9njv3534iepqepauqvd52d5hy5r4",
+      "category": "apple",
+      "object_instance": "apple_042",
+      "relative_path": "oo3d9dsingle/apple_042_sp3c9njv3534iepqepauqvd52d5hy5r4",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "apple_044_a99kly61ff5ddr3l9cau3yfz280b0s40",
+      "category": "apple",
+      "object_instance": "apple_044",
+      "relative_path": "oo3d9dsingle/apple_044_a99kly61ff5ddr3l9cau3yfz280b0s40",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "apple_045_k534lbh2tvxun235zmpbhj87wrvlzrz2",
+      "category": "apple",
+      "object_instance": "apple_045",
+      "relative_path": "oo3d9dsingle/apple_045_k534lbh2tvxun235zmpbhj87wrvlzrz2",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "apple_046_jj70gtle4u54mmbtmzway8irjovghjjc",
+      "category": "apple",
+      "object_instance": "apple_046",
+      "relative_path": "oo3d9dsingle/apple_046_jj70gtle4u54mmbtmzway8irjovghjjc",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "apple_047_j8erkzx0f4bbvmilyrd17n5xzxt1spyu",
+      "category": "apple",
+      "object_instance": "apple_047",
+      "relative_path": "oo3d9dsingle/apple_047_j8erkzx0f4bbvmilyrd17n5xzxt1spyu",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "apple_048_u5iwr1mm69rq6lcysg48xfar3om5xd6h",
+      "category": "apple",
+      "object_instance": "apple_048",
+      "relative_path": "oo3d9dsingle/apple_048_u5iwr1mm69rq6lcysg48xfar3om5xd6h",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "apple_049_bso7huqss5nx914o6p3a6hezyixinpof",
+      "category": "apple",
+      "object_instance": "apple_049",
+      "relative_path": "oo3d9dsingle/apple_049_bso7huqss5nx914o6p3a6hezyixinpof",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "apple_050_8ci4ndcskl7uhn5t4vb14l2ccastgpfa",
+      "category": "apple",
+      "object_instance": "apple_050",
+      "relative_path": "oo3d9dsingle/apple_050_8ci4ndcskl7uhn5t4vb14l2ccastgpfa",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "apple_051_gsa6y0mbzx4by7ru49m9jef97m6aw9fx",
+      "category": "apple",
+      "object_instance": "apple_051",
+      "relative_path": "oo3d9dsingle/apple_051_gsa6y0mbzx4by7ru49m9jef97m6aw9fx",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "apple_052_1g5ssvb1f0zcdc9ixw13iqvwbs4s3622",
+      "category": "apple",
+      "object_instance": "apple_052",
+      "relative_path": "oo3d9dsingle/apple_052_1g5ssvb1f0zcdc9ixw13iqvwbs4s3622",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "apple_053_g6xk948ijx5kc4akj34m51i6x3ekgl7j",
+      "category": "apple",
+      "object_instance": "apple_053",
+      "relative_path": "oo3d9dsingle/apple_053_g6xk948ijx5kc4akj34m51i6x3ekgl7j",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "apple_054_0f4i0oeefwhar8a7hz0odl9ud8np96lw",
+      "category": "apple",
+      "object_instance": "apple_054",
+      "relative_path": "oo3d9dsingle/apple_054_0f4i0oeefwhar8a7hz0odl9ud8np96lw",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "apple_055_or4k1vp67q9vi1jrtuyw8uzh8vx55yk8",
+      "category": "apple",
+      "object_instance": "apple_055",
+      "relative_path": "oo3d9dsingle/apple_055_or4k1vp67q9vi1jrtuyw8uzh8vx55yk8",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "apple_056_jiy5io8vlke1cm6xu145t3awhajasbi4",
+      "category": "apple",
+      "object_instance": "apple_056",
+      "relative_path": "oo3d9dsingle/apple_056_jiy5io8vlke1cm6xu145t3awhajasbi4",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "apple_057_xqnd031gcicagqzpagn1md9mr0ahuym1",
+      "category": "apple",
+      "object_instance": "apple_057",
+      "relative_path": "oo3d9dsingle/apple_057_xqnd031gcicagqzpagn1md9mr0ahuym1",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "apple_058_v1kucqo8i2n2vppy45yb3c42vlr9dmz4",
+      "category": "apple",
+      "object_instance": "apple_058",
+      "relative_path": "oo3d9dsingle/apple_058_v1kucqo8i2n2vppy45yb3c42vlr9dmz4",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "apple_059_9266aiqlzsvo97dwgulddpfkysub3tbx",
+      "category": "apple",
+      "object_instance": "apple_059",
+      "relative_path": "oo3d9dsingle/apple_059_9266aiqlzsvo97dwgulddpfkysub3tbx",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "apple_060_5m3zwlhxajtn27ovwccn796bwxjmxelx",
+      "category": "apple",
+      "object_instance": "apple_060",
+      "relative_path": "oo3d9dsingle/apple_060_5m3zwlhxajtn27ovwccn796bwxjmxelx",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "apple_061_2l2bcmc5u5axztn2fumm2bgu215axjee",
+      "category": "apple",
+      "object_instance": "apple_061",
+      "relative_path": "oo3d9dsingle/apple_061_2l2bcmc5u5axztn2fumm2bgu215axjee",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "apple_062_116ne0ion2k470gvy41cxbs5b7w61ffq",
+      "category": "apple",
+      "object_instance": "apple_062",
+      "relative_path": "oo3d9dsingle/apple_062_116ne0ion2k470gvy41cxbs5b7w61ffq",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "apple_063_icmsj5xnuovvo0iwf4c2ico562jbi2up",
+      "category": "apple",
+      "object_instance": "apple_063",
+      "relative_path": "oo3d9dsingle/apple_063_icmsj5xnuovvo0iwf4c2ico562jbi2up",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "apple_064_t5u02zz1w36h64b2imsg0d310ardudp1",
+      "category": "apple",
+      "object_instance": "apple_064",
+      "relative_path": "oo3d9dsingle/apple_064_t5u02zz1w36h64b2imsg0d310ardudp1",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "apple_065_jhkafpv90dh7eahkx07eheigwvs4myo6",
+      "category": "apple",
+      "object_instance": "apple_065",
+      "relative_path": "oo3d9dsingle/apple_065_jhkafpv90dh7eahkx07eheigwvs4myo6",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "asparagus_009_wtrtlpwzdyy5b2hjej002lmqih79qqxq",
+      "category": "asparagus",
+      "object_instance": "asparagus_009",
+      "relative_path": "oo3d9dsingle/asparagus_009_wtrtlpwzdyy5b2hjej002lmqih79qqxq",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "asparagus_010_nae2r5mzhy3y2w4ly2a9lv5atb6rq4mt",
+      "category": "asparagus",
+      "object_instance": "asparagus_010",
+      "relative_path": "oo3d9dsingle/asparagus_010_nae2r5mzhy3y2w4ly2a9lv5atb6rq4mt",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "asparagus_011_70p991m78c21eje9xt6ra063hel03j08",
+      "category": "asparagus",
+      "object_instance": "asparagus_011",
+      "relative_path": "oo3d9dsingle/asparagus_011_70p991m78c21eje9xt6ra063hel03j08",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "asparagus_012_butr4q2i3merkclit6q3bbqpf18hzh07",
+      "category": "asparagus",
+      "object_instance": "asparagus_012",
+      "relative_path": "oo3d9dsingle/asparagus_012_butr4q2i3merkclit6q3bbqpf18hzh07",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "asparagus_013_utcawq6akyky7mlie7ferqwyui6v3aw1",
+      "category": "asparagus",
+      "object_instance": "asparagus_013",
+      "relative_path": "oo3d9dsingle/asparagus_013_utcawq6akyky7mlie7ferqwyui6v3aw1",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "asparagus_014_y3m88202rnozvyntmlmwnpy40vfset6g",
+      "category": "asparagus",
+      "object_instance": "asparagus_014",
+      "relative_path": "oo3d9dsingle/asparagus_014_y3m88202rnozvyntmlmwnpy40vfset6g",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "backpack_023_10bkzqwiw59sidrej1yjkr3ipp4t1nbb",
+      "category": "backpack",
+      "object_instance": "backpack_023",
+      "relative_path": "oo3d9dsingle/backpack_023_10bkzqwiw59sidrej1yjkr3ipp4t1nbb",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "backpack_024_encnlkm87zik20uehkgn8k8i0c0hlwdw",
+      "category": "backpack",
+      "object_instance": "backpack_024",
+      "relative_path": "oo3d9dsingle/backpack_024_encnlkm87zik20uehkgn8k8i0c0hlwdw",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "backpack_025_7qv4ddi9f36kypof687v689brgxhmz9r",
+      "category": "backpack",
+      "object_instance": "backpack_025",
+      "relative_path": "oo3d9dsingle/backpack_025_7qv4ddi9f36kypof687v689brgxhmz9r",
+      "rgb_count": 40
+    },
+    {
+      "scene_name": "backpack_026_4202o1t5z78t3aq4kk4sizydtkrg8ihq",
+      "category": "backpack",
+      "object_instance": "backpack_026",
+      "relative_path": "oo3d9dsingle/backpack_026_4202o1t5z78t3aq4kk4sizydtkrg8ihq",
+      "rgb_count": 45
+    },
+    {
+      "scene_name": "backpack_027_xjqcmzs9g9uv05gfw05z2l0e80f25bw2",
+      "category": "backpack",
+      "object_instance": "backpack_027",
+      "relative_path": "oo3d9dsingle/backpack_027_xjqcmzs9g9uv05gfw05z2l0e80f25bw2",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "backpack_031_ipanb0ik3ko7hhwi1i2hqmeqko0l9r3m",
+      "category": "backpack",
+      "object_instance": "backpack_031",
+      "relative_path": "oo3d9dsingle/backpack_031_ipanb0ik3ko7hhwi1i2hqmeqko0l9r3m",
+      "rgb_count": 49
+    },
+    {
+      "scene_name": "backpack_032_mhy1lftqa1syr1xjo9ofi5rcu2aecqvd",
+      "category": "backpack",
+      "object_instance": "backpack_032",
+      "relative_path": "oo3d9dsingle/backpack_032_mhy1lftqa1syr1xjo9ofi5rcu2aecqvd",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "backpack_033_ieuk4js49zcka1y3rn1xz3f0rk8vbm9f",
+      "category": "backpack",
+      "object_instance": "backpack_033",
+      "relative_path": "oo3d9dsingle/backpack_033_ieuk4js49zcka1y3rn1xz3f0rk8vbm9f",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "backpack_034_xykp0i7g3yfytm7fdh1ch43qmzyh491e",
+      "category": "backpack",
+      "object_instance": "backpack_034",
+      "relative_path": "oo3d9dsingle/backpack_034_xykp0i7g3yfytm7fdh1ch43qmzyh491e",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "ball_018_vrai04wec1309gm0yux181n7m42xdtfn",
+      "category": "ball",
+      "object_instance": "ball_018",
+      "relative_path": "oo3d9dsingle/ball_018_vrai04wec1309gm0yux181n7m42xdtfn",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "ball_019_6ak2pm6gch3q1wdrcc9j3tib43dj18uc",
+      "category": "ball",
+      "object_instance": "ball_019",
+      "relative_path": "oo3d9dsingle/ball_019_6ak2pm6gch3q1wdrcc9j3tib43dj18uc",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "ball_020_wd706urvalhwtpbqzm4fe8678cmxgi6g",
+      "category": "ball",
+      "object_instance": "ball_020",
+      "relative_path": "oo3d9dsingle/ball_020_wd706urvalhwtpbqzm4fe8678cmxgi6g",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "ball_021_cfbu6wp4b1xidedzmdh3m2suh9lz2qco",
+      "category": "ball",
+      "object_instance": "ball_021",
+      "relative_path": "oo3d9dsingle/ball_021_cfbu6wp4b1xidedzmdh3m2suh9lz2qco",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "ball_022_z1w5ajafitdxrhd5lcvjwxwdkb392m1i",
+      "category": "ball",
+      "object_instance": "ball_022",
+      "relative_path": "oo3d9dsingle/ball_022_z1w5ajafitdxrhd5lcvjwxwdkb392m1i",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "ball_023_c647pmar2vrsg2eo4vonp3n3kqyizko2",
+      "category": "ball",
+      "object_instance": "ball_023",
+      "relative_path": "oo3d9dsingle/ball_023_c647pmar2vrsg2eo4vonp3n3kqyizko2",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "ball_024_n2d87lg46egtvv375c1gmtq0y4q48psf",
+      "category": "ball",
+      "object_instance": "ball_024",
+      "relative_path": "oo3d9dsingle/ball_024_n2d87lg46egtvv375c1gmtq0y4q48psf",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "ball_025_fvnx7cf87lyzxr0bluzrlhy5libclrub",
+      "category": "ball",
+      "object_instance": "ball_025",
+      "relative_path": "oo3d9dsingle/ball_025_fvnx7cf87lyzxr0bluzrlhy5libclrub",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "bamboo_shoots_023_x5ujpw29sszlodses4npg250icxz8qiv",
+      "category": "bamboo_shoots",
+      "object_instance": "bamboo_shoots_023",
+      "relative_path": "oo3d9dsingle/bamboo_shoots_023_x5ujpw29sszlodses4npg250icxz8qiv",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "bamboo_shoots_024_v4593fflmcq4v6qvy3emoc277qe52gaf",
+      "category": "bamboo_shoots",
+      "object_instance": "bamboo_shoots_024",
+      "relative_path": "oo3d9dsingle/bamboo_shoots_024_v4593fflmcq4v6qvy3emoc277qe52gaf",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "bamboo_shoots_025_w5qlblmrb9t1r87eavpxju2ama0es689",
+      "category": "bamboo_shoots",
+      "object_instance": "bamboo_shoots_025",
+      "relative_path": "oo3d9dsingle/bamboo_shoots_025_w5qlblmrb9t1r87eavpxju2ama0es689",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "bamboo_shoots_026_hci7u92vyjqw2k7wrqzycqxudkj7fcy2",
+      "category": "bamboo_shoots",
+      "object_instance": "bamboo_shoots_026",
+      "relative_path": "oo3d9dsingle/bamboo_shoots_026_hci7u92vyjqw2k7wrqzycqxudkj7fcy2",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "bamboo_shoots_027_pv535kvrmh5i9n2peehjhkec1xbebg0r",
+      "category": "bamboo_shoots",
+      "object_instance": "bamboo_shoots_027",
+      "relative_path": "oo3d9dsingle/bamboo_shoots_027_pv535kvrmh5i9n2peehjhkec1xbebg0r",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "bamboo_shoots_028_uiv6h4idqzm4ho0p4o41qrqqejf7761u",
+      "category": "bamboo_shoots",
+      "object_instance": "bamboo_shoots_028",
+      "relative_path": "oo3d9dsingle/bamboo_shoots_028_uiv6h4idqzm4ho0p4o41qrqqejf7761u",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "bamboo_shoots_029_w513h1p2i7z18xtjwwomf3dd3fvx43w5",
+      "category": "bamboo_shoots",
+      "object_instance": "bamboo_shoots_029",
+      "relative_path": "oo3d9dsingle/bamboo_shoots_029_w513h1p2i7z18xtjwwomf3dd3fvx43w5",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "bamboo_shoots_030_mrvlgkvn84afx3jokikpoxc8rz7oxvaf",
+      "category": "bamboo_shoots",
+      "object_instance": "bamboo_shoots_030",
+      "relative_path": "oo3d9dsingle/bamboo_shoots_030_mrvlgkvn84afx3jokikpoxc8rz7oxvaf",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "bamboo_shoots_031_7ub9s6l51cix26k604v6y3s9hspfsb2s",
+      "category": "bamboo_shoots",
+      "object_instance": "bamboo_shoots_031",
+      "relative_path": "oo3d9dsingle/bamboo_shoots_031_7ub9s6l51cix26k604v6y3s9hspfsb2s",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "bamboo_shoots_032_mbrylpobs7f5o9nyps62zkklbtk3c5c6",
+      "category": "bamboo_shoots",
+      "object_instance": "bamboo_shoots_032",
+      "relative_path": "oo3d9dsingle/bamboo_shoots_032_mbrylpobs7f5o9nyps62zkklbtk3c5c6",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "bamboo_shoots_033_xpmakz86r0ywywgyk2pxal1mikyive5i",
+      "category": "bamboo_shoots",
+      "object_instance": "bamboo_shoots_033",
+      "relative_path": "oo3d9dsingle/bamboo_shoots_033_xpmakz86r0ywywgyk2pxal1mikyive5i",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "bamboo_shoots_034_5jofwe4mzq2yuq2v3b2g7mxda5v7f0zz",
+      "category": "bamboo_shoots",
+      "object_instance": "bamboo_shoots_034",
+      "relative_path": "oo3d9dsingle/bamboo_shoots_034_5jofwe4mzq2yuq2v3b2g7mxda5v7f0zz",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "bamboo_shoots_035_t6fms0s7chrpz4nyv1ctdpy4aave6brk",
+      "category": "bamboo_shoots",
+      "object_instance": "bamboo_shoots_035",
+      "relative_path": "oo3d9dsingle/bamboo_shoots_035_t6fms0s7chrpz4nyv1ctdpy4aave6brk",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "bamboo_shoots_036_jttt4vsyzcg0iet0z9ox97jtyc8cmya9",
+      "category": "bamboo_shoots",
+      "object_instance": "bamboo_shoots_036",
+      "relative_path": "oo3d9dsingle/bamboo_shoots_036_jttt4vsyzcg0iet0z9ox97jtyc8cmya9",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "bamboo_shoots_037_xpm83sqdn64cci5bzc163hfhcu4j9h0v",
+      "category": "bamboo_shoots",
+      "object_instance": "bamboo_shoots_037",
+      "relative_path": "oo3d9dsingle/bamboo_shoots_037_xpm83sqdn64cci5bzc163hfhcu4j9h0v",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "banana_026_xtcye2wixng0xdmxq7074e933xsqkguz",
+      "category": "banana",
+      "object_instance": "banana_026",
+      "relative_path": "oo3d9dsingle/banana_026_xtcye2wixng0xdmxq7074e933xsqkguz",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "banana_030_bhvdm47qdj8hemq2gxcpify5ql8l97xb",
+      "category": "banana",
+      "object_instance": "banana_030",
+      "relative_path": "oo3d9dsingle/banana_030_bhvdm47qdj8hemq2gxcpify5ql8l97xb",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "banana_034_13b14spcpfw7p08g6ovbwanra7pyh6af",
+      "category": "banana",
+      "object_instance": "banana_034",
+      "relative_path": "oo3d9dsingle/banana_034_13b14spcpfw7p08g6ovbwanra7pyh6af",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "banana_035_5rglxasn1pir27cv6p48oorxxq76yv66",
+      "category": "banana",
+      "object_instance": "banana_035",
+      "relative_path": "oo3d9dsingle/banana_035_5rglxasn1pir27cv6p48oorxxq76yv66",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "banana_036_56xz90eek8g39tnsrvd6ew0d90xhitt7",
+      "category": "banana",
+      "object_instance": "banana_036",
+      "relative_path": "oo3d9dsingle/banana_036_56xz90eek8g39tnsrvd6ew0d90xhitt7",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "banana_037_vfsokpeszqlet6ypeizxbn3jbb0irw2e",
+      "category": "banana",
+      "object_instance": "banana_037",
+      "relative_path": "oo3d9dsingle/banana_037_vfsokpeszqlet6ypeizxbn3jbb0irw2e",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "banana_038_avvafj3g1j1y7oz361z9x4zswo161ncv",
+      "category": "banana",
+      "object_instance": "banana_038",
+      "relative_path": "oo3d9dsingle/banana_038_avvafj3g1j1y7oz361z9x4zswo161ncv",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "banana_039_tg9sgojhu4oqw0y97wscz7bqjcrd391b",
+      "category": "banana",
+      "object_instance": "banana_039",
+      "relative_path": "oo3d9dsingle/banana_039_tg9sgojhu4oqw0y97wscz7bqjcrd391b",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "banana_040_j112z78hp5ng3lf4ywa2vmgtras2dr91",
+      "category": "banana",
+      "object_instance": "banana_040",
+      "relative_path": "oo3d9dsingle/banana_040_j112z78hp5ng3lf4ywa2vmgtras2dr91",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "banana_041_9789zedom1504qfefnr6ifjgt41rrel6",
+      "category": "banana",
+      "object_instance": "banana_041",
+      "relative_path": "oo3d9dsingle/banana_041_9789zedom1504qfefnr6ifjgt41rrel6",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "banana_042_ryg0yc6pxmczynajt9ga8fpnzt4mbk3x",
+      "category": "banana",
+      "object_instance": "banana_042",
+      "relative_path": "oo3d9dsingle/banana_042_ryg0yc6pxmczynajt9ga8fpnzt4mbk3x",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "banana_043_gxb7p8bi14t4hqatc1dmzqcsrtm2pop7",
+      "category": "banana",
+      "object_instance": "banana_043",
+      "relative_path": "oo3d9dsingle/banana_043_gxb7p8bi14t4hqatc1dmzqcsrtm2pop7",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "banana_044_5lw34yk8p1wyaiihk2591n66ynfx0rd7",
+      "category": "banana",
+      "object_instance": "banana_044",
+      "relative_path": "oo3d9dsingle/banana_044_5lw34yk8p1wyaiihk2591n66ynfx0rd7",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "banana_045_7obp4k3iw3ntsbm1eiwcwt7dovzcumrw",
+      "category": "banana",
+      "object_instance": "banana_045",
+      "relative_path": "oo3d9dsingle/banana_045_7obp4k3iw3ntsbm1eiwcwt7dovzcumrw",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "battery_003_zsedx3b9xl1r3636s89neg6padhmb6sx",
+      "category": "battery",
+      "object_instance": "battery_003",
+      "relative_path": "oo3d9dsingle/battery_003_zsedx3b9xl1r3636s89neg6padhmb6sx",
+      "rgb_count": 50
+    },
+    {
+      "scene_name": "beauty_blender_002_z2zre7acvhjdo88n98cwi9h3785ku4ow",
+      "category": "beauty_blender",
+      "object_instance": "beauty_blender_002",
+      "relative_path": "oo3d9dsingle/beauty_blender_002_z2zre7acvhjdo88n98cwi9h3785ku4ow",
+      "rgb_count": 50
+    }
+  ]
+}
