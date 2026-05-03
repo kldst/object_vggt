@@ -153,6 +153,22 @@ def _rotation_matrix_to_rot6d(rotation_matrix: torch.Tensor) -> torch.Tensor:
     return rotation_matrix[..., :, :2].reshape(*rotation_matrix.shape[:-2], 6)
 
 
+def _rot6d_to_rotation_matrix(rot6d: torch.Tensor) -> torch.Tensor:
+    """Gram-Schmidt: (..., 6) -> (..., 3, 3) with orthonormal columns.
+
+    Mirrors the row-major rot6d convention used in `_rotation_matrix_to_rot6d`
+    (first two columns of R flattened as [c0, c1] in shape (..., 6)).
+    """
+    a1 = rot6d[..., :3]
+    a2 = rot6d[..., 3:6]
+    b1 = F.normalize(a1, dim=-1, eps=1e-8)
+    proj = (b1 * a2).sum(dim=-1, keepdim=True) * b1
+    b2 = F.normalize(a2 - proj, dim=-1, eps=1e-8)
+    b3 = torch.cross(b1, b2, dim=-1)
+    # Stack as columns to get shape (..., 3, 3).
+    return torch.stack([b1, b2, b3], dim=-1)
+
+
 def _vector_loss(pred: torch.Tensor, gt: torch.Tensor, loss_type: str = "l1") -> torch.Tensor:
     if loss_type == "l1":
         return (pred - gt).abs().mean()
@@ -161,10 +177,56 @@ def _vector_loss(pred: torch.Tensor, gt: torch.Tensor, loss_type: str = "l1") ->
     raise ValueError(f"Unknown loss_type: {loss_type}")
 
 
+def _rotation_loss(
+    pred_rot6d: torch.Tensor,
+    gt_R: torch.Tensor,
+    pose_rep: str,
+    loss_type: str,
+) -> torch.Tensor:
+    """Rotation loss with selectable representation.
+
+    pose_rep:
+      - "rot6d":     vector loss (L1/L2) directly on the 6D representation.
+                     Cheap and stable, but not a true SO(3) distance — model
+                     can game it by scaling output columns.
+      - "frobenius": ||R_pred - R_gt||_F^2 after Gram-Schmidt projection.
+                     Equals 4(1 - cos θ); smooth, monotone in geodesic angle,
+                     no arccos singularity. Recommended over geodesic.
+      - "cosine":    (1 - cos θ).mean(); equivalent to frobenius up to a
+                     constant, kept here for logging/A-B convenience.
+      - "geodesic":  arccos((tr(R_pred R_gt^T) - 1) / 2). Has gradient
+                     instability near θ = π; only use for fine-tuning after
+                     the model is already close to GT.
+    """
+    if pose_rep == "rot6d":
+        gt_rot6d = _rotation_matrix_to_rot6d(gt_R)
+        return _vector_loss(pred_rot6d, gt_rot6d, loss_type=loss_type)
+
+    R_pred = _rot6d_to_rotation_matrix(pred_rot6d)
+    if pose_rep == "frobenius":
+        return ((R_pred - gt_R) ** 2).sum(dim=(-1, -2)).mean()
+
+    # cos(theta) = (trace(R_pred R_gt^T) - 1) / 2
+    trace = (R_pred * gt_R).sum(dim=(-1, -2))
+    cos_theta = (trace - 1.0) * 0.5
+
+    if pose_rep == "cosine":
+        return (1.0 - cos_theta).mean()
+    if pose_rep == "geodesic":
+        cos_theta = cos_theta.clamp(-1.0 + 1e-6, 1.0 - 1e-6)
+        return torch.arccos(cos_theta).mean()
+
+    raise ValueError(
+        f"Unknown pose_rep '{pose_rep}'. Expected one of: "
+        "rot6d, frobenius, cosine, geodesic."
+    )
+
+
 def compute_object_srt_loss(
     predictions,
     batch,
     loss_type="l1",
+    pose_rep="rot6d",
     weight_pose=1.0,
     weight_translation=1.0,
     init_w=1.0,
@@ -182,13 +244,18 @@ def compute_object_srt_loss(
       - object_translation: (B, 3)
     Optional batch key:
       - has_object: (B,) bool mask
+
+    pose_rep: rotation loss representation. See `_rotation_loss`.
+              "rot6d" preserves legacy behavior. "frobenius" is the
+              recommended SO(3)-aware default.
+    loss_type: applies to translation always, and to rotation only when
+               pose_rep == "rot6d".
     """
     pred_pose = predictions["object_pose"]
     pred_translation = predictions["object_translation"]
     # pred_pose_0 = predictions.get("pred_pose_0", None)
 
-    gt_rot = batch["object_rotation"]
-    gt_pose = _rotation_matrix_to_rot6d(gt_rot)
+    gt_R = batch["object_rotation"]
     gt_translation = batch["object_translation"]
 
     if debug_force_model_output_to_ground_truth and not getattr(
@@ -196,8 +263,9 @@ def compute_object_srt_loss(
     ):
         print(
             "[DebugDType][object_srt] "
-            f"pred_pose={pred_pose.dtype}, gt_pose={gt_pose.dtype}, "
-            f"pred_translation={pred_translation.dtype}, gt_translation={gt_translation.dtype}",
+            f"pred_pose={pred_pose.dtype}, gt_R={gt_R.dtype}, "
+            f"pred_translation={pred_translation.dtype}, gt_translation={gt_translation.dtype}, "
+            f"pose_rep={pose_rep}",
             flush=True,
         )
         compute_object_srt_loss._dtype_logged_once = True
@@ -215,12 +283,12 @@ def compute_object_srt_loss(
             }
         pred_pose = pred_pose[valid_mask]
         pred_translation = pred_translation[valid_mask]
-        gt_pose = gt_pose[valid_mask]
+        gt_R = gt_R[valid_mask]
         gt_translation = gt_translation[valid_mask]
         # if pred_pose_0 is not None:
         #     pred_pose_0 = pred_pose_0[valid_mask]
 
-    loss_pose = _vector_loss(pred_pose, gt_pose, loss_type=loss_type)
+    loss_pose = _rotation_loss(pred_pose, gt_R, pose_rep=pose_rep, loss_type=loss_type)
     loss_translation = _vector_loss(pred_translation, gt_translation, loss_type=loss_type)
 
     # if pred_pose_0 is not None:
