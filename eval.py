@@ -481,6 +481,116 @@ def _tokens_to_heatmaps(tokens, num_views, h_p, w_p):
     return t.norm(dim=-1).numpy()
 
 
+def _safe_pearson(a, b):
+    a = np.asarray(a, dtype=np.float64).reshape(-1)
+    b = np.asarray(b, dtype=np.float64).reshape(-1)
+    ok = np.isfinite(a) & np.isfinite(b)
+    if ok.sum() < 2:
+        return float("nan")
+    a = a[ok]
+    b = b[ok]
+    if np.std(a) < 1e-12 or np.std(b) < 1e-12:
+        return float("nan")
+    return float(np.corrcoef(a, b)[0, 1])
+
+
+def _gini_nonnegative(values):
+    values = np.asarray(values, dtype=np.float64).reshape(-1)
+    values = values[np.isfinite(values)]
+    if values.size == 0:
+        return float("nan")
+    values = values - values.min()
+    total = values.sum()
+    if total <= 1e-12:
+        return 0.0
+    values = np.sort(values)
+    n = values.size
+    coeff = (2 * np.arange(1, n + 1) - n - 1).dot(values)
+    return float(coeff / (n * total))
+
+
+def _entropy_normalized(values):
+    values = np.asarray(values, dtype=np.float64).reshape(-1)
+    values = values[np.isfinite(values)]
+    if values.size <= 1:
+        return float("nan")
+    values = values - values.min()
+    total = values.sum()
+    if total <= 1e-12:
+        return 1.0
+    probs = values / total
+    probs = probs[probs > 0]
+    return float(-(probs * np.log(probs)).sum() / np.log(values.size))
+
+
+def _weighted_center_dist(heat):
+    heat = np.asarray(heat, dtype=np.float64)
+    if heat.ndim != 2:
+        return float("nan")
+    weights = heat - np.nanmin(heat)
+    weights = np.nan_to_num(weights, nan=0.0, posinf=0.0, neginf=0.0)
+    if weights.sum() <= 1e-12:
+        return 0.0
+    ys, xs = np.indices(weights.shape, dtype=np.float64)
+    cy = float((ys * weights).sum() / weights.sum())
+    cx = float((xs * weights).sum() / weights.sum())
+    cy = cy / max(weights.shape[0] - 1, 1)
+    cx = cx / max(weights.shape[1] - 1, 1)
+    return float(np.sqrt((cy - 0.5) ** 2 + (cx - 0.5) ** 2))
+
+
+def _heatmap_layer_stats(heat):
+    """Summarize one raw layer heatmap of shape (S, H_p, W_p)."""
+    heat = np.asarray(heat, dtype=np.float32)
+    finite = heat[np.isfinite(heat)]
+    if finite.size == 0:
+        return {}
+
+    h_min = float(finite.min())
+    h_max = float(finite.max())
+    h_mean = float(finite.mean())
+    h_std = float(finite.std())
+    denom = max(h_max - h_min, 1e-12)
+    norm = (heat - h_min) / denom
+    norm = np.nan_to_num(norm, nan=0.0, posinf=1.0, neginf=0.0)
+    flat = norm.reshape(-1)
+    top10_start = int(0.9 * flat.size)
+    top10_mean = float(np.sort(flat)[top10_start:].mean()) if flat.size else float("nan")
+    flat_mean = float(flat.mean())
+
+    view_corrs = []
+    if norm.ndim == 3:
+        for i in range(norm.shape[0]):
+            for j in range(i + 1, norm.shape[0]):
+                view_corrs.append(_safe_pearson(norm[i], norm[j]))
+    view_corrs = [c for c in view_corrs if np.isfinite(c)]
+
+    per_view_mean = norm.mean(axis=(1, 2)) if norm.ndim == 3 else np.asarray([flat_mean])
+    per_view_peak = norm.max(axis=(1, 2)) if norm.ndim == 3 else np.asarray([float(flat.max())])
+    center_dists = [_weighted_center_dist(v) for v in norm] if norm.ndim == 3 else [_weighted_center_dist(norm)]
+
+    return {
+        "heat_raw_mean": h_mean,
+        "heat_raw_std": h_std,
+        "heat_raw_cv": float(h_std / max(abs(h_mean), 1e-12)),
+        "heat_raw_min": h_min,
+        "heat_raw_max": h_max,
+        "heat_norm_mean": flat_mean,
+        "heat_norm_std": float(flat.std()),
+        "heat_norm_entropy": _entropy_normalized(flat),
+        "heat_norm_gini": _gini_nonnegative(flat),
+        "heat_top10_ratio": float(top10_mean / max(flat_mean, 1e-12)),
+        "heat_frac_gt_50": float((flat > 0.50).mean()),
+        "heat_frac_gt_75": float((flat > 0.75).mean()),
+        "heat_frac_gt_90": float((flat > 0.90).mean()),
+        "heat_view_mean_std": float(np.std(per_view_mean)),
+        "heat_view_peak_std": float(np.std(per_view_peak)),
+        "heat_view_corr_mean": float(np.mean(view_corrs)) if view_corrs else float("nan"),
+        "heat_center_dist_mean": float(np.nanmean(center_dists)),
+        "heat_center_dist_std": float(np.nanstd(center_dists)),
+    }
+
+
 def generate_cross_attn_heatmaps(model, dataset, sample_meta, out_path: Path, seed: int):
     seed_everything(seed)
     batch = dataset.get_data(
@@ -502,6 +612,8 @@ def generate_cross_attn_heatmaps(model, dataset, sample_meta, out_path: Path, se
 
     rgb_views = [np.asarray(im, dtype=np.uint8) for im in batch["images"]]
     obj_views = [np.asarray(im, dtype=np.uint8) for im in batch["object_images"]]
+    heatmaps_by_layer = {}
+    layer_metric_rows = []
 
     n_rows = 1 + len(layer_indices)
     n_cols = s_scene
@@ -516,6 +628,17 @@ def generate_cross_attn_heatmaps(model, dataset, sample_meta, out_path: Path, se
 
     for r, L in enumerate(layer_indices, start=1):
         heat = _tokens_to_heatmaps(captured[L], s_scene, h_p, w_p)  # (S, h_p, w_p)
+        heatmaps_by_layer[int(L)] = heat.astype(np.float32)
+        layer_metric_rows.append({
+            **metrics,
+            "split": sample_meta["split"],
+            "sample_idx": sample_meta["sample_idx"],
+            "object_id": sample_meta["object_id"],
+            "scene_name": sample_meta["scene_name"],
+            "category": sample_meta.get("category", ""),
+            "layer": int(L),
+            **_heatmap_layer_stats(heat),
+        })
         # Per-layer global min/max so views are comparable within the same layer.
         vmin = float(np.nanmin(heat))
         vmax = float(np.nanmax(heat))
@@ -561,7 +684,17 @@ def generate_cross_attn_heatmaps(model, dataset, sample_meta, out_path: Path, se
     plt.close(fig2)
     print(f"[HEATMAP] {obj_path}")
 
-    return {
+    npz_path = out_path.with_name(out_path.stem + "_heatmaps.npz")
+    np.savez_compressed(
+        npz_path,
+        layer_indices=np.asarray(layer_indices, dtype=np.int64),
+        scene_ids=np.asarray(batch["ids"], dtype=np.int64),
+        object_cam_indices=np.asarray(batch["object_cam_indices"], dtype=np.int64),
+        **{f"layer_{int(L)}": heatmaps_by_layer[int(L)] for L in layer_indices},
+    )
+    print(f"[HEATMAP] {npz_path}")
+
+    sample_row = {
         **metrics,
         "split": sample_meta["split"],
         "sample_idx": sample_meta["sample_idx"],
@@ -569,7 +702,9 @@ def generate_cross_attn_heatmaps(model, dataset, sample_meta, out_path: Path, se
         "scene_name": sample_meta["scene_name"],
         "category": sample_meta.get("category", ""),
         "heatmap_path": str(out_path),
+        "raw_heatmap_npz": str(npz_path),
     }
+    return sample_row, layer_metric_rows
 
 
 def find_all_samples_for_object(split: str, object_id: int, category: str = None):
@@ -776,22 +911,27 @@ def main():
                 heatmap_tasks.append(picked)
 
         heatmap_rows = []
+        heatmap_layer_rows = []
         for picked in heatmap_tasks:
             ds = build_dataset(picked["split"])
             tag = f"{picked['split']}_idx{picked['sample_idx']}_obj{picked['object_id']}"
             out_path = heatmap_dir / f"crossattn_heatmap_{tag}.png"
             try:
-                row = generate_cross_attn_heatmaps(
+                row, layer_rows = generate_cross_attn_heatmaps(
                     trained, ds, picked, out_path, seed=args.seed_base
                 )
                 if row is not None:
                     heatmap_rows.append(row)
+                heatmap_layer_rows.extend(layer_rows)
             except Exception as exc:
                 print(f"[HEATMAP] {picked['split']} idx={picked['sample_idx']} failed: {exc}")
 
         if heatmap_rows:
             csv_path = heatmap_dir / "heatmap_metrics.csv"
             write_csv(heatmap_rows, csv_path)
+        if heatmap_layer_rows:
+            csv_path = heatmap_dir / "heatmap_layer_metrics.csv"
+            write_csv(heatmap_layer_rows, csv_path)
 
     if args.heatmap_only:
         print("[HEATMAP] --heatmap-only specified; skipping eval loop.")

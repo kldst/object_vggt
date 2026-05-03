@@ -3,7 +3,7 @@ defaults:
 
 # torchrun --master_port=29200 --nproc_per_node=1 launch.py  --config default_object
 
-exp_name: baseline_ov9d_multi_object_pose_frobenius_v1
+exp_name: baseline_ov9d_multi_object_pose_mask_0503v1
 img_size: 518
 num_workers: 0
 seed_value: 30
@@ -107,9 +107,9 @@ logging:
         # - loss_conf_object_point
         # - loss_reg_object_point
         # - loss_grad_object_point
-        # - loss_object_mask
-        # - loss_object_mask_bce
-        # - loss_object_mask_dice
+        - loss_object_mask
+        - loss_object_mask_bce
+        - loss_object_mask_dice
         - loss_object_srt
         - loss_object_pose
         - loss_object_translation
@@ -122,9 +122,9 @@ logging:
         # - loss_conf_object_point
         # - loss_reg_object_point
         # - loss_grad_object_point
-        # - loss_object_mask
-        # - loss_object_mask_bce
-        # - loss_object_mask_dice
+        - loss_object_mask
+        - loss_object_mask_bce
+        - loss_object_mask_dice
         - loss_object_srt
         - loss_object_pose
         - loss_object_translation
@@ -137,8 +137,8 @@ logging:
 checkpoint:
   save_dir: logs/${exp_name}/ckpts
   save_freq: 10
-  resume_checkpoint_path: /logs/baseline_0417_14000_shuffle_v2/ckpts/checkpoint_60.pt
-  # resume_checkpoint_path: /mnt/train-data-4-hdd/yian/freepose/vggt_model/model.pt
+  # resume_checkpoint_path: /logs/baseline_0417_14000_shuffle_v2/ckpts/checkpoint_60.pt
+  resume_checkpoint_path: /mnt/train-data-4-hdd/yian/freepose/vggt_model/model.pt
   load_optimizer_state: False
   load_training_state: False
   load_scaler_state: False
@@ -157,15 +157,15 @@ loss:
   #   alpha: 0.2
   #   gradient_loss_fn: "normal"
   #   valid_range: -1
-  # object_mask:
-  #   weight: 1.0
-  #   bce_weight: 1.0
-  #   dice_weight: 1.0
-  #   pos_weight: 2.0
+  object_mask:
+    weight: 1.0
+    bce_weight: 1.0
+    dice_weight: 1.0
+    pos_weight: 2.0
   object_srt:
     weight: 1.0
     loss_type: l1            # used for translation always; used for rotation only when pose_rep == rot6d
-    pose_rep: frobenius      # rot6d | frobenius | cosine | geodesic
+    pose_rep: rot6d     # rot6d | frobenius | cosine | geodesic
     weight_pose: 1.0
     weight_translation: 1.0
     # init_w: 1.0  # disabled because loss_object_pose_init is removed
@@ -209,9 +209,9 @@ optim:
       # - module_name: ["object_pt_head"]
       #   max_norm: 1.0   # feel free to reduce this if you see instabilities
       #   norm_type: 2
-      # - module_name: ["object_mask_head"]
-      #   max_norm: 1.0
-      #   norm_type: 2
+      - module_name: ["object_mask_head"]
+        max_norm: 1.0
+        norm_type: 2
       - module_name: ["object_srt_head"]
         max_norm: 1.0
         norm_type: 2
@@ -246,7 +246,7 @@ model:
   enable_point: False
   enable_track: False
   enable_object_point: False
-  enable_object_mask: False
+  enable_object_mask: True
   enable_object_srt: True
   use_shared_object_latent: False # set False to switch back to the original version (no shared latent)
   enable_object_cross_attn: False

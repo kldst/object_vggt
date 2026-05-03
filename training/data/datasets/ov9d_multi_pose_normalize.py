@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 import numpy as np
+from PIL import Image
 
 TRAINING_ROOT = Path(__file__).resolve().parents[2]
 OBJECT_ROOT = Path(__file__).resolve().parents[3]
@@ -319,6 +320,25 @@ class OV9DMultiPoseNormalizeDataset(OV9DPoseNormalizeDataset):
         mask_path = scene_dir / "mask_visib" / f"{image_id:06d}_{object_index:06d}.png"
         return self.apply_mask_white_background(rgb, mask_path)
 
+    def _load_scene_object_mask(
+        self,
+        scene_dir: Path,
+        image_id: int,
+        object_index: Optional[int],
+        image_shape: tuple[int, int],
+    ) -> np.ndarray:
+        if object_index is None:
+            return np.zeros(image_shape, dtype=np.float32)
+        mask_path = scene_dir / "mask_visib" / f"{image_id:06d}_{object_index:06d}.png"
+        if not mask_path.is_file():
+            return np.zeros(image_shape, dtype=np.float32)
+        mask = np.asarray(Image.open(mask_path).convert("L"), dtype=np.float32)
+        if mask.shape != image_shape:
+            raise ValueError(
+                f"Object mask shape {mask.shape} does not match image shape {image_shape} for {mask_path}"
+            )
+        return (mask > 0).astype(np.float32)
+
     def _process_scene_view(
         self,
         image: np.ndarray,
@@ -339,6 +359,28 @@ class OV9DMultiPoseNormalizeDataset(OV9DPoseNormalizeDataset):
             target_image_shape=target_image_shape,
             filepath=filepath,
         )
+
+    def _process_scene_object_mask(
+        self,
+        mask: np.ndarray,
+        extrinsic: np.ndarray,
+        intrinsic: np.ndarray,
+        aspect_ratio: float,
+        filepath: str,
+    ) -> np.ndarray:
+        dummy_image = np.repeat((mask[..., None] * 255.0).astype(np.uint8), 3, axis=2)
+        original_size = np.array(mask.shape[:2], dtype=np.int32)
+        target_image_shape = self.get_target_shape(aspect_ratio)
+        _, processed_mask, *_ = self.process_one_image(
+            image=dummy_image,
+            depth_map=mask.astype(np.float32),
+            extri_opencv=extrinsic,
+            intri_opencv=intrinsic,
+            original_size=original_size,
+            target_image_shape=target_image_shape,
+            filepath=filepath,
+        )
+        return (processed_mask > 0.5).astype(bool)
 
     def _process_object_image(
         self,
@@ -452,6 +494,7 @@ class OV9DMultiPoseNormalizeDataset(OV9DPoseNormalizeDataset):
         raw_cam_points = []
         raw_world_points = []
         point_masks = []
+        object_masks = []
         extrinsics = []
         intrinsics = []
         original_sizes = []
@@ -461,6 +504,16 @@ class OV9DMultiPoseNormalizeDataset(OV9DPoseNormalizeDataset):
                 image_id,
                 scene_camera[str(image_id)],
             )
+            object_index = self._object_index_for_id(scene_gt[str(image_id)], target_object_id)
+            object_mask = self._load_scene_object_mask(
+                scene_dir,
+                image_id,
+                object_index,
+                image.shape[:2],
+            )
+            raw_extrinsic = extrinsic.copy()
+            raw_intrinsic = intrinsic.copy()
+            process_rng_state = np.random.get_state()
             image, depth, extrinsic, intrinsic, world_points, cam_points, point_mask, _ = self._process_scene_view(
                 image=image,
                 depth=depth,
@@ -469,11 +522,20 @@ class OV9DMultiPoseNormalizeDataset(OV9DPoseNormalizeDataset):
                 aspect_ratio=aspect_ratio,
                 filepath=str(scene_dir / "rgb" / f"{image_id:06d}.png"),
             )
+            np.random.set_state(process_rng_state)
+            object_mask = self._process_scene_object_mask(
+                mask=object_mask,
+                extrinsic=raw_extrinsic,
+                intrinsic=raw_intrinsic,
+                aspect_ratio=aspect_ratio,
+                filepath=str(scene_dir / "mask_visib" / f"{image_id:06d}_{object_index if object_index is not None else 0:06d}.png"),
+            )
             scene_images.append(image)
             raw_depths.append(depth)
             raw_cam_points.append(cam_points)
             raw_world_points.append(world_points)
             point_masks.append(point_mask)
+            object_masks.append(object_mask)
             extrinsics.append(extrinsic)
             intrinsics.append(intrinsic)
             original_sizes.append(np.array(image.shape[:2], dtype=np.int32))
@@ -543,6 +605,7 @@ class OV9DMultiPoseNormalizeDataset(OV9DPoseNormalizeDataset):
             "has_object": np.array(0.0 if use_negative_object else 1.0, dtype=np.float32),
             "object_rotation": normalized_object_rotation,
             "object_translation": normalized_object_translation,
+            "object_masks": object_masks,
             "object_srt": np.concatenate(
                 [normalized_object_rotation.reshape(-1), normalized_object_translation], axis=0
             ).astype(np.float32),
@@ -557,7 +620,6 @@ class OV9DMultiPoseNormalizeDataset(OV9DPoseNormalizeDataset):
                     "cam_points": [(points / scale).astype(np.float32) for points in raw_cam_points],
                     "world_points": [points.astype(np.float32) for points in normalized_world_points],
                     "point_masks": point_masks,
-                    "object_masks": point_masks,
                 }
             )
 
@@ -612,13 +674,23 @@ def _print_sample_paths(dataset: OV9DMultiPoseNormalizeDataset, seq_index: int, 
     for image_id in batch["object_cam_indices"].tolist():
         object_index = dataset._object_index_for_id(object_scene_gt[str(image_id)], object_target_id)
         object_rgb_paths.append(object_scene_dir / "rgb" / f"{image_id:06d}.png")
-        object_mask_paths.append(object_scene_dir / "mask_visib" / f"{image_id:06d}_{object_index:06d}.png")
+        if object_index is None:
+            object_mask_paths.append(f"None for frame {image_id:06d} (reference object not visible)")
+        else:
+            object_mask_paths.append(object_scene_dir / "mask_visib" / f"{image_id:06d}_{object_index:06d}.png")
+
+    object_mask_shapes = [mask.shape for mask in batch.get("object_masks", [])]
+    object_mask_area_ratios = [
+        float(np.asarray(mask, dtype=np.float32).mean()) for mask in batch.get("object_masks", [])
+    ]
 
     print(f"[sample seq_index={seq_index}]")
     print(f"  seq_name: {batch['seq_name']}")
     print(f"  has_object: {str(has_object).lower()}")
     if not has_object:
         print("  false")
+    print(f"  scene_frame_ids: {batch['ids'].tolist()}")
+    print(f"  object_reference_frame_ids: {batch['object_cam_indices'].tolist()}")
     print(f"  target_object_id: {target_object_id}")
     print(f"  category: {batch.get('category', '')}")
     print(f"  object_reference_id: {int(batch['object_reference_id'])}")
@@ -639,8 +711,10 @@ def _print_sample_paths(dataset: OV9DMultiPoseNormalizeDataset, seq_index: int, 
         "  loaded_shapes: "
         f"images={len(batch['images'])}x{batch['images'][0].shape}, "
         f"object_images={len(batch['object_images'])}x{batch['object_images'][0].shape}, "
+        f"object_masks={len(object_mask_shapes)}x{object_mask_shapes[0] if object_mask_shapes else None}, "
         f"extrinsics={batch['extrinsics'].shape}, object_srt={batch['object_srt'].shape}"
     )
+    print(f"  object_mask_area_ratios: {[round(x, 6) for x in object_mask_area_ratios]}")
     print()
 
 
@@ -686,6 +760,11 @@ def _main() -> None:
 
     sample_count = min(args.samples, dataset.sequence_list_len)
     sample_indices = random.sample(range(dataset.sequence_list_len), sample_count)
+    print(f"data_root: {dataset.data_root}")
+    print(f"multi_root: {dataset.multi_root}")
+    print(f"single_root: {dataset.single_root}")
+    print(f"split_json: {dataset.split_json}")
+    print(f"name_to_oid_json: {dataset.name_to_oid_json}")
     print(f"dataset_records: {dataset.sequence_list_len}")
     print(f"single_reference_object_ids: {len(dataset.single_records_by_object_id)}")
     print(f"negative_object_prob: {args.negative_object_prob}")
