@@ -1,0 +1,44 @@
+
+=== Per-split bias summary ===
+
+[train]  n=91
+  Pose:
+    ||pred - train_mean||  mean=1.2597  median=1.2774
+    ||gt   - train_mean||  mean=1.3816  median=1.3684
+    bias ratio (d_pred/d_gt)        median=0.943  (78/91 below 1)
+    fraction explained <v_pr,v_gt>/||v_gt||^2  median=+0.888
+    cosine(v_pred, v_gt)            median=+0.949
+  Translation:
+    ||pred - train_mean||  mean=0.1626  median=0.1521
+    ||gt   - train_mean||  mean=0.1919  median=0.1822
+    bias ratio (d_pred/d_gt)        median=0.888  (66/91 below 1)
+    fraction explained <v_pr,v_gt>/||v_gt||^2  median=+0.866
+    cosine(v_pred, v_gt)            median=+0.985
+
+[test1]  n=17
+  Pose:
+    ||pred - train_mean||  mean=1.1317  median=1.1538
+    ||gt   - train_mean||  mean=1.4017  median=1.4131
+    bias ratio (d_pred/d_gt)        median=0.833  (17/17 below 1)
+    fraction explained <v_pr,v_gt>/||v_gt||^2  median=+0.229
+    cosine(v_pred, v_gt)            median=+0.287
+  Translation:
+    ||pred - train_mean||  mean=0.1964  median=0.1894
+    ||gt   - train_mean||  mean=0.2567  median=0.2489
+    bias ratio (d_pred/d_gt)        median=0.819  (13/17 below 1)
+    fraction explained <v_pr,v_gt>/||v_gt||^2  median=+0.817
+    cosine(v_pred, v_gt)            median=+0.984
+
+=== Per-obj_id pose variance (std across scenes) ===
+  obj_id  split    n   std_pred_pose  std_gt_pose  std_pred_t    std_gt_t
+     196  train   17          1.2351       1.3909      0.1593      0.1887
+     196  test1    2          0.7480       0.5208      0.1596      0.1501
+     203  train   14          1.3092       1.3659      0.1700      0.1875
+     203  test1    3          0.6153       1.1749      0.1050      0.1063
+     205  train   19          1.2916       1.3753      0.2014      0.2239
+     205  test1    4          0.7822       1.3052      0.1409      0.2130
+     211  train   14          1.3151       1.3825      0.1953      0.2173
+     211  test1    6          1.0747       1.2964      0.2353      0.2885
+     221  train   17          1.2312       1.3850      0.1462      0.1872
+     221  test1    2          0.8104       0.4409      0.0506      0.1643
+     225  train   10          1.2421       1.3219      0.1789      0.2411

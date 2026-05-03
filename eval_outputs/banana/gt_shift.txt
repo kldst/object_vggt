@@ -1,0 +1,17 @@
+
+=== Distribution shift of GT between train and test1 (per obj_id) ===
+If 'shift_in_std_units' is small (< 1), test1 GT lives inside train GT spread
+→ rules out 'test1 GT happens to land on train_mean' lucky coincidence;
+  the model fails despite test1 GT being in-distribution.
+
+  obj   kind  n_tr n_te  mean_shift   std_train   std_test1  shift/std_train
+  196   pose    17    2      1.3049      1.3909      0.5208            0.938
+  196  trans    17    2      0.3248      0.1887      0.1501            1.721
+  203   pose    14    3      0.8101      1.3659      1.1749            0.593
+  203  trans    14    3      0.1257      0.1875      0.1063            0.670
+  205   pose    19    4      0.5279      1.3753      1.3052            0.384
+  205  trans    19    4      0.1480      0.2239      0.2130            0.661
+  211   pose    14    6      0.6719      1.3825      1.2964            0.486
+  211  trans    14    6      0.0873      0.2173      0.2885            0.402
+  221   pose    17    2      1.2720      1.3850      0.4409            0.918
+  221  trans    17    2      0.2240      0.1872      0.1643            1.197
