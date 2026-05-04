@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, Optional, Tuple
+from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 import torch
@@ -18,11 +18,11 @@ class ObjectPoseHeadConfig:
 	transformer_heads: int = 8
 	transformer_mlp_dim: int = 1024
 	transformer_dim_head: int = 64
-	transformer_dropout: float = 0.0
+	transformer_dropout: float = 0.1
 	transformer_emb_dropout: float = 0.0
 	transformer_norm: str = "layer"
 	transformer_dim: int = 1024
-	ief_iters: int = 1
+	ief_iters: int = 3
 	init_params_path: Optional[str] = None
 
 
@@ -76,9 +76,11 @@ class ObjectPoseTransformerDecoderHead(nn.Module):
 		self.register_buffer("init_translate", torch.from_numpy(init_translate).unsqueeze(0))  # (1,3)
 		self.register_buffer("init_pose", torch.from_numpy(init_rot6d).unsqueeze(0))  # (1,6)
 
+		# Token carries the current (pose_6d, translate_3) estimate so each IEF
+		# iteration is conditioned on the previous prediction (real HMR-style IEF).
 		self.transformer = TransformerDecoder(
 			num_tokens=1,
-			token_dim=1,
+			token_dim=9,
 			dim=self.cfg.transformer_dim,
 			depth=self.cfg.transformer_depth,
 			heads=self.cfg.transformer_heads,
@@ -97,25 +99,40 @@ class ObjectPoseTransformerDecoderHead(nn.Module):
 		nn.init.xavier_uniform_(self.dectranslate.weight, gain=0.01)
 		nn.init.xavier_uniform_(self.presence_branch.weight, gain=0.01)
 
-	def forward(self, context_tokens: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
-		"""context_tokens: (B, N, C_context) -> (object_pose_6d, object_translation_3, object_presence_logits)."""
-		B = context_tokens.shape[0]
-		pred_pose = self.init_pose.expand(B, -1)
-		pred_translate = self.init_translate.expand(B, -1)
-		presence_logits = None
-		# pred_pose_0 = pred_pose
+	def forward(
+		self, context_tokens: torch.Tensor
+	) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor, List[torch.Tensor], List[torch.Tensor]]:
+		"""context_tokens: (B, N, C_context).
 
-		for iter_idx in range(int(self.cfg.ief_iters)):
-			token = torch.zeros((B, 1, 1), device=context_tokens.device, dtype=context_tokens.dtype)
+		Real IEF: each iteration consumes the current (pose, translate) estimate
+		as the query token, so the transformer can produce a *different* delta
+		conditioned on how far the running estimate is from GT.
+
+		Returns:
+			pred_pose:             (B, 6) final iteration pose
+			pred_translate:        (B, 3) final iteration translation
+			presence_logits:       (B,)   from final iteration
+			pred_pose_list:        list of length ief_iters with per-iter (B,6)
+			pred_translate_list:   list of length ief_iters with per-iter (B,3)
+		"""
+		B = context_tokens.shape[0]
+		pred_pose = self.init_pose.expand(B, -1).contiguous()
+		pred_translate = self.init_translate.expand(B, -1).contiguous()
+		presence_logits = None
+		pred_pose_list: List[torch.Tensor] = []
+		pred_translate_list: List[torch.Tensor] = []
+
+		for _ in range(int(self.cfg.ief_iters)):
+			current_state = torch.cat([pred_pose, pred_translate], dim=-1)  # (B, 9)
+			token = current_state.unsqueeze(1).to(context_tokens.dtype)     # (B, 1, 9)
 			token_out = self.transformer(token, context=context_tokens).squeeze(1)
 			pred_pose = self.decpose(token_out) + pred_pose
 			pred_translate = self.dectranslate(token_out) + pred_translate
 			presence_logits = self.presence_branch(token_out).squeeze(-1)
-			# if iter_idx == 0:
-			# 	pred_pose_0 = pred_pose
+			pred_pose_list.append(pred_pose)
+			pred_translate_list.append(pred_translate)
 
-		return pred_pose, pred_translate, presence_logits
-		# return pred_pose, pred_translate, pred_pose_0
+		return pred_pose, pred_translate, presence_logits, pred_pose_list, pred_translate_list
 
 
 class ObjectPoseHead(nn.Module):
@@ -162,13 +179,19 @@ class ObjectPoseHead(nn.Module):
 			scene_global = patch_tokens.mean(dim=(1, 2))
 			object_global = object_tokens.mean(dim=(1, 2))
 			context_tokens = torch.cat([scene_global, object_global], dim=-1).unsqueeze(1)
-			object_pose, object_translation, object_presence_logits = self.decoder(context_tokens)
-			# object_pose, object_translation, pred_pose_0 = self.decoder(context_tokens)
+			(
+				object_pose,
+				object_translation,
+				object_presence_logits,
+				object_pose_list,
+				object_translation_list,
+			) = self.decoder(context_tokens)
 			return {
 				"object_pose": object_pose,
 				"object_translation": object_translation,
 				"object_presence_logits": object_presence_logits,
-				# "pred_pose_0": pred_pose_0,
+				"object_pose_list": object_pose_list,
+				"object_translation_list": object_translation_list,
 			}
 
 		if self.context_pool == "mean":
@@ -185,14 +208,20 @@ class ObjectPoseHead(nn.Module):
 				raise ValueError(f"object_latent should be (B,S,C), got {tuple(object_latent.shape)}")
 			context_tokens = torch.cat([object_latent, context_tokens], dim=1)
 
-		object_pose, object_translation, object_presence_logits = self.decoder(context_tokens)
-		# object_pose, object_translation, pred_pose_0 = self.decoder(context_tokens)
+		(
+			object_pose,
+			object_translation,
+			object_presence_logits,
+			object_pose_list,
+			object_translation_list,
+		) = self.decoder(context_tokens)
 
 		outputs: Dict[str, torch.Tensor] = {
 			"object_pose": object_pose,
 			"object_translation": object_translation,
 			"object_presence_logits": object_presence_logits,
-			# "pred_pose_0": pred_pose_0,
+			"object_pose_list": object_pose_list,
+			"object_translation_list": object_translation_list,
 		}
 		return outputs
 
