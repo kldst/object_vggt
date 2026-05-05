@@ -141,7 +141,7 @@ logging:
 checkpoint:
   save_dir: logs/${exp_name}/ckpts
   save_freq: 10
-  resume_checkpoint_path: /all_data/model/model.pt
+  resume_checkpoint_path: /logs/baseline_0417_14000_shuffle_v2/ckpts/checkpoint_60.pt
   # resume_checkpoint_path: /mnt/train-data-4-hdd/yian/freepose/vggt_model/model.pt
   load_optimizer_state: False
   load_training_state: False
