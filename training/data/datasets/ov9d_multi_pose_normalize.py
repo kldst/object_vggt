@@ -46,9 +46,12 @@ class OV9DMultiPoseNormalizeDataset(OV9DPoseNormalizeDataset):
         min_view_gap: int = 5,
         object_view_min_gap: int = 6,
         object_view_max_gap: int = 9,
+        fixed_object_view_ids: Optional[List[int]] = None,
         load_point_map: bool = False,
         scale_by_points: bool = True,
         negative_object_prob: float = 0.0,
+        print_sample_paths: bool = False,
+        print_sample_paths_limit: int = 5,
         only_scene_name: str = "",
         only_scene_names: Optional[List[str]] = None,
         only_object_id: Optional[int] = None,
@@ -73,9 +76,22 @@ class OV9DMultiPoseNormalizeDataset(OV9DPoseNormalizeDataset):
         self.min_view_gap = int(min_view_gap)
         self.object_view_min_gap = int(object_view_min_gap)
         self.object_view_max_gap = int(object_view_max_gap)
+        self.fixed_object_view_ids = (
+            tuple(int(x) for x in fixed_object_view_ids)
+            if fixed_object_view_ids is not None
+            else None
+        )
+        if self.fixed_object_view_ids is not None and len(self.fixed_object_view_ids) != self.num_object_views:
+            raise ValueError(
+                "fixed_object_view_ids length must match num_object_views "
+                f"({len(self.fixed_object_view_ids)} != {self.num_object_views})"
+            )
         self.load_point_map = bool(load_point_map)
         self.scale_by_points = bool(scale_by_points)
         self.negative_object_prob = float(negative_object_prob)
+        self.print_sample_paths = bool(print_sample_paths)
+        self.print_sample_paths_limit = int(print_sample_paths_limit)
+        self._printed_sample_paths = 0
 
         self.only_scene_names = [x.strip() for x in (only_scene_names or []) if str(x).strip()]
         if only_scene_name:
@@ -108,6 +124,70 @@ class OV9DMultiPoseNormalizeDataset(OV9DPoseNormalizeDataset):
         status = "Training" if self.training else "Testing"
         logging.info(f"{status}: OV9D multi normalized pose sequence count: {self.sequence_list_len}")
         logging.info(f"{status}: OV9D multi normalized pose dataset length: {len(self)}")
+
+    def _maybe_print_training_sample_paths(
+        self,
+        batch: Dict[str, Any],
+        scene_dir: Path,
+        scene_gt: Dict[str, Any],
+        object_scene_dir: Path,
+        object_scene_gt: Dict[str, Any],
+        seq_index: int,
+    ) -> None:
+        if not self.print_sample_paths:
+            return
+        if self.print_sample_paths_limit >= 0 and self._printed_sample_paths >= self.print_sample_paths_limit:
+            return
+
+        target_object_id = int(batch["object_id"])
+        object_reference_id = int(batch["object_reference_id"])
+        scene_rgb_paths = []
+        scene_depth_paths = []
+        scene_mask_paths = []
+        for image_id in batch["ids"].tolist():
+            image_id = int(image_id)
+            object_index = self._object_index_for_id(scene_gt[str(image_id)], target_object_id)
+            scene_rgb_paths.append(scene_dir / "rgb" / f"{image_id:06d}.png")
+            scene_depth_paths.append(scene_dir / "depth" / f"{image_id:06d}.png")
+            if object_index is None:
+                scene_mask_paths.append(f"None for frame {image_id:06d} (target object not visible)")
+            else:
+                scene_mask_paths.append(scene_dir / "mask_visib" / f"{image_id:06d}_{object_index:06d}.png")
+
+        object_rgb_paths = []
+        object_mask_paths = []
+        for image_id in batch["object_cam_indices"].tolist():
+            image_id = int(image_id)
+            object_index = self._object_index_for_id(object_scene_gt[str(image_id)], object_reference_id)
+            object_rgb_paths.append(object_scene_dir / "rgb" / f"{image_id:06d}.png")
+            if object_index is None:
+                object_mask_paths.append(f"None for frame {image_id:06d} (reference object not visible)")
+            else:
+                object_mask_paths.append(object_scene_dir / "mask_visib" / f"{image_id:06d}_{object_index:06d}.png")
+
+        self._printed_sample_paths += 1
+        print(f"[TRAIN_SAMPLE_PATHS {self._printed_sample_paths}/{self.print_sample_paths_limit}] seq_index={seq_index}", flush=True)
+        print(f"  seq_name: {batch['seq_name']}", flush=True)
+        print(f"  has_object: {bool(float(batch['has_object']) > 0.5)}", flush=True)
+        print(f"  scene_frame_ids: {batch['ids'].tolist()}", flush=True)
+        print(f"  object_reference_frame_ids: {batch['object_cam_indices'].tolist()}", flush=True)
+        print(f"  target_object_id: {target_object_id}", flush=True)
+        print(f"  object_reference_id: {object_reference_id}", flush=True)
+        print(f"  category: {batch.get('category', '')}", flush=True)
+        print(f"  object_reference_category: {batch.get('object_reference_category', '')}", flush=True)
+        print(f"  multi_scene_dir: {scene_dir}", flush=True)
+        print("  scene_rgb_paths:", flush=True)
+        print(_format_paths(scene_rgb_paths), flush=True)
+        print("  scene_depth_paths:", flush=True)
+        print(_format_paths(scene_depth_paths), flush=True)
+        print("  scene_target_mask_paths:", flush=True)
+        print(_format_paths(scene_mask_paths), flush=True)
+        print(f"  object_reference_scene_dir: {object_scene_dir}", flush=True)
+        print("  object_rgb_paths:", flush=True)
+        print(_format_paths(object_rgb_paths), flush=True)
+        print("  object_mask_paths:", flush=True)
+        print(_format_paths(object_mask_paths), flush=True)
+        print("", flush=True)
 
     @staticmethod
     def _category_for_object(item: Dict[str, Any], object_id: int) -> str:
@@ -223,6 +303,10 @@ class OV9DMultiPoseNormalizeDataset(OV9DPoseNormalizeDataset):
                 mask_path = scene_dir / "mask_visib" / f"{image_id:06d}_000000.png"
                 if not self.verify_files or mask_path.is_file():
                     object_image_ids.append(image_id)
+            if self.fixed_object_view_ids is not None:
+                object_image_id_set = set(object_image_ids)
+                if any(image_id not in object_image_id_set for image_id in self.fixed_object_view_ids):
+                    continue
             if len(object_image_ids) < self.num_object_views:
                 continue
 
@@ -303,6 +387,16 @@ class OV9DMultiPoseNormalizeDataset(OV9DPoseNormalizeDataset):
         return list(rng.choice(candidates))
 
     def _sample_object_image_ids(self, available_ids: List[int], count: int, rng: random.Random) -> List[int]:
+        if self.fixed_object_view_ids is not None:
+            available_set = {int(x) for x in available_ids}
+            missing = [image_id for image_id in self.fixed_object_view_ids if image_id not in available_set]
+            if missing:
+                raise FileNotFoundError(
+                    f"Fixed object view ids {missing} are not available. "
+                    f"Available ids include: {sorted(available_set)[:20]}"
+                )
+            return list(self.fixed_object_view_ids)
+
         count = min(int(count), len(available_ids))
         ranged = self._ids_with_gap_range(
             available_ids,
@@ -623,6 +717,15 @@ class OV9DMultiPoseNormalizeDataset(OV9DPoseNormalizeDataset):
                 }
             )
 
+        self._maybe_print_training_sample_paths(
+            batch=batch,
+            scene_dir=scene_dir,
+            scene_gt=scene_gt,
+            object_scene_dir=object_scene_dir,
+            object_scene_gt=object_scene_gt,
+            seq_index=int(seq_index),
+        )
+
         return batch
 
 
@@ -732,6 +835,7 @@ def _main() -> None:
     parser.add_argument("--min-view-gap", type=int, default=5)
     parser.add_argument("--object-view-min-gap", type=int, default=6)
     parser.add_argument("--object-view-max-gap", type=int, default=9)
+    parser.add_argument("--fixed-object-view-ids", type=int, nargs="*", default=None)
     parser.add_argument("--negative-object-prob", type=float, default=0.3)
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--debug", action="store_true")
@@ -753,6 +857,7 @@ def _main() -> None:
         min_view_gap=args.min_view_gap,
         object_view_min_gap=args.object_view_min_gap,
         object_view_max_gap=args.object_view_max_gap,
+        fixed_object_view_ids=args.fixed_object_view_ids,
         load_point_map=False,
         scale_by_points=True,
         negative_object_prob=args.negative_object_prob,
@@ -768,6 +873,7 @@ def _main() -> None:
     print(f"dataset_records: {dataset.sequence_list_len}")
     print(f"single_reference_object_ids: {len(dataset.single_records_by_object_id)}")
     print(f"negative_object_prob: {args.negative_object_prob}")
+    print(f"fixed_object_view_ids: {args.fixed_object_view_ids}")
     print(f"object_view_gap_range: ({args.object_view_min_gap}, {args.object_view_max_gap}) exclusive")
     print(f"sample_indices: {sample_indices}")
     print()

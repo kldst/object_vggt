@@ -3,19 +3,19 @@ defaults:
 
 # torchrun --master_port=29200 --nproc_per_node=1 launch.py  --config default_object
 
-exp_name: baseline_ov9d_multi_object_pose_mask_frobenius_iter3_0504v1
+exp_name: baseline_ov9d_multi_object_pose_mask_rot6d_0505v1
 img_size: 518
 num_workers: 0
 seed_value: 30
 accum_steps: 1    # We did not use gradient accumulation in our training, while if you suffer from OOM, you can try to use it.
 patch_size: 14
-val_epoch_freq: 10
+val_epoch_freq: 5
 max_img_per_gpu: 80
 
-limit_train_batches: 8 # sample 幾次 (一次 per gpu / img num)
+limit_train_batches: 112 # sample 幾次 (一次 per gpu / img num)
 # limit_train_batches:  100
 # limit_train_batches:  50
-limit_val_batches: 5
+limit_val_batches: 22
 
 debug:
   force_model_output_to_ground_truth: False
@@ -40,17 +40,20 @@ data:
         - _target_: data.datasets.ov9d_multi_pose_normalize.OV9DMultiPoseNormalizeDataset
           split: train
           DATA_ROOT: /dataset/ov9d
-          SPLIT_JSON: /baseline_ov9d/splits_multi_0504_500/train.json
+          SPLIT_JSON: /baseline_ov9d_0505/splits_multi_4_3000/train.json
           # DATA_ROOT: /mnt/train-data-4-hdd/yian/freepose/ov9d/ov9d
-          # SPLIT_JSON: /mnt/train-data-4-hdd/yian/freepose/baseline_0503/splits_multi_0504_500/train.json
+          # SPLIT_JSON: /mnt/train-data-4-hdd/yian/freepose/baseline_0503/splits_multi_4_3000/train.json
           num_scene_views: 4
           num_object_views: 4
+          fixed_object_view_ids: [10, 20, 30, 40]
           min_view_gap: 5
           object_view_min_gap: 6
           object_view_max_gap: 9
           load_point_map: false
           scale_by_points: true
           negative_object_prob: 0.3
+          print_sample_paths: false
+          print_sample_paths_limit: 5
   val:
     _target_: data.dynamic_dataloader.DynamicTorchDataset
     num_workers: ${num_workers}
@@ -68,11 +71,12 @@ data:
         - _target_: data.datasets.ov9d_multi_pose_normalize.OV9DMultiPoseNormalizeDataset
           split: test1
           DATA_ROOT: /dataset/ov9d
-          SPLIT_JSON: /baseline_ov9d/splits_multi_0504_500/test1.json
+          SPLIT_JSON: /baseline_ov9d_0505/splits_multi_4_3000/test1.json
           # DATA_ROOT: /mnt/train-data-4-hdd/yian/freepose/ov9d/ov9d
-          # SPLIT_JSON: /mnt/train-data-4-hdd/yian/freepose/baseline_0503/splits_multi_0504_500/test1.json
+          # SPLIT_JSON: /mnt/train-data-4-hdd/yian/freepose/baseline_0503/splits_multi_4_3000/test1.json
           num_scene_views: 4
           num_object_views: 4
+          fixed_object_view_ids: [10, 20, 30, 40]
           min_view_gap: 5
           object_view_min_gap: 6
           object_view_max_gap: 9
@@ -137,7 +141,7 @@ logging:
 checkpoint:
   save_dir: logs/${exp_name}/ckpts
   save_freq: 10
-  resume_checkpoint_path: /logs/baseline_0417_14000_shuffle_v2/ckpts/checkpoint_60.pt
+  resume_checkpoint_path: /all_data/model/model.pt
   # resume_checkpoint_path: /mnt/train-data-4-hdd/yian/freepose/vggt_model/model.pt
   load_optimizer_state: False
   load_training_state: False
@@ -165,7 +169,7 @@ loss:
   object_srt:
     weight: 1.0
     loss_type: l1            # used for translation always; used for rotation only when pose_rep == rot6d
-    pose_rep: frobenius     # rot6d | frobenius | cosine | geodesic
+    pose_rep: rot6d     # rot6d | frobenius | cosine | geodesic
     weight_pose: 1.0
     weight_translation: 1.0
     # init_w: 1.0  # disabled because loss_object_pose_init is removed
