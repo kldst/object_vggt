@@ -29,6 +29,9 @@ DEFAULT_SCENE_GT = (
     "/mnt/train-data-4-hdd/yian/freepose/ov9d/ov9d/oo3d9dmulti/"
     "oo3d-5rb631pa708yxz9p8agclj0ty8i1wzin/scene_gt.json"
 )
+DEFAULT_SYMMETRY_INFO = (
+    "/mnt/train-data-4-hdd/yian/freepose/ov9d/ov9d/models_info_with_symmetry.json"
+)
 
 
 def load_first_gt_pose(scene_gt_path: str) -> tuple[torch.Tensor, torch.Tensor, dict]:
@@ -46,7 +49,13 @@ def load_first_gt_pose(scene_gt_path: str) -> tuple[torch.Tensor, torch.Tensor, 
     return rotation, translation, meta
 
 
-def run_case(gt_R: torch.Tensor, gt_t: torch.Tensor, pose_rep: str, loss_type: str) -> dict[str, float]:
+def run_case(
+    gt_R: torch.Tensor,
+    gt_t: torch.Tensor,
+    object_id: int,
+    pose_rep: str,
+    loss_type: str,
+) -> dict[str, float]:
     pred_pose = _rotation_matrix_to_rot6d(gt_R)
     predictions = {
         "object_pose": pred_pose.clone(),
@@ -56,12 +65,15 @@ def run_case(gt_R: torch.Tensor, gt_t: torch.Tensor, pose_rep: str, loss_type: s
         "object_rotation": gt_R.clone(),
         "object_translation": gt_t.clone(),
         "has_object": torch.ones(gt_R.shape[0], dtype=torch.float32),
+        "object_id": torch.tensor([object_id], dtype=torch.int64),
     }
     losses = compute_object_srt_loss(
         predictions,
         batch,
         pose_rep=pose_rep,
         loss_type=loss_type,
+        symmetry_info_path=DEFAULT_SYMMETRY_INFO,
+        symmetry_continuous_steps=36,
         weight_pose=1.0,
         weight_translation=1.0,
     )
@@ -84,8 +96,14 @@ def main() -> None:
     print(f"  gt_t shape: {tuple(gt_t.shape)}")
 
     failed = False
-    for pose_rep in ("rot6d", "frobenius"):
-        losses = run_case(gt_R, gt_t, pose_rep=pose_rep, loss_type=args.loss_type)
+    for pose_rep in ("rot6d", "symmetric_rot6d", "frobenius"):
+        losses = run_case(
+            gt_R,
+            gt_t,
+            object_id=int(meta["obj_id"]),
+            pose_rep=pose_rep,
+            loss_type=args.loss_type,
+        )
         print(f"\npose_rep={pose_rep}")
         for key, value in losses.items():
             print(f"  {key}: {value:.12g}")

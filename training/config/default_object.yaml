@@ -3,7 +3,7 @@ defaults:
 
 # torchrun --master_port=29200 --nproc_per_node=1 launch.py  --config default_object
 
-exp_name: baseline_ov9d_multi_object_pose_mask_frobenius_0506v2
+exp_name: baseline_ov9d_multi_object_pose_mask_symmetric_rot6d_0507_2gpu
 img_size: 518
 num_workers: 0
 seed_value: 30
@@ -141,7 +141,7 @@ logging:
 checkpoint:
   save_dir: logs/${exp_name}/ckpts
   save_freq: 10
-  resume_checkpoint_path: /omni_vggt/model/model.pt
+  resume_checkpoint_path: /omni_vggt/model/checkpoint_60.pt
   # resume_checkpoint_path: /logs/baseline_0417_14000_shuffle_v2/ckpts/checkpoint_60.pt
   # resume_checkpoint_path: /mnt/train-data-4-hdd/yian/freepose/vggt_model/model.pt
   load_optimizer_state: False
@@ -170,7 +170,10 @@ loss:
   object_srt:
     weight: 1.0
     loss_type: l1            # used for translation always; used for rotation only when pose_rep == rot6d
-    pose_rep: frobenius # rot6d | frobenius | cosine | geodesic
+    pose_rep: symmetric_rot6d # rot6d | symmetric_rot6d | frobenius | cosine | geodesic
+    # symmetry_info_path: /mnt/train-data-4-hdd/yian/freepose/ov9d/ov9d/models_info_with_symmetry.json
+    symmetry_info_path: /dataset/ov9d/models_info_with_symmetry.json
+    symmetry_continuous_steps: 72
     weight_pose: 1.0
     weight_translation: 1.0
     # init_w: 1.0  # disabled because loss_object_pose_init is removed

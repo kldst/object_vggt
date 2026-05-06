@@ -7,10 +7,11 @@
 import torch
 import torch.nn.functional as F
 
+import json
 from dataclasses import dataclass
 from vggt.utils.pose_enc import extri_intri_to_pose_encoding
 from train_utils.general import check_and_fix_inf_nan
-from math import ceil, floor
+from math import ceil, floor, pi
 
 
 @dataclass(eq=False)
@@ -178,11 +179,150 @@ def _vector_loss(pred: torch.Tensor, gt: torch.Tensor, loss_type: str = "l1") ->
     raise ValueError(f"Unknown loss_type: {loss_type}")
 
 
+def _vector_loss_per_candidate(
+    pred: torch.Tensor,
+    gt_candidates: torch.Tensor,
+    loss_type: str = "l1",
+) -> torch.Tensor:
+    """Return one scalar loss for each candidate target.
+
+    pred: (6,), gt_candidates: (K, 6) -> (K,)
+    """
+    if loss_type == "l1":
+        return (pred.unsqueeze(0) - gt_candidates).abs().mean(dim=-1)
+    if loss_type == "l2":
+        return ((pred.unsqueeze(0) - gt_candidates) ** 2).mean(dim=-1)
+    raise ValueError(f"Unknown loss_type: {loss_type}")
+
+
+def _axis_angle_to_matrix(axis, angle: float) -> torch.Tensor:
+    axis = torch.tensor(axis, dtype=torch.float32)
+    axis = axis / axis.norm().clamp_min(1e-8)
+    x, y, z = axis.unbind()
+    angle = torch.as_tensor(angle, dtype=torch.float32)
+    c = torch.cos(angle)
+    s = torch.sin(angle)
+    one_c = 1.0 - c
+    return torch.stack(
+        [
+            torch.stack([c + x * x * one_c, x * y * one_c - z * s, x * z * one_c + y * s]),
+            torch.stack([y * x * one_c + z * s, c + y * y * one_c, y * z * one_c - x * s]),
+            torch.stack([z * x * one_c - y * s, z * y * one_c + x * s, c + z * z * one_c]),
+        ]
+    )
+
+
+def _load_symmetry_candidates_cpu(
+    symmetry_info_path: str,
+    continuous_steps: int,
+) -> dict[int, torch.Tensor]:
+    cache_key = (str(symmetry_info_path), int(continuous_steps))
+    cache = getattr(_load_symmetry_candidates_cpu, "_cache", {})
+    if cache_key in cache:
+        return cache[cache_key]
+
+    identity = torch.eye(3, dtype=torch.float32)
+    with open(symmetry_info_path, "r") as f:
+        models_info = json.load(f)
+
+    candidates_by_object_id = {}
+    steps = max(1, int(continuous_steps))
+    for object_id_str, info in models_info.items():
+        base_syms = [identity]
+        for symmetry in info.get("symmetries_discrete", []) or []:
+            mat = torch.tensor(symmetry, dtype=torch.float32).reshape(4, 4)
+            base_syms.append(mat[:3, :3])
+
+        continuous_syms = [identity]
+        for symmetry in info.get("symmetries_continuous", []) or []:
+            axis = symmetry.get("axis", None)
+            if axis is None:
+                continue
+            continuous_syms.extend(
+                _axis_angle_to_matrix(axis, 2.0 * pi * step / steps)
+                for step in range(1, steps)
+            )
+
+        candidates = []
+        for base_sym in base_syms:
+            for continuous_sym in continuous_syms:
+                candidates.append(base_sym @ continuous_sym)
+        candidates_by_object_id[int(object_id_str)] = torch.stack(candidates, dim=0)
+
+    cache[cache_key] = candidates_by_object_id
+    _load_symmetry_candidates_cpu._cache = cache
+    return candidates_by_object_id
+
+
+def _object_ids_to_list(object_ids) -> list[int]:
+    if torch.is_tensor(object_ids):
+        return [int(x) for x in object_ids.detach().cpu().reshape(-1).tolist()]
+    if isinstance(object_ids, (list, tuple)):
+        values = []
+        for item in object_ids:
+            if torch.is_tensor(item):
+                values.extend(int(x) for x in item.detach().cpu().reshape(-1).tolist())
+            else:
+                values.append(int(item))
+        return values
+    return [int(object_ids)]
+
+
+def _filter_object_ids(object_ids, valid_mask: torch.Tensor):
+    if object_ids is None:
+        return None
+    if torch.is_tensor(object_ids):
+        return object_ids[valid_mask.to(device=object_ids.device)]
+    ids = _object_ids_to_list(object_ids)
+    keep = valid_mask.detach().cpu().reshape(-1).tolist()
+    return [object_id for object_id, is_valid in zip(ids, keep) if is_valid]
+
+
+def _symmetric_rot6d_loss(
+    pred_rot6d: torch.Tensor,
+    gt_R: torch.Tensor,
+    object_ids,
+    loss_type: str,
+    symmetry_info_path: str,
+    symmetry_continuous_steps: int,
+) -> torch.Tensor:
+    if symmetry_info_path is None:
+        raise ValueError("pose_rep='symmetric_rot6d' requires symmetry_info_path in object_srt config.")
+    if object_ids is None:
+        raise ValueError("pose_rep='symmetric_rot6d' requires batch['object_id'].")
+
+    ids = _object_ids_to_list(object_ids)
+    if len(ids) != pred_rot6d.shape[0]:
+        raise ValueError(
+            f"object_id count ({len(ids)}) does not match batch size ({pred_rot6d.shape[0]})."
+        )
+
+    candidates_cpu = _load_symmetry_candidates_cpu(symmetry_info_path, symmetry_continuous_steps)
+    losses = []
+    for sample_idx, object_id in enumerate(ids):
+        symmetries = candidates_cpu.get(int(object_id))
+        if symmetries is None:
+            symmetries = torch.eye(3, dtype=torch.float32).reshape(1, 3, 3)
+        symmetries = symmetries.to(device=gt_R.device, dtype=gt_R.dtype)
+        gt_equiv_R = gt_R[sample_idx].unsqueeze(0) @ symmetries
+        gt_equiv_rot6d = _rotation_matrix_to_rot6d(gt_equiv_R).to(dtype=pred_rot6d.dtype)
+        candidate_losses = _vector_loss_per_candidate(
+            pred_rot6d[sample_idx],
+            gt_equiv_rot6d,
+            loss_type=loss_type,
+        )
+        losses.append(candidate_losses.min())
+    return torch.stack(losses).mean()
+
+
 def _rotation_loss(
     pred_rot6d: torch.Tensor,
     gt_R: torch.Tensor,
     pose_rep: str,
     loss_type: str,
+    object_ids=None,
+    symmetry_info_path=None,
+    symmetry_continuous_steps=36,
 ) -> torch.Tensor:
     """Rotation loss with selectable representation.
 
@@ -192,6 +332,10 @@ def _rotation_loss(
                      can game it by scaling output columns. This preserves the
                      legacy training behavior and does not call
                      `_rot6d_to_rotation_matrix`.
+      - "symmetric_rot6d":
+                     Same 6D vector loss style as "rot6d", but the GT target is
+                     expanded with object symmetries and the minimum candidate
+                     loss is used per sample.
       - "frobenius": ||R_pred - R_gt||_F^2 after Gram-Schmidt projection.
                      Equals 4(1 - cos θ); smooth, monotone in geodesic angle,
                      no arccos singularity. Recommended over geodesic.
@@ -204,6 +348,15 @@ def _rotation_loss(
     if pose_rep == "rot6d":
         gt_rot6d = _rotation_matrix_to_rot6d(gt_R)
         return _vector_loss(pred_rot6d, gt_rot6d, loss_type=loss_type)
+    if pose_rep == "symmetric_rot6d":
+        return _symmetric_rot6d_loss(
+            pred_rot6d,
+            gt_R,
+            object_ids=object_ids,
+            loss_type=loss_type,
+            symmetry_info_path=symmetry_info_path,
+            symmetry_continuous_steps=symmetry_continuous_steps,
+        )
 
     R_pred = _rot6d_to_rotation_matrix(pred_rot6d)
     if pose_rep == "frobenius":
@@ -221,7 +374,7 @@ def _rotation_loss(
 
     raise ValueError(
         f"Unknown pose_rep '{pose_rep}'. Expected one of: "
-        "rot6d, frobenius, cosine, geodesic."
+        "rot6d, symmetric_rot6d, frobenius, cosine, geodesic."
     )
 
 
@@ -230,6 +383,8 @@ def compute_object_srt_loss(
     batch,
     loss_type="l1",
     pose_rep="rot6d",
+    symmetry_info_path=None,
+    symmetry_continuous_steps=36,
     weight_pose=1.0,
     weight_translation=1.0,
     init_w=1.0,
@@ -260,6 +415,7 @@ def compute_object_srt_loss(
 
     gt_R = batch["object_rotation"]
     gt_translation = batch["object_translation"]
+    object_ids = batch.get("object_id", None)
 
     if debug_force_model_output_to_ground_truth and not getattr(
         compute_object_srt_loss, "_dtype_logged_once", False
@@ -288,10 +444,19 @@ def compute_object_srt_loss(
         pred_translation = pred_translation[valid_mask]
         gt_R = gt_R[valid_mask]
         gt_translation = gt_translation[valid_mask]
+        object_ids = _filter_object_ids(object_ids, valid_mask)
         # if pred_pose_0 is not None:
         #     pred_pose_0 = pred_pose_0[valid_mask]
 
-    loss_pose = _rotation_loss(pred_pose, gt_R, pose_rep=pose_rep, loss_type=loss_type)
+    loss_pose = _rotation_loss(
+        pred_pose,
+        gt_R,
+        pose_rep=pose_rep,
+        loss_type=loss_type,
+        object_ids=object_ids,
+        symmetry_info_path=symmetry_info_path,
+        symmetry_continuous_steps=symmetry_continuous_steps,
+    )
     loss_translation = _vector_loss(pred_translation, gt_translation, loss_type=loss_type)
 
     # if pred_pose_0 is not None:
