@@ -12,10 +12,10 @@ patch_size: 14
 val_epoch_freq: 5
 max_img_per_gpu: 80
 
-limit_train_batches: 112 # sample 幾次 (一次 per gpu / img num)
+limit_train_batches: 168 # sample 幾次 (一次 per gpu / img num)
 # limit_train_batches:  8
 # limit_val_batches:  1
-limit_val_batches: 22
+limit_val_batches: 33
 
 debug:
   force_model_output_to_ground_truth: False
