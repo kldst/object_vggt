@@ -1,0 +1,2009 @@
+{
+  "description": "For each anchor_object_id, the number of train scenes it appears in.",
+  "total_scenes": 5000,
+  "total_anchor_objects": 400,
+  "metric_object_ids": "count of scenes whose object_ids contains the anchor (any view count)",
+  "metric_eligible_object_ids": "count of scenes whose eligible_object_ids contains the anchor (>=4 views, qualifies as anchor)",
+  "counts": [
+    {
+      "anchor_object_id": 26,
+      "scenes_in_object_ids": 16,
+      "scenes_in_eligible_object_ids": 11
+    },
+    {
+      "anchor_object_id": 34,
+      "scenes_in_object_ids": 24,
+      "scenes_in_eligible_object_ids": 21
+    },
+    {
+      "anchor_object_id": 36,
+      "scenes_in_object_ids": 16,
+      "scenes_in_eligible_object_ids": 13
+    },
+    {
+      "anchor_object_id": 39,
+      "scenes_in_object_ids": 23,
+      "scenes_in_eligible_object_ids": 13
+    },
+    {
+      "anchor_object_id": 44,
+      "scenes_in_object_ids": 25,
+      "scenes_in_eligible_object_ids": 21
+    },
+    {
+      "anchor_object_id": 51,
+      "scenes_in_object_ids": 22,
+      "scenes_in_eligible_object_ids": 15
+    },
+    {
+      "anchor_object_id": 79,
+      "scenes_in_object_ids": 18,
+      "scenes_in_eligible_object_ids": 12
+    },
+    {
+      "anchor_object_id": 85,
+      "scenes_in_object_ids": 18,
+      "scenes_in_eligible_object_ids": 15
+    },
+    {
+      "anchor_object_id": 110,
+      "scenes_in_object_ids": 19,
+      "scenes_in_eligible_object_ids": 13
+    },
+    {
+      "anchor_object_id": 133,
+      "scenes_in_object_ids": 17,
+      "scenes_in_eligible_object_ids": 16
+    },
+    {
+      "anchor_object_id": 153,
+      "scenes_in_object_ids": 19,
+      "scenes_in_eligible_object_ids": 13
+    },
+    {
+      "anchor_object_id": 182,
+      "scenes_in_object_ids": 26,
+      "scenes_in_eligible_object_ids": 21
+    },
+    {
+      "anchor_object_id": 183,
+      "scenes_in_object_ids": 32,
+      "scenes_in_eligible_object_ids": 23
+    },
+    {
+      "anchor_object_id": 196,
+      "scenes_in_object_ids": 22,
+      "scenes_in_eligible_object_ids": 19
+    },
+    {
+      "anchor_object_id": 203,
+      "scenes_in_object_ids": 16,
+      "scenes_in_eligible_object_ids": 15
+    },
+    {
+      "anchor_object_id": 205,
+      "scenes_in_object_ids": 24,
+      "scenes_in_eligible_object_ids": 20
+    },
+    {
+      "anchor_object_id": 211,
+      "scenes_in_object_ids": 19,
+      "scenes_in_eligible_object_ids": 14
+    },
+    {
+      "anchor_object_id": 221,
+      "scenes_in_object_ids": 14,
+      "scenes_in_eligible_object_ids": 8
+    },
+    {
+      "anchor_object_id": 225,
+      "scenes_in_object_ids": 20,
+      "scenes_in_eligible_object_ids": 15
+    },
+    {
+      "anchor_object_id": 229,
+      "scenes_in_object_ids": 21,
+      "scenes_in_eligible_object_ids": 14
+    },
+    {
+      "anchor_object_id": 232,
+      "scenes_in_object_ids": 28,
+      "scenes_in_eligible_object_ids": 18
+    },
+    {
+      "anchor_object_id": 253,
+      "scenes_in_object_ids": 21,
+      "scenes_in_eligible_object_ids": 18
+    },
+    {
+      "anchor_object_id": 269,
+      "scenes_in_object_ids": 15,
+      "scenes_in_eligible_object_ids": 13
+    },
+    {
+      "anchor_object_id": 334,
+      "scenes_in_object_ids": 28,
+      "scenes_in_eligible_object_ids": 24
+    },
+    {
+      "anchor_object_id": 343,
+      "scenes_in_object_ids": 23,
+      "scenes_in_eligible_object_ids": 16
+    },
+    {
+      "anchor_object_id": 345,
+      "scenes_in_object_ids": 22,
+      "scenes_in_eligible_object_ids": 20
+    },
+    {
+      "anchor_object_id": 350,
+      "scenes_in_object_ids": 22,
+      "scenes_in_eligible_object_ids": 16
+    },
+    {
+      "anchor_object_id": 362,
+      "scenes_in_object_ids": 21,
+      "scenes_in_eligible_object_ids": 16
+    },
+    {
+      "anchor_object_id": 384,
+      "scenes_in_object_ids": 25,
+      "scenes_in_eligible_object_ids": 19
+    },
+    {
+      "anchor_object_id": 405,
+      "scenes_in_object_ids": 25,
+      "scenes_in_eligible_object_ids": 24
+    },
+    {
+      "anchor_object_id": 418,
+      "scenes_in_object_ids": 21,
+      "scenes_in_eligible_object_ids": 20
+    },
+    {
+      "anchor_object_id": 423,
+      "scenes_in_object_ids": 21,
+      "scenes_in_eligible_object_ids": 19
+    },
+    {
+      "anchor_object_id": 431,
+      "scenes_in_object_ids": 16,
+      "scenes_in_eligible_object_ids": 14
+    },
+    {
+      "anchor_object_id": 445,
+      "scenes_in_object_ids": 16,
+      "scenes_in_eligible_object_ids": 15
+    },
+    {
+      "anchor_object_id": 451,
+      "scenes_in_object_ids": 28,
+      "scenes_in_eligible_object_ids": 24
+    },
+    {
+      "anchor_object_id": 453,
+      "scenes_in_object_ids": 22,
+      "scenes_in_eligible_object_ids": 16
+    },
+    {
+      "anchor_object_id": 458,
+      "scenes_in_object_ids": 26,
+      "scenes_in_eligible_object_ids": 22
+    },
+    {
+      "anchor_object_id": 465,
+      "scenes_in_object_ids": 25,
+      "scenes_in_eligible_object_ids": 20
+    },
+    {
+      "anchor_object_id": 466,
+      "scenes_in_object_ids": 24,
+      "scenes_in_eligible_object_ids": 16
+    },
+    {
+      "anchor_object_id": 469,
+      "scenes_in_object_ids": 27,
+      "scenes_in_eligible_object_ids": 20
+    },
+    {
+      "anchor_object_id": 491,
+      "scenes_in_object_ids": 11,
+      "scenes_in_eligible_object_ids": 8
+    },
+    {
+      "anchor_object_id": 500,
+      "scenes_in_object_ids": 23,
+      "scenes_in_eligible_object_ids": 16
+    },
+    {
+      "anchor_object_id": 502,
+      "scenes_in_object_ids": 21,
+      "scenes_in_eligible_object_ids": 17
+    },
+    {
+      "anchor_object_id": 511,
+      "scenes_in_object_ids": 20,
+      "scenes_in_eligible_object_ids": 15
+    },
+    {
+      "anchor_object_id": 537,
+      "scenes_in_object_ids": 14,
+      "scenes_in_eligible_object_ids": 13
+    },
+    {
+      "anchor_object_id": 540,
+      "scenes_in_object_ids": 23,
+      "scenes_in_eligible_object_ids": 17
+    },
+    {
+      "anchor_object_id": 556,
+      "scenes_in_object_ids": 24,
+      "scenes_in_eligible_object_ids": 17
+    },
+    {
+      "anchor_object_id": 559,
+      "scenes_in_object_ids": 19,
+      "scenes_in_eligible_object_ids": 14
+    },
+    {
+      "anchor_object_id": 581,
+      "scenes_in_object_ids": 20,
+      "scenes_in_eligible_object_ids": 16
+    },
+    {
+      "anchor_object_id": 584,
+      "scenes_in_object_ids": 24,
+      "scenes_in_eligible_object_ids": 22
+    },
+    {
+      "anchor_object_id": 595,
+      "scenes_in_object_ids": 22,
+      "scenes_in_eligible_object_ids": 16
+    },
+    {
+      "anchor_object_id": 610,
+      "scenes_in_object_ids": 23,
+      "scenes_in_eligible_object_ids": 19
+    },
+    {
+      "anchor_object_id": 616,
+      "scenes_in_object_ids": 23,
+      "scenes_in_eligible_object_ids": 19
+    },
+    {
+      "anchor_object_id": 626,
+      "scenes_in_object_ids": 29,
+      "scenes_in_eligible_object_ids": 22
+    },
+    {
+      "anchor_object_id": 637,
+      "scenes_in_object_ids": 20,
+      "scenes_in_eligible_object_ids": 12
+    },
+    {
+      "anchor_object_id": 650,
+      "scenes_in_object_ids": 17,
+      "scenes_in_eligible_object_ids": 14
+    },
+    {
+      "anchor_object_id": 656,
+      "scenes_in_object_ids": 23,
+      "scenes_in_eligible_object_ids": 19
+    },
+    {
+      "anchor_object_id": 685,
+      "scenes_in_object_ids": 22,
+      "scenes_in_eligible_object_ids": 20
+    },
+    {
+      "anchor_object_id": 695,
+      "scenes_in_object_ids": 20,
+      "scenes_in_eligible_object_ids": 15
+    },
+    {
+      "anchor_object_id": 718,
+      "scenes_in_object_ids": 22,
+      "scenes_in_eligible_object_ids": 10
+    },
+    {
+      "anchor_object_id": 742,
+      "scenes_in_object_ids": 30,
+      "scenes_in_eligible_object_ids": 25
+    },
+    {
+      "anchor_object_id": 745,
+      "scenes_in_object_ids": 19,
+      "scenes_in_eligible_object_ids": 16
+    },
+    {
+      "anchor_object_id": 752,
+      "scenes_in_object_ids": 21,
+      "scenes_in_eligible_object_ids": 17
+    },
+    {
+      "anchor_object_id": 756,
+      "scenes_in_object_ids": 20,
+      "scenes_in_eligible_object_ids": 14
+    },
+    {
+      "anchor_object_id": 767,
+      "scenes_in_object_ids": 25,
+      "scenes_in_eligible_object_ids": 23
+    },
+    {
+      "anchor_object_id": 776,
+      "scenes_in_object_ids": 27,
+      "scenes_in_eligible_object_ids": 18
+    },
+    {
+      "anchor_object_id": 808,
+      "scenes_in_object_ids": 28,
+      "scenes_in_eligible_object_ids": 23
+    },
+    {
+      "anchor_object_id": 812,
+      "scenes_in_object_ids": 27,
+      "scenes_in_eligible_object_ids": 19
+    },
+    {
+      "anchor_object_id": 817,
+      "scenes_in_object_ids": 26,
+      "scenes_in_eligible_object_ids": 19
+    },
+    {
+      "anchor_object_id": 823,
+      "scenes_in_object_ids": 18,
+      "scenes_in_eligible_object_ids": 18
+    },
+    {
+      "anchor_object_id": 824,
+      "scenes_in_object_ids": 23,
+      "scenes_in_eligible_object_ids": 21
+    },
+    {
+      "anchor_object_id": 833,
+      "scenes_in_object_ids": 23,
+      "scenes_in_eligible_object_ids": 19
+    },
+    {
+      "anchor_object_id": 838,
+      "scenes_in_object_ids": 18,
+      "scenes_in_eligible_object_ids": 13
+    },
+    {
+      "anchor_object_id": 852,
+      "scenes_in_object_ids": 30,
+      "scenes_in_eligible_object_ids": 21
+    },
+    {
+      "anchor_object_id": 871,
+      "scenes_in_object_ids": 27,
+      "scenes_in_eligible_object_ids": 21
+    },
+    {
+      "anchor_object_id": 875,
+      "scenes_in_object_ids": 23,
+      "scenes_in_eligible_object_ids": 17
+    },
+    {
+      "anchor_object_id": 913,
+      "scenes_in_object_ids": 17,
+      "scenes_in_eligible_object_ids": 15
+    },
+    {
+      "anchor_object_id": 933,
+      "scenes_in_object_ids": 25,
+      "scenes_in_eligible_object_ids": 22
+    },
+    {
+      "anchor_object_id": 946,
+      "scenes_in_object_ids": 30,
+      "scenes_in_eligible_object_ids": 25
+    },
+    {
+      "anchor_object_id": 973,
+      "scenes_in_object_ids": 28,
+      "scenes_in_eligible_object_ids": 21
+    },
+    {
+      "anchor_object_id": 1003,
+      "scenes_in_object_ids": 17,
+      "scenes_in_eligible_object_ids": 15
+    },
+    {
+      "anchor_object_id": 1026,
+      "scenes_in_object_ids": 28,
+      "scenes_in_eligible_object_ids": 19
+    },
+    {
+      "anchor_object_id": 1035,
+      "scenes_in_object_ids": 26,
+      "scenes_in_eligible_object_ids": 19
+    },
+    {
+      "anchor_object_id": 1049,
+      "scenes_in_object_ids": 19,
+      "scenes_in_eligible_object_ids": 11
+    },
+    {
+      "anchor_object_id": 1062,
+      "scenes_in_object_ids": 19,
+      "scenes_in_eligible_object_ids": 12
+    },
+    {
+      "anchor_object_id": 1084,
+      "scenes_in_object_ids": 24,
+      "scenes_in_eligible_object_ids": 19
+    },
+    {
+      "anchor_object_id": 1098,
+      "scenes_in_object_ids": 22,
+      "scenes_in_eligible_object_ids": 15
+    },
+    {
+      "anchor_object_id": 1129,
+      "scenes_in_object_ids": 23,
+      "scenes_in_eligible_object_ids": 21
+    },
+    {
+      "anchor_object_id": 1139,
+      "scenes_in_object_ids": 13,
+      "scenes_in_eligible_object_ids": 10
+    },
+    {
+      "anchor_object_id": 1164,
+      "scenes_in_object_ids": 13,
+      "scenes_in_eligible_object_ids": 10
+    },
+    {
+      "anchor_object_id": 1176,
+      "scenes_in_object_ids": 14,
+      "scenes_in_eligible_object_ids": 10
+    },
+    {
+      "anchor_object_id": 1192,
+      "scenes_in_object_ids": 27,
+      "scenes_in_eligible_object_ids": 20
+    },
+    {
+      "anchor_object_id": 1204,
+      "scenes_in_object_ids": 20,
+      "scenes_in_eligible_object_ids": 16
+    },
+    {
+      "anchor_object_id": 1217,
+      "scenes_in_object_ids": 17,
+      "scenes_in_eligible_object_ids": 16
+    },
+    {
+      "anchor_object_id": 1219,
+      "scenes_in_object_ids": 24,
+      "scenes_in_eligible_object_ids": 20
+    },
+    {
+      "anchor_object_id": 1220,
+      "scenes_in_object_ids": 26,
+      "scenes_in_eligible_object_ids": 26
+    },
+    {
+      "anchor_object_id": 1221,
+      "scenes_in_object_ids": 28,
+      "scenes_in_eligible_object_ids": 19
+    },
+    {
+      "anchor_object_id": 1245,
+      "scenes_in_object_ids": 27,
+      "scenes_in_eligible_object_ids": 21
+    },
+    {
+      "anchor_object_id": 1251,
+      "scenes_in_object_ids": 23,
+      "scenes_in_eligible_object_ids": 18
+    },
+    {
+      "anchor_object_id": 1261,
+      "scenes_in_object_ids": 27,
+      "scenes_in_eligible_object_ids": 23
+    },
+    {
+      "anchor_object_id": 1277,
+      "scenes_in_object_ids": 18,
+      "scenes_in_eligible_object_ids": 10
+    },
+    {
+      "anchor_object_id": 1294,
+      "scenes_in_object_ids": 17,
+      "scenes_in_eligible_object_ids": 11
+    },
+    {
+      "anchor_object_id": 1305,
+      "scenes_in_object_ids": 19,
+      "scenes_in_eligible_object_ids": 15
+    },
+    {
+      "anchor_object_id": 1307,
+      "scenes_in_object_ids": 19,
+      "scenes_in_eligible_object_ids": 16
+    },
+    {
+      "anchor_object_id": 1309,
+      "scenes_in_object_ids": 26,
+      "scenes_in_eligible_object_ids": 20
+    },
+    {
+      "anchor_object_id": 1310,
+      "scenes_in_object_ids": 14,
+      "scenes_in_eligible_object_ids": 10
+    },
+    {
+      "anchor_object_id": 1330,
+      "scenes_in_object_ids": 21,
+      "scenes_in_eligible_object_ids": 18
+    },
+    {
+      "anchor_object_id": 1346,
+      "scenes_in_object_ids": 15,
+      "scenes_in_eligible_object_ids": 14
+    },
+    {
+      "anchor_object_id": 1363,
+      "scenes_in_object_ids": 16,
+      "scenes_in_eligible_object_ids": 13
+    },
+    {
+      "anchor_object_id": 1367,
+      "scenes_in_object_ids": 17,
+      "scenes_in_eligible_object_ids": 12
+    },
+    {
+      "anchor_object_id": 1374,
+      "scenes_in_object_ids": 23,
+      "scenes_in_eligible_object_ids": 17
+    },
+    {
+      "anchor_object_id": 1408,
+      "scenes_in_object_ids": 17,
+      "scenes_in_eligible_object_ids": 15
+    },
+    {
+      "anchor_object_id": 1427,
+      "scenes_in_object_ids": 27,
+      "scenes_in_eligible_object_ids": 23
+    },
+    {
+      "anchor_object_id": 1429,
+      "scenes_in_object_ids": 23,
+      "scenes_in_eligible_object_ids": 22
+    },
+    {
+      "anchor_object_id": 1431,
+      "scenes_in_object_ids": 23,
+      "scenes_in_eligible_object_ids": 17
+    },
+    {
+      "anchor_object_id": 1442,
+      "scenes_in_object_ids": 19,
+      "scenes_in_eligible_object_ids": 15
+    },
+    {
+      "anchor_object_id": 1446,
+      "scenes_in_object_ids": 21,
+      "scenes_in_eligible_object_ids": 13
+    },
+    {
+      "anchor_object_id": 1455,
+      "scenes_in_object_ids": 23,
+      "scenes_in_eligible_object_ids": 21
+    },
+    {
+      "anchor_object_id": 1462,
+      "scenes_in_object_ids": 18,
+      "scenes_in_eligible_object_ids": 12
+    },
+    {
+      "anchor_object_id": 1469,
+      "scenes_in_object_ids": 27,
+      "scenes_in_eligible_object_ids": 21
+    },
+    {
+      "anchor_object_id": 1470,
+      "scenes_in_object_ids": 32,
+      "scenes_in_eligible_object_ids": 28
+    },
+    {
+      "anchor_object_id": 1475,
+      "scenes_in_object_ids": 20,
+      "scenes_in_eligible_object_ids": 16
+    },
+    {
+      "anchor_object_id": 1483,
+      "scenes_in_object_ids": 19,
+      "scenes_in_eligible_object_ids": 12
+    },
+    {
+      "anchor_object_id": 1485,
+      "scenes_in_object_ids": 16,
+      "scenes_in_eligible_object_ids": 10
+    },
+    {
+      "anchor_object_id": 1495,
+      "scenes_in_object_ids": 21,
+      "scenes_in_eligible_object_ids": 18
+    },
+    {
+      "anchor_object_id": 1504,
+      "scenes_in_object_ids": 23,
+      "scenes_in_eligible_object_ids": 16
+    },
+    {
+      "anchor_object_id": 1524,
+      "scenes_in_object_ids": 21,
+      "scenes_in_eligible_object_ids": 11
+    },
+    {
+      "anchor_object_id": 1527,
+      "scenes_in_object_ids": 25,
+      "scenes_in_eligible_object_ids": 17
+    },
+    {
+      "anchor_object_id": 1540,
+      "scenes_in_object_ids": 12,
+      "scenes_in_eligible_object_ids": 5
+    },
+    {
+      "anchor_object_id": 1542,
+      "scenes_in_object_ids": 15,
+      "scenes_in_eligible_object_ids": 12
+    },
+    {
+      "anchor_object_id": 1552,
+      "scenes_in_object_ids": 33,
+      "scenes_in_eligible_object_ids": 30
+    },
+    {
+      "anchor_object_id": 1576,
+      "scenes_in_object_ids": 25,
+      "scenes_in_eligible_object_ids": 20
+    },
+    {
+      "anchor_object_id": 1587,
+      "scenes_in_object_ids": 32,
+      "scenes_in_eligible_object_ids": 32
+    },
+    {
+      "anchor_object_id": 1593,
+      "scenes_in_object_ids": 25,
+      "scenes_in_eligible_object_ids": 24
+    },
+    {
+      "anchor_object_id": 1615,
+      "scenes_in_object_ids": 17,
+      "scenes_in_eligible_object_ids": 15
+    },
+    {
+      "anchor_object_id": 1630,
+      "scenes_in_object_ids": 14,
+      "scenes_in_eligible_object_ids": 11
+    },
+    {
+      "anchor_object_id": 1640,
+      "scenes_in_object_ids": 19,
+      "scenes_in_eligible_object_ids": 12
+    },
+    {
+      "anchor_object_id": 1661,
+      "scenes_in_object_ids": 23,
+      "scenes_in_eligible_object_ids": 17
+    },
+    {
+      "anchor_object_id": 1662,
+      "scenes_in_object_ids": 22,
+      "scenes_in_eligible_object_ids": 15
+    },
+    {
+      "anchor_object_id": 1676,
+      "scenes_in_object_ids": 29,
+      "scenes_in_eligible_object_ids": 26
+    },
+    {
+      "anchor_object_id": 1690,
+      "scenes_in_object_ids": 25,
+      "scenes_in_eligible_object_ids": 24
+    },
+    {
+      "anchor_object_id": 1734,
+      "scenes_in_object_ids": 22,
+      "scenes_in_eligible_object_ids": 13
+    },
+    {
+      "anchor_object_id": 1739,
+      "scenes_in_object_ids": 15,
+      "scenes_in_eligible_object_ids": 11
+    },
+    {
+      "anchor_object_id": 1753,
+      "scenes_in_object_ids": 16,
+      "scenes_in_eligible_object_ids": 13
+    },
+    {
+      "anchor_object_id": 1808,
+      "scenes_in_object_ids": 15,
+      "scenes_in_eligible_object_ids": 12
+    },
+    {
+      "anchor_object_id": 1819,
+      "scenes_in_object_ids": 24,
+      "scenes_in_eligible_object_ids": 19
+    },
+    {
+      "anchor_object_id": 1831,
+      "scenes_in_object_ids": 17,
+      "scenes_in_eligible_object_ids": 14
+    },
+    {
+      "anchor_object_id": 1841,
+      "scenes_in_object_ids": 27,
+      "scenes_in_eligible_object_ids": 23
+    },
+    {
+      "anchor_object_id": 1862,
+      "scenes_in_object_ids": 18,
+      "scenes_in_eligible_object_ids": 12
+    },
+    {
+      "anchor_object_id": 1868,
+      "scenes_in_object_ids": 34,
+      "scenes_in_eligible_object_ids": 26
+    },
+    {
+      "anchor_object_id": 1873,
+      "scenes_in_object_ids": 23,
+      "scenes_in_eligible_object_ids": 20
+    },
+    {
+      "anchor_object_id": 1889,
+      "scenes_in_object_ids": 22,
+      "scenes_in_eligible_object_ids": 20
+    },
+    {
+      "anchor_object_id": 1892,
+      "scenes_in_object_ids": 21,
+      "scenes_in_eligible_object_ids": 15
+    },
+    {
+      "anchor_object_id": 1896,
+      "scenes_in_object_ids": 26,
+      "scenes_in_eligible_object_ids": 23
+    },
+    {
+      "anchor_object_id": 1904,
+      "scenes_in_object_ids": 20,
+      "scenes_in_eligible_object_ids": 15
+    },
+    {
+      "anchor_object_id": 1912,
+      "scenes_in_object_ids": 21,
+      "scenes_in_eligible_object_ids": 13
+    },
+    {
+      "anchor_object_id": 1929,
+      "scenes_in_object_ids": 21,
+      "scenes_in_eligible_object_ids": 15
+    },
+    {
+      "anchor_object_id": 1942,
+      "scenes_in_object_ids": 21,
+      "scenes_in_eligible_object_ids": 18
+    },
+    {
+      "anchor_object_id": 1945,
+      "scenes_in_object_ids": 27,
+      "scenes_in_eligible_object_ids": 25
+    },
+    {
+      "anchor_object_id": 1947,
+      "scenes_in_object_ids": 26,
+      "scenes_in_eligible_object_ids": 23
+    },
+    {
+      "anchor_object_id": 1965,
+      "scenes_in_object_ids": 22,
+      "scenes_in_eligible_object_ids": 19
+    },
+    {
+      "anchor_object_id": 1968,
+      "scenes_in_object_ids": 18,
+      "scenes_in_eligible_object_ids": 17
+    },
+    {
+      "anchor_object_id": 1979,
+      "scenes_in_object_ids": 20,
+      "scenes_in_eligible_object_ids": 16
+    },
+    {
+      "anchor_object_id": 1992,
+      "scenes_in_object_ids": 17,
+      "scenes_in_eligible_object_ids": 12
+    },
+    {
+      "anchor_object_id": 2000,
+      "scenes_in_object_ids": 28,
+      "scenes_in_eligible_object_ids": 23
+    },
+    {
+      "anchor_object_id": 2029,
+      "scenes_in_object_ids": 28,
+      "scenes_in_eligible_object_ids": 25
+    },
+    {
+      "anchor_object_id": 2037,
+      "scenes_in_object_ids": 15,
+      "scenes_in_eligible_object_ids": 15
+    },
+    {
+      "anchor_object_id": 2060,
+      "scenes_in_object_ids": 17,
+      "scenes_in_eligible_object_ids": 8
+    },
+    {
+      "anchor_object_id": 2067,
+      "scenes_in_object_ids": 17,
+      "scenes_in_eligible_object_ids": 15
+    },
+    {
+      "anchor_object_id": 2071,
+      "scenes_in_object_ids": 19,
+      "scenes_in_eligible_object_ids": 15
+    },
+    {
+      "anchor_object_id": 2073,
+      "scenes_in_object_ids": 23,
+      "scenes_in_eligible_object_ids": 19
+    },
+    {
+      "anchor_object_id": 2085,
+      "scenes_in_object_ids": 29,
+      "scenes_in_eligible_object_ids": 19
+    },
+    {
+      "anchor_object_id": 2088,
+      "scenes_in_object_ids": 22,
+      "scenes_in_eligible_object_ids": 20
+    },
+    {
+      "anchor_object_id": 2106,
+      "scenes_in_object_ids": 23,
+      "scenes_in_eligible_object_ids": 18
+    },
+    {
+      "anchor_object_id": 2109,
+      "scenes_in_object_ids": 29,
+      "scenes_in_eligible_object_ids": 21
+    },
+    {
+      "anchor_object_id": 2113,
+      "scenes_in_object_ids": 20,
+      "scenes_in_eligible_object_ids": 11
+    },
+    {
+      "anchor_object_id": 2120,
+      "scenes_in_object_ids": 21,
+      "scenes_in_eligible_object_ids": 16
+    },
+    {
+      "anchor_object_id": 2137,
+      "scenes_in_object_ids": 19,
+      "scenes_in_eligible_object_ids": 14
+    },
+    {
+      "anchor_object_id": 2148,
+      "scenes_in_object_ids": 27,
+      "scenes_in_eligible_object_ids": 18
+    },
+    {
+      "anchor_object_id": 2152,
+      "scenes_in_object_ids": 23,
+      "scenes_in_eligible_object_ids": 20
+    },
+    {
+      "anchor_object_id": 2164,
+      "scenes_in_object_ids": 18,
+      "scenes_in_eligible_object_ids": 15
+    },
+    {
+      "anchor_object_id": 2168,
+      "scenes_in_object_ids": 12,
+      "scenes_in_eligible_object_ids": 9
+    },
+    {
+      "anchor_object_id": 2175,
+      "scenes_in_object_ids": 22,
+      "scenes_in_eligible_object_ids": 18
+    },
+    {
+      "anchor_object_id": 2177,
+      "scenes_in_object_ids": 23,
+      "scenes_in_eligible_object_ids": 20
+    },
+    {
+      "anchor_object_id": 2197,
+      "scenes_in_object_ids": 36,
+      "scenes_in_eligible_object_ids": 32
+    },
+    {
+      "anchor_object_id": 2211,
+      "scenes_in_object_ids": 20,
+      "scenes_in_eligible_object_ids": 19
+    },
+    {
+      "anchor_object_id": 2216,
+      "scenes_in_object_ids": 24,
+      "scenes_in_eligible_object_ids": 23
+    },
+    {
+      "anchor_object_id": 2239,
+      "scenes_in_object_ids": 25,
+      "scenes_in_eligible_object_ids": 22
+    },
+    {
+      "anchor_object_id": 2247,
+      "scenes_in_object_ids": 18,
+      "scenes_in_eligible_object_ids": 12
+    },
+    {
+      "anchor_object_id": 2259,
+      "scenes_in_object_ids": 17,
+      "scenes_in_eligible_object_ids": 11
+    },
+    {
+      "anchor_object_id": 2298,
+      "scenes_in_object_ids": 19,
+      "scenes_in_eligible_object_ids": 8
+    },
+    {
+      "anchor_object_id": 2309,
+      "scenes_in_object_ids": 17,
+      "scenes_in_eligible_object_ids": 14
+    },
+    {
+      "anchor_object_id": 2313,
+      "scenes_in_object_ids": 24,
+      "scenes_in_eligible_object_ids": 22
+    },
+    {
+      "anchor_object_id": 2322,
+      "scenes_in_object_ids": 24,
+      "scenes_in_eligible_object_ids": 21
+    },
+    {
+      "anchor_object_id": 2333,
+      "scenes_in_object_ids": 19,
+      "scenes_in_eligible_object_ids": 13
+    },
+    {
+      "anchor_object_id": 2335,
+      "scenes_in_object_ids": 21,
+      "scenes_in_eligible_object_ids": 15
+    },
+    {
+      "anchor_object_id": 2343,
+      "scenes_in_object_ids": 28,
+      "scenes_in_eligible_object_ids": 25
+    },
+    {
+      "anchor_object_id": 2350,
+      "scenes_in_object_ids": 28,
+      "scenes_in_eligible_object_ids": 22
+    },
+    {
+      "anchor_object_id": 2351,
+      "scenes_in_object_ids": 18,
+      "scenes_in_eligible_object_ids": 13
+    },
+    {
+      "anchor_object_id": 2367,
+      "scenes_in_object_ids": 14,
+      "scenes_in_eligible_object_ids": 8
+    },
+    {
+      "anchor_object_id": 2401,
+      "scenes_in_object_ids": 18,
+      "scenes_in_eligible_object_ids": 14
+    },
+    {
+      "anchor_object_id": 2413,
+      "scenes_in_object_ids": 20,
+      "scenes_in_eligible_object_ids": 17
+    },
+    {
+      "anchor_object_id": 2414,
+      "scenes_in_object_ids": 21,
+      "scenes_in_eligible_object_ids": 20
+    },
+    {
+      "anchor_object_id": 2420,
+      "scenes_in_object_ids": 19,
+      "scenes_in_eligible_object_ids": 17
+    },
+    {
+      "anchor_object_id": 2431,
+      "scenes_in_object_ids": 30,
+      "scenes_in_eligible_object_ids": 29
+    },
+    {
+      "anchor_object_id": 2455,
+      "scenes_in_object_ids": 10,
+      "scenes_in_eligible_object_ids": 3
+    },
+    {
+      "anchor_object_id": 2470,
+      "scenes_in_object_ids": 22,
+      "scenes_in_eligible_object_ids": 14
+    },
+    {
+      "anchor_object_id": 2474,
+      "scenes_in_object_ids": 28,
+      "scenes_in_eligible_object_ids": 21
+    },
+    {
+      "anchor_object_id": 2503,
+      "scenes_in_object_ids": 23,
+      "scenes_in_eligible_object_ids": 22
+    },
+    {
+      "anchor_object_id": 2507,
+      "scenes_in_object_ids": 23,
+      "scenes_in_eligible_object_ids": 20
+    },
+    {
+      "anchor_object_id": 2514,
+      "scenes_in_object_ids": 13,
+      "scenes_in_eligible_object_ids": 6
+    },
+    {
+      "anchor_object_id": 2525,
+      "scenes_in_object_ids": 19,
+      "scenes_in_eligible_object_ids": 11
+    },
+    {
+      "anchor_object_id": 2566,
+      "scenes_in_object_ids": 27,
+      "scenes_in_eligible_object_ids": 21
+    },
+    {
+      "anchor_object_id": 2589,
+      "scenes_in_object_ids": 22,
+      "scenes_in_eligible_object_ids": 13
+    },
+    {
+      "anchor_object_id": 2614,
+      "scenes_in_object_ids": 11,
+      "scenes_in_eligible_object_ids": 6
+    },
+    {
+      "anchor_object_id": 2615,
+      "scenes_in_object_ids": 27,
+      "scenes_in_eligible_object_ids": 15
+    },
+    {
+      "anchor_object_id": 2636,
+      "scenes_in_object_ids": 14,
+      "scenes_in_eligible_object_ids": 9
+    },
+    {
+      "anchor_object_id": 2640,
+      "scenes_in_object_ids": 16,
+      "scenes_in_eligible_object_ids": 8
+    },
+    {
+      "anchor_object_id": 2667,
+      "scenes_in_object_ids": 22,
+      "scenes_in_eligible_object_ids": 18
+    },
+    {
+      "anchor_object_id": 2668,
+      "scenes_in_object_ids": 15,
+      "scenes_in_eligible_object_ids": 15
+    },
+    {
+      "anchor_object_id": 2677,
+      "scenes_in_object_ids": 26,
+      "scenes_in_eligible_object_ids": 19
+    },
+    {
+      "anchor_object_id": 2682,
+      "scenes_in_object_ids": 23,
+      "scenes_in_eligible_object_ids": 19
+    },
+    {
+      "anchor_object_id": 2694,
+      "scenes_in_object_ids": 22,
+      "scenes_in_eligible_object_ids": 9
+    },
+    {
+      "anchor_object_id": 2703,
+      "scenes_in_object_ids": 13,
+      "scenes_in_eligible_object_ids": 7
+    },
+    {
+      "anchor_object_id": 2722,
+      "scenes_in_object_ids": 19,
+      "scenes_in_eligible_object_ids": 13
+    },
+    {
+      "anchor_object_id": 2750,
+      "scenes_in_object_ids": 25,
+      "scenes_in_eligible_object_ids": 17
+    },
+    {
+      "anchor_object_id": 2752,
+      "scenes_in_object_ids": 16,
+      "scenes_in_eligible_object_ids": 8
+    },
+    {
+      "anchor_object_id": 2776,
+      "scenes_in_object_ids": 25,
+      "scenes_in_eligible_object_ids": 14
+    },
+    {
+      "anchor_object_id": 2795,
+      "scenes_in_object_ids": 31,
+      "scenes_in_eligible_object_ids": 26
+    },
+    {
+      "anchor_object_id": 2814,
+      "scenes_in_object_ids": 20,
+      "scenes_in_eligible_object_ids": 16
+    },
+    {
+      "anchor_object_id": 2838,
+      "scenes_in_object_ids": 19,
+      "scenes_in_eligible_object_ids": 14
+    },
+    {
+      "anchor_object_id": 2846,
+      "scenes_in_object_ids": 19,
+      "scenes_in_eligible_object_ids": 11
+    },
+    {
+      "anchor_object_id": 2852,
+      "scenes_in_object_ids": 19,
+      "scenes_in_eligible_object_ids": 17
+    },
+    {
+      "anchor_object_id": 2863,
+      "scenes_in_object_ids": 26,
+      "scenes_in_eligible_object_ids": 19
+    },
+    {
+      "anchor_object_id": 2868,
+      "scenes_in_object_ids": 22,
+      "scenes_in_eligible_object_ids": 11
+    },
+    {
+      "anchor_object_id": 2881,
+      "scenes_in_object_ids": 20,
+      "scenes_in_eligible_object_ids": 12
+    },
+    {
+      "anchor_object_id": 2886,
+      "scenes_in_object_ids": 24,
+      "scenes_in_eligible_object_ids": 20
+    },
+    {
+      "anchor_object_id": 2949,
+      "scenes_in_object_ids": 15,
+      "scenes_in_eligible_object_ids": 8
+    },
+    {
+      "anchor_object_id": 2970,
+      "scenes_in_object_ids": 25,
+      "scenes_in_eligible_object_ids": 18
+    },
+    {
+      "anchor_object_id": 2979,
+      "scenes_in_object_ids": 21,
+      "scenes_in_eligible_object_ids": 12
+    },
+    {
+      "anchor_object_id": 3011,
+      "scenes_in_object_ids": 19,
+      "scenes_in_eligible_object_ids": 15
+    },
+    {
+      "anchor_object_id": 3023,
+      "scenes_in_object_ids": 17,
+      "scenes_in_eligible_object_ids": 12
+    },
+    {
+      "anchor_object_id": 3026,
+      "scenes_in_object_ids": 23,
+      "scenes_in_eligible_object_ids": 17
+    },
+    {
+      "anchor_object_id": 3036,
+      "scenes_in_object_ids": 33,
+      "scenes_in_eligible_object_ids": 27
+    },
+    {
+      "anchor_object_id": 3037,
+      "scenes_in_object_ids": 20,
+      "scenes_in_eligible_object_ids": 13
+    },
+    {
+      "anchor_object_id": 3051,
+      "scenes_in_object_ids": 21,
+      "scenes_in_eligible_object_ids": 14
+    },
+    {
+      "anchor_object_id": 3054,
+      "scenes_in_object_ids": 22,
+      "scenes_in_eligible_object_ids": 13
+    },
+    {
+      "anchor_object_id": 3059,
+      "scenes_in_object_ids": 29,
+      "scenes_in_eligible_object_ids": 22
+    },
+    {
+      "anchor_object_id": 3073,
+      "scenes_in_object_ids": 23,
+      "scenes_in_eligible_object_ids": 18
+    },
+    {
+      "anchor_object_id": 3080,
+      "scenes_in_object_ids": 25,
+      "scenes_in_eligible_object_ids": 15
+    },
+    {
+      "anchor_object_id": 3083,
+      "scenes_in_object_ids": 17,
+      "scenes_in_eligible_object_ids": 15
+    },
+    {
+      "anchor_object_id": 3086,
+      "scenes_in_object_ids": 25,
+      "scenes_in_eligible_object_ids": 24
+    },
+    {
+      "anchor_object_id": 3091,
+      "scenes_in_object_ids": 21,
+      "scenes_in_eligible_object_ids": 15
+    },
+    {
+      "anchor_object_id": 3109,
+      "scenes_in_object_ids": 24,
+      "scenes_in_eligible_object_ids": 17
+    },
+    {
+      "anchor_object_id": 3134,
+      "scenes_in_object_ids": 28,
+      "scenes_in_eligible_object_ids": 27
+    },
+    {
+      "anchor_object_id": 3144,
+      "scenes_in_object_ids": 21,
+      "scenes_in_eligible_object_ids": 15
+    },
+    {
+      "anchor_object_id": 3180,
+      "scenes_in_object_ids": 19,
+      "scenes_in_eligible_object_ids": 14
+    },
+    {
+      "anchor_object_id": 3188,
+      "scenes_in_object_ids": 23,
+      "scenes_in_eligible_object_ids": 18
+    },
+    {
+      "anchor_object_id": 3245,
+      "scenes_in_object_ids": 20,
+      "scenes_in_eligible_object_ids": 16
+    },
+    {
+      "anchor_object_id": 3254,
+      "scenes_in_object_ids": 16,
+      "scenes_in_eligible_object_ids": 13
+    },
+    {
+      "anchor_object_id": 3257,
+      "scenes_in_object_ids": 19,
+      "scenes_in_eligible_object_ids": 12
+    },
+    {
+      "anchor_object_id": 3262,
+      "scenes_in_object_ids": 25,
+      "scenes_in_eligible_object_ids": 21
+    },
+    {
+      "anchor_object_id": 3286,
+      "scenes_in_object_ids": 16,
+      "scenes_in_eligible_object_ids": 12
+    },
+    {
+      "anchor_object_id": 3289,
+      "scenes_in_object_ids": 19,
+      "scenes_in_eligible_object_ids": 14
+    },
+    {
+      "anchor_object_id": 3291,
+      "scenes_in_object_ids": 30,
+      "scenes_in_eligible_object_ids": 23
+    },
+    {
+      "anchor_object_id": 3305,
+      "scenes_in_object_ids": 24,
+      "scenes_in_eligible_object_ids": 17
+    },
+    {
+      "anchor_object_id": 3342,
+      "scenes_in_object_ids": 29,
+      "scenes_in_eligible_object_ids": 27
+    },
+    {
+      "anchor_object_id": 3343,
+      "scenes_in_object_ids": 30,
+      "scenes_in_eligible_object_ids": 28
+    },
+    {
+      "anchor_object_id": 3355,
+      "scenes_in_object_ids": 21,
+      "scenes_in_eligible_object_ids": 20
+    },
+    {
+      "anchor_object_id": 3371,
+      "scenes_in_object_ids": 25,
+      "scenes_in_eligible_object_ids": 23
+    },
+    {
+      "anchor_object_id": 3378,
+      "scenes_in_object_ids": 22,
+      "scenes_in_eligible_object_ids": 18
+    },
+    {
+      "anchor_object_id": 3383,
+      "scenes_in_object_ids": 32,
+      "scenes_in_eligible_object_ids": 27
+    },
+    {
+      "anchor_object_id": 3412,
+      "scenes_in_object_ids": 21,
+      "scenes_in_eligible_object_ids": 15
+    },
+    {
+      "anchor_object_id": 3447,
+      "scenes_in_object_ids": 21,
+      "scenes_in_eligible_object_ids": 19
+    },
+    {
+      "anchor_object_id": 3465,
+      "scenes_in_object_ids": 20,
+      "scenes_in_eligible_object_ids": 19
+    },
+    {
+      "anchor_object_id": 3488,
+      "scenes_in_object_ids": 17,
+      "scenes_in_eligible_object_ids": 13
+    },
+    {
+      "anchor_object_id": 3495,
+      "scenes_in_object_ids": 22,
+      "scenes_in_eligible_object_ids": 16
+    },
+    {
+      "anchor_object_id": 3506,
+      "scenes_in_object_ids": 29,
+      "scenes_in_eligible_object_ids": 24
+    },
+    {
+      "anchor_object_id": 3512,
+      "scenes_in_object_ids": 19,
+      "scenes_in_eligible_object_ids": 13
+    },
+    {
+      "anchor_object_id": 3516,
+      "scenes_in_object_ids": 22,
+      "scenes_in_eligible_object_ids": 19
+    },
+    {
+      "anchor_object_id": 3540,
+      "scenes_in_object_ids": 21,
+      "scenes_in_eligible_object_ids": 13
+    },
+    {
+      "anchor_object_id": 3564,
+      "scenes_in_object_ids": 30,
+      "scenes_in_eligible_object_ids": 21
+    },
+    {
+      "anchor_object_id": 3570,
+      "scenes_in_object_ids": 16,
+      "scenes_in_eligible_object_ids": 10
+    },
+    {
+      "anchor_object_id": 3622,
+      "scenes_in_object_ids": 15,
+      "scenes_in_eligible_object_ids": 10
+    },
+    {
+      "anchor_object_id": 3644,
+      "scenes_in_object_ids": 19,
+      "scenes_in_eligible_object_ids": 14
+    },
+    {
+      "anchor_object_id": 3650,
+      "scenes_in_object_ids": 21,
+      "scenes_in_eligible_object_ids": 17
+    },
+    {
+      "anchor_object_id": 3657,
+      "scenes_in_object_ids": 18,
+      "scenes_in_eligible_object_ids": 9
+    },
+    {
+      "anchor_object_id": 3692,
+      "scenes_in_object_ids": 24,
+      "scenes_in_eligible_object_ids": 18
+    },
+    {
+      "anchor_object_id": 3699,
+      "scenes_in_object_ids": 28,
+      "scenes_in_eligible_object_ids": 20
+    },
+    {
+      "anchor_object_id": 3714,
+      "scenes_in_object_ids": 17,
+      "scenes_in_eligible_object_ids": 13
+    },
+    {
+      "anchor_object_id": 3760,
+      "scenes_in_object_ids": 19,
+      "scenes_in_eligible_object_ids": 18
+    },
+    {
+      "anchor_object_id": 3768,
+      "scenes_in_object_ids": 24,
+      "scenes_in_eligible_object_ids": 16
+    },
+    {
+      "anchor_object_id": 3778,
+      "scenes_in_object_ids": 17,
+      "scenes_in_eligible_object_ids": 7
+    },
+    {
+      "anchor_object_id": 3781,
+      "scenes_in_object_ids": 21,
+      "scenes_in_eligible_object_ids": 16
+    },
+    {
+      "anchor_object_id": 3802,
+      "scenes_in_object_ids": 24,
+      "scenes_in_eligible_object_ids": 18
+    },
+    {
+      "anchor_object_id": 3835,
+      "scenes_in_object_ids": 26,
+      "scenes_in_eligible_object_ids": 19
+    },
+    {
+      "anchor_object_id": 3843,
+      "scenes_in_object_ids": 24,
+      "scenes_in_eligible_object_ids": 16
+    },
+    {
+      "anchor_object_id": 3846,
+      "scenes_in_object_ids": 19,
+      "scenes_in_eligible_object_ids": 12
+    },
+    {
+      "anchor_object_id": 3866,
+      "scenes_in_object_ids": 25,
+      "scenes_in_eligible_object_ids": 21
+    },
+    {
+      "anchor_object_id": 3902,
+      "scenes_in_object_ids": 25,
+      "scenes_in_eligible_object_ids": 21
+    },
+    {
+      "anchor_object_id": 3913,
+      "scenes_in_object_ids": 22,
+      "scenes_in_eligible_object_ids": 16
+    },
+    {
+      "anchor_object_id": 3921,
+      "scenes_in_object_ids": 26,
+      "scenes_in_eligible_object_ids": 22
+    },
+    {
+      "anchor_object_id": 3984,
+      "scenes_in_object_ids": 25,
+      "scenes_in_eligible_object_ids": 16
+    },
+    {
+      "anchor_object_id": 3999,
+      "scenes_in_object_ids": 25,
+      "scenes_in_eligible_object_ids": 17
+    },
+    {
+      "anchor_object_id": 4034,
+      "scenes_in_object_ids": 21,
+      "scenes_in_eligible_object_ids": 19
+    },
+    {
+      "anchor_object_id": 4036,
+      "scenes_in_object_ids": 22,
+      "scenes_in_eligible_object_ids": 21
+    },
+    {
+      "anchor_object_id": 4038,
+      "scenes_in_object_ids": 17,
+      "scenes_in_eligible_object_ids": 13
+    },
+    {
+      "anchor_object_id": 4047,
+      "scenes_in_object_ids": 23,
+      "scenes_in_eligible_object_ids": 15
+    },
+    {
+      "anchor_object_id": 4048,
+      "scenes_in_object_ids": 19,
+      "scenes_in_eligible_object_ids": 11
+    },
+    {
+      "anchor_object_id": 4056,
+      "scenes_in_object_ids": 12,
+      "scenes_in_eligible_object_ids": 6
+    },
+    {
+      "anchor_object_id": 4074,
+      "scenes_in_object_ids": 26,
+      "scenes_in_eligible_object_ids": 22
+    },
+    {
+      "anchor_object_id": 4096,
+      "scenes_in_object_ids": 24,
+      "scenes_in_eligible_object_ids": 20
+    },
+    {
+      "anchor_object_id": 4098,
+      "scenes_in_object_ids": 25,
+      "scenes_in_eligible_object_ids": 19
+    },
+    {
+      "anchor_object_id": 4100,
+      "scenes_in_object_ids": 18,
+      "scenes_in_eligible_object_ids": 14
+    },
+    {
+      "anchor_object_id": 4138,
+      "scenes_in_object_ids": 24,
+      "scenes_in_eligible_object_ids": 14
+    },
+    {
+      "anchor_object_id": 4161,
+      "scenes_in_object_ids": 21,
+      "scenes_in_eligible_object_ids": 12
+    },
+    {
+      "anchor_object_id": 4178,
+      "scenes_in_object_ids": 26,
+      "scenes_in_eligible_object_ids": 17
+    },
+    {
+      "anchor_object_id": 4197,
+      "scenes_in_object_ids": 20,
+      "scenes_in_eligible_object_ids": 15
+    },
+    {
+      "anchor_object_id": 4202,
+      "scenes_in_object_ids": 29,
+      "scenes_in_eligible_object_ids": 22
+    },
+    {
+      "anchor_object_id": 4240,
+      "scenes_in_object_ids": 25,
+      "scenes_in_eligible_object_ids": 19
+    },
+    {
+      "anchor_object_id": 4241,
+      "scenes_in_object_ids": 22,
+      "scenes_in_eligible_object_ids": 20
+    },
+    {
+      "anchor_object_id": 4252,
+      "scenes_in_object_ids": 29,
+      "scenes_in_eligible_object_ids": 24
+    },
+    {
+      "anchor_object_id": 4263,
+      "scenes_in_object_ids": 25,
+      "scenes_in_eligible_object_ids": 18
+    },
+    {
+      "anchor_object_id": 4271,
+      "scenes_in_object_ids": 22,
+      "scenes_in_eligible_object_ids": 18
+    },
+    {
+      "anchor_object_id": 4275,
+      "scenes_in_object_ids": 23,
+      "scenes_in_eligible_object_ids": 16
+    },
+    {
+      "anchor_object_id": 4286,
+      "scenes_in_object_ids": 19,
+      "scenes_in_eligible_object_ids": 17
+    },
+    {
+      "anchor_object_id": 4298,
+      "scenes_in_object_ids": 26,
+      "scenes_in_eligible_object_ids": 18
+    },
+    {
+      "anchor_object_id": 4303,
+      "scenes_in_object_ids": 29,
+      "scenes_in_eligible_object_ids": 25
+    },
+    {
+      "anchor_object_id": 4313,
+      "scenes_in_object_ids": 21,
+      "scenes_in_eligible_object_ids": 12
+    },
+    {
+      "anchor_object_id": 4345,
+      "scenes_in_object_ids": 24,
+      "scenes_in_eligible_object_ids": 22
+    },
+    {
+      "anchor_object_id": 4352,
+      "scenes_in_object_ids": 20,
+      "scenes_in_eligible_object_ids": 19
+    },
+    {
+      "anchor_object_id": 4359,
+      "scenes_in_object_ids": 27,
+      "scenes_in_eligible_object_ids": 23
+    },
+    {
+      "anchor_object_id": 4362,
+      "scenes_in_object_ids": 17,
+      "scenes_in_eligible_object_ids": 14
+    },
+    {
+      "anchor_object_id": 4364,
+      "scenes_in_object_ids": 21,
+      "scenes_in_eligible_object_ids": 14
+    },
+    {
+      "anchor_object_id": 4379,
+      "scenes_in_object_ids": 17,
+      "scenes_in_eligible_object_ids": 12
+    },
+    {
+      "anchor_object_id": 4391,
+      "scenes_in_object_ids": 15,
+      "scenes_in_eligible_object_ids": 13
+    },
+    {
+      "anchor_object_id": 4394,
+      "scenes_in_object_ids": 13,
+      "scenes_in_eligible_object_ids": 9
+    },
+    {
+      "anchor_object_id": 4409,
+      "scenes_in_object_ids": 23,
+      "scenes_in_eligible_object_ids": 18
+    },
+    {
+      "anchor_object_id": 4414,
+      "scenes_in_object_ids": 20,
+      "scenes_in_eligible_object_ids": 15
+    },
+    {
+      "anchor_object_id": 4420,
+      "scenes_in_object_ids": 22,
+      "scenes_in_eligible_object_ids": 19
+    },
+    {
+      "anchor_object_id": 4421,
+      "scenes_in_object_ids": 10,
+      "scenes_in_eligible_object_ids": 6
+    },
+    {
+      "anchor_object_id": 4431,
+      "scenes_in_object_ids": 20,
+      "scenes_in_eligible_object_ids": 20
+    },
+    {
+      "anchor_object_id": 4449,
+      "scenes_in_object_ids": 23,
+      "scenes_in_eligible_object_ids": 18
+    },
+    {
+      "anchor_object_id": 4470,
+      "scenes_in_object_ids": 22,
+      "scenes_in_eligible_object_ids": 14
+    },
+    {
+      "anchor_object_id": 4478,
+      "scenes_in_object_ids": 21,
+      "scenes_in_eligible_object_ids": 15
+    },
+    {
+      "anchor_object_id": 4489,
+      "scenes_in_object_ids": 22,
+      "scenes_in_eligible_object_ids": 18
+    },
+    {
+      "anchor_object_id": 4490,
+      "scenes_in_object_ids": 21,
+      "scenes_in_eligible_object_ids": 15
+    },
+    {
+      "anchor_object_id": 4499,
+      "scenes_in_object_ids": 29,
+      "scenes_in_eligible_object_ids": 26
+    },
+    {
+      "anchor_object_id": 4506,
+      "scenes_in_object_ids": 28,
+      "scenes_in_eligible_object_ids": 23
+    },
+    {
+      "anchor_object_id": 4509,
+      "scenes_in_object_ids": 23,
+      "scenes_in_eligible_object_ids": 15
+    },
+    {
+      "anchor_object_id": 4528,
+      "scenes_in_object_ids": 24,
+      "scenes_in_eligible_object_ids": 20
+    },
+    {
+      "anchor_object_id": 4534,
+      "scenes_in_object_ids": 22,
+      "scenes_in_eligible_object_ids": 20
+    },
+    {
+      "anchor_object_id": 4535,
+      "scenes_in_object_ids": 16,
+      "scenes_in_eligible_object_ids": 13
+    },
+    {
+      "anchor_object_id": 4539,
+      "scenes_in_object_ids": 21,
+      "scenes_in_eligible_object_ids": 18
+    },
+    {
+      "anchor_object_id": 4550,
+      "scenes_in_object_ids": 18,
+      "scenes_in_eligible_object_ids": 11
+    },
+    {
+      "anchor_object_id": 4570,
+      "scenes_in_object_ids": 22,
+      "scenes_in_eligible_object_ids": 17
+    },
+    {
+      "anchor_object_id": 4580,
+      "scenes_in_object_ids": 19,
+      "scenes_in_eligible_object_ids": 14
+    },
+    {
+      "anchor_object_id": 4587,
+      "scenes_in_object_ids": 24,
+      "scenes_in_eligible_object_ids": 14
+    },
+    {
+      "anchor_object_id": 4611,
+      "scenes_in_object_ids": 19,
+      "scenes_in_eligible_object_ids": 16
+    },
+    {
+      "anchor_object_id": 4649,
+      "scenes_in_object_ids": 19,
+      "scenes_in_eligible_object_ids": 11
+    },
+    {
+      "anchor_object_id": 4670,
+      "scenes_in_object_ids": 22,
+      "scenes_in_eligible_object_ids": 20
+    },
+    {
+      "anchor_object_id": 4699,
+      "scenes_in_object_ids": 26,
+      "scenes_in_eligible_object_ids": 21
+    },
+    {
+      "anchor_object_id": 4701,
+      "scenes_in_object_ids": 24,
+      "scenes_in_eligible_object_ids": 19
+    },
+    {
+      "anchor_object_id": 4702,
+      "scenes_in_object_ids": 28,
+      "scenes_in_eligible_object_ids": 24
+    },
+    {
+      "anchor_object_id": 4721,
+      "scenes_in_object_ids": 31,
+      "scenes_in_eligible_object_ids": 21
+    },
+    {
+      "anchor_object_id": 4729,
+      "scenes_in_object_ids": 35,
+      "scenes_in_eligible_object_ids": 30
+    },
+    {
+      "anchor_object_id": 4740,
+      "scenes_in_object_ids": 26,
+      "scenes_in_eligible_object_ids": 16
+    },
+    {
+      "anchor_object_id": 4773,
+      "scenes_in_object_ids": 22,
+      "scenes_in_eligible_object_ids": 12
+    },
+    {
+      "anchor_object_id": 4799,
+      "scenes_in_object_ids": 22,
+      "scenes_in_eligible_object_ids": 13
+    },
+    {
+      "anchor_object_id": 4821,
+      "scenes_in_object_ids": 25,
+      "scenes_in_eligible_object_ids": 17
+    },
+    {
+      "anchor_object_id": 4824,
+      "scenes_in_object_ids": 29,
+      "scenes_in_eligible_object_ids": 20
+    },
+    {
+      "anchor_object_id": 4835,
+      "scenes_in_object_ids": 22,
+      "scenes_in_eligible_object_ids": 17
+    },
+    {
+      "anchor_object_id": 4857,
+      "scenes_in_object_ids": 28,
+      "scenes_in_eligible_object_ids": 18
+    },
+    {
+      "anchor_object_id": 4867,
+      "scenes_in_object_ids": 27,
+      "scenes_in_eligible_object_ids": 18
+    },
+    {
+      "anchor_object_id": 4904,
+      "scenes_in_object_ids": 24,
+      "scenes_in_eligible_object_ids": 16
+    },
+    {
+      "anchor_object_id": 4939,
+      "scenes_in_object_ids": 29,
+      "scenes_in_eligible_object_ids": 22
+    },
+    {
+      "anchor_object_id": 4944,
+      "scenes_in_object_ids": 22,
+      "scenes_in_eligible_object_ids": 18
+    },
+    {
+      "anchor_object_id": 4967,
+      "scenes_in_object_ids": 17,
+      "scenes_in_eligible_object_ids": 11
+    },
+    {
+      "anchor_object_id": 4979,
+      "scenes_in_object_ids": 27,
+      "scenes_in_eligible_object_ids": 17
+    },
+    {
+      "anchor_object_id": 4990,
+      "scenes_in_object_ids": 20,
+      "scenes_in_eligible_object_ids": 14
+    },
+    {
+      "anchor_object_id": 5058,
+      "scenes_in_object_ids": 27,
+      "scenes_in_eligible_object_ids": 23
+    },
+    {
+      "anchor_object_id": 5082,
+      "scenes_in_object_ids": 30,
+      "scenes_in_eligible_object_ids": 26
+    },
+    {
+      "anchor_object_id": 5093,
+      "scenes_in_object_ids": 27,
+      "scenes_in_eligible_object_ids": 22
+    },
+    {
+      "anchor_object_id": 5115,
+      "scenes_in_object_ids": 24,
+      "scenes_in_eligible_object_ids": 15
+    },
+    {
+      "anchor_object_id": 5130,
+      "scenes_in_object_ids": 20,
+      "scenes_in_eligible_object_ids": 16
+    },
+    {
+      "anchor_object_id": 5138,
+      "scenes_in_object_ids": 20,
+      "scenes_in_eligible_object_ids": 8
+    },
+    {
+      "anchor_object_id": 5146,
+      "scenes_in_object_ids": 20,
+      "scenes_in_eligible_object_ids": 16
+    },
+    {
+      "anchor_object_id": 5188,
+      "scenes_in_object_ids": 29,
+      "scenes_in_eligible_object_ids": 22
+    },
+    {
+      "anchor_object_id": 5191,
+      "scenes_in_object_ids": 27,
+      "scenes_in_eligible_object_ids": 24
+    },
+    {
+      "anchor_object_id": 5227,
+      "scenes_in_object_ids": 17,
+      "scenes_in_eligible_object_ids": 11
+    },
+    {
+      "anchor_object_id": 5238,
+      "scenes_in_object_ids": 16,
+      "scenes_in_eligible_object_ids": 11
+    },
+    {
+      "anchor_object_id": 5243,
+      "scenes_in_object_ids": 13,
+      "scenes_in_eligible_object_ids": 8
+    },
+    {
+      "anchor_object_id": 5254,
+      "scenes_in_object_ids": 23,
+      "scenes_in_eligible_object_ids": 19
+    },
+    {
+      "anchor_object_id": 5260,
+      "scenes_in_object_ids": 24,
+      "scenes_in_eligible_object_ids": 18
+    },
+    {
+      "anchor_object_id": 5299,
+      "scenes_in_object_ids": 18,
+      "scenes_in_eligible_object_ids": 12
+    },
+    {
+      "anchor_object_id": 5316,
+      "scenes_in_object_ids": 27,
+      "scenes_in_eligible_object_ids": 20
+    },
+    {
+      "anchor_object_id": 5332,
+      "scenes_in_object_ids": 24,
+      "scenes_in_eligible_object_ids": 22
+    },
+    {
+      "anchor_object_id": 5344,
+      "scenes_in_object_ids": 22,
+      "scenes_in_eligible_object_ids": 19
+    },
+    {
+      "anchor_object_id": 5349,
+      "scenes_in_object_ids": 26,
+      "scenes_in_eligible_object_ids": 23
+    },
+    {
+      "anchor_object_id": 5352,
+      "scenes_in_object_ids": 19,
+      "scenes_in_eligible_object_ids": 12
+    }
+  ]
+}

@@ -10,6 +10,8 @@ from types import SimpleNamespace
 os.environ.setdefault("CUDA_VISIBLE_DEVICES", "0")
 os.environ.setdefault("GRADIO_TEMP_DIR", "/mnt/train-data-4-hdd/yian/freepose/baseline/tmp")
 
+# OV9D_DEMO_DISABLE_ANCHORS=1 python /mnt/train-data-4-hdd/yian/freepose/baseline/demo_gradio_ov9d.py
+
 import cv2
 import gradio as gr
 import numpy as np
@@ -423,6 +425,7 @@ def describe_selection(sample_label: str, seed: int):
         "No inference yet.",
         None,
         [],
+        None,
     )
 
 
@@ -462,7 +465,54 @@ def toggle_same_object(same_object: bool, split: str, sample_label: str, seed: i
     )
 
 
-def run_inference(sample_label: str, seed: int, overlay_mode: str, object_scale_multiplier: float):
+def visual_geometry_from_state(inference_state: dict, object_scale_multiplier: float):
+    if not inference_state:
+        raise ValueError("Run Generate first.")
+    batch = inference_state["batch"]
+    bbox_obj = bbox_points_from_models_info(
+        inference_state["object_id"],
+        inference_state["normalization_scale"],
+        object_scale_multiplier,
+    )
+    pred_bbox = transform_points(
+        bbox_obj,
+        inference_state["pred_pose"],
+        inference_state["pred_translation"],
+    )
+    gt_bbox = transform_points(
+        bbox_obj,
+        inference_state["gt_pose"],
+        inference_state["gt_translation"],
+    )
+    return batch, pred_bbox, gt_bbox
+
+
+def update_projection_from_state(inference_state: dict, object_scale_multiplier: float):
+    batch, pred_bbox, gt_bbox = visual_geometry_from_state(inference_state, object_scale_multiplier)
+    projection = build_projection_gallery(batch, pred_bbox, gt_bbox)
+    return projection, "2D projection updated from cached inference."
+
+
+def build_viewer_from_state(inference_state: dict, overlay_mode: str, object_scale_multiplier: float):
+    batch, pred_bbox, gt_bbox = visual_geometry_from_state(inference_state, object_scale_multiplier)
+    glb_path, scene_point_count = build_glb(
+        batch,
+        pred_bbox,
+        gt_bbox,
+        inference_state["pred_pose"],
+        inference_state["gt_pose"],
+        inference_state["pred_translation"],
+        inference_state["gt_translation"],
+        overlay_mode,
+    )
+    log = (
+        f"3D viewer updated. overlay={overlay_mode}, "
+        f"scene_points={scene_point_count}, glb={glb_path}."
+    )
+    return glb_path, log
+
+
+def run_inference(sample_label: str, seed: int, object_scale_multiplier: float):
     if not torch.cuda.is_available():
         raise ValueError("CUDA is not available. This checkpoint is too large for CPU demo inference.")
     if model is None:
@@ -490,16 +540,6 @@ def run_inference(sample_label: str, seed: int, overlay_mode: str, object_scale_
     pred_bbox = transform_points(bbox_obj, pred_pose, pred_translation)
     gt_bbox = transform_points(bbox_obj, gt_pose, gt_translation)
     projection = build_projection_gallery(batch, pred_bbox, gt_bbox)
-    glb_path, scene_point_count = build_glb(
-        batch,
-        pred_bbox,
-        gt_bbox,
-        pred_pose,
-        gt_pose,
-        pred_translation,
-        gt_translation,
-        overlay_mode,
-    )
 
     rot_err = rotation_error_degrees(pred_pose, gt_rotation)
     trans_err = translation_error(pred_translation, gt_translation)
@@ -515,8 +555,8 @@ def run_inference(sample_label: str, seed: int, overlay_mode: str, object_scale_
         f"Normalization Scale: `{normalization_scale:.6f}`  \n"
         f"Pred Translation: `{[round(float(v), 6) for v in pred_translation.tolist()]}`  \n"
         f"GT Translation: `{[round(float(v), 6) for v in gt_translation.tolist()]}`  \n"
-        f"Scene Points In GLB: `{scene_point_count}`  \n"
-        f"Inference Time: `{elapsed:.2f}s`"
+        f"Inference Time: `{elapsed:.2f}s`  \n"
+        f"3D Viewer: `not built yet`"
     )
     log = (
         f"Done. split={split}, sample={parse_sample_index(sample_label)}, "
@@ -547,13 +587,21 @@ def run_inference(sample_label: str, seed: int, overlay_mode: str, object_scale_
             "pose_l1": pose_l1,
             "translation_l1": trans_l1,
         },
-        "assets": {
-            "glb": glb_path,
-        },
     }
-    report_path = Path(glb_path).with_suffix(".json")
+    report_dir = VIEWER_CACHE_ROOT / split
+    report_dir.mkdir(parents=True, exist_ok=True)
+    report_path = report_dir / "latest_inference.json"
     report_path.write_text(json.dumps(report, indent=2), encoding="utf-8")
-    return log, metrics, glb_path, projection
+    inference_state = {
+        "batch": batch,
+        "object_id": object_id,
+        "normalization_scale": normalization_scale,
+        "pred_pose": pred_pose,
+        "pred_translation": pred_translation,
+        "gt_pose": gt_pose,
+        "gt_translation": gt_translation,
+    }
+    return log, metrics, None, projection, inference_state
 
 
 theme = gr.themes.Ocean()
@@ -562,6 +610,7 @@ initial_labels = sample_labels(initial_split)
 initial_sample = initial_labels[0] if initial_labels else None
 
 with gr.Blocks(theme=theme) as demo:
+    inference_state = gr.State(None)
     gr.HTML(
         """
         <h1>OV9D Multi-Object VGGT Pose Demo</h1>
@@ -590,6 +639,8 @@ with gr.Blocks(theme=theme) as demo:
             scale_slider = gr.Slider(0.25, 4.0, value=1.0, step=0.05, label="Object Box Scale")
             refresh_btn = gr.Button("Refresh Sample")
             generate_btn = gr.Button("Generate", variant="primary")
+            update_projection_btn = gr.Button("Update 2D Projection")
+            build_viewer_btn = gr.Button("Build 3D Viewer")
             log_output = gr.Markdown("Select a sample, then click Generate.")
             metrics_output = gr.Markdown("No inference yet.")
         with gr.Column(scale=2):
@@ -605,37 +656,47 @@ with gr.Blocks(theme=theme) as demo:
     demo.load(
         fn=lambda: describe_selection(initial_sample, 42),
         inputs=[],
-        outputs=[scene_gallery, object_gallery, log_output, metrics_output, model_viewer, projection_gallery],
+        outputs=[scene_gallery, object_gallery, log_output, metrics_output, model_viewer, projection_gallery, inference_state],
     )
     split_dropdown.change(
         fn=refresh_split,
         inputs=[split_dropdown, sample_dropdown, same_object_check, seed_input],
-        outputs=[sample_dropdown, scene_gallery, object_gallery, log_output, metrics_output, model_viewer, projection_gallery],
+        outputs=[sample_dropdown, scene_gallery, object_gallery, log_output, metrics_output, model_viewer, projection_gallery, inference_state],
     )
     same_object_check.change(
         fn=toggle_same_object,
         inputs=[same_object_check, split_dropdown, sample_dropdown, seed_input],
-        outputs=[sample_dropdown, scene_gallery, object_gallery, log_output, metrics_output, model_viewer, projection_gallery],
+        outputs=[sample_dropdown, scene_gallery, object_gallery, log_output, metrics_output, model_viewer, projection_gallery, inference_state],
     )
     sample_dropdown.change(
         fn=refresh_sample,
         inputs=[sample_dropdown, seed_input],
-        outputs=[scene_gallery, object_gallery, log_output, metrics_output, model_viewer, projection_gallery],
+        outputs=[scene_gallery, object_gallery, log_output, metrics_output, model_viewer, projection_gallery, inference_state],
     )
     seed_input.change(
         fn=refresh_sample,
         inputs=[sample_dropdown, seed_input],
-        outputs=[scene_gallery, object_gallery, log_output, metrics_output, model_viewer, projection_gallery],
+        outputs=[scene_gallery, object_gallery, log_output, metrics_output, model_viewer, projection_gallery, inference_state],
     )
     refresh_btn.click(
         fn=refresh_sample,
         inputs=[sample_dropdown, seed_input],
-        outputs=[scene_gallery, object_gallery, log_output, metrics_output, model_viewer, projection_gallery],
+        outputs=[scene_gallery, object_gallery, log_output, metrics_output, model_viewer, projection_gallery, inference_state],
     )
     generate_btn.click(
         fn=run_inference,
-        inputs=[sample_dropdown, seed_input, overlay_mode, scale_slider],
-        outputs=[log_output, metrics_output, model_viewer, projection_gallery],
+        inputs=[sample_dropdown, seed_input, scale_slider],
+        outputs=[log_output, metrics_output, model_viewer, projection_gallery, inference_state],
+    )
+    update_projection_btn.click(
+        fn=update_projection_from_state,
+        inputs=[inference_state, scale_slider],
+        outputs=[projection_gallery, log_output],
+    )
+    build_viewer_btn.click(
+        fn=build_viewer_from_state,
+        inputs=[inference_state, overlay_mode, scale_slider],
+        outputs=[model_viewer, log_output],
     )
 
 

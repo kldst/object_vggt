@@ -157,10 +157,11 @@ def _rot6d_to_rotation_matrix(rot6d: torch.Tensor) -> torch.Tensor:
     """Gram-Schmidt: (..., 6) -> (..., 3, 3) with orthonormal columns.
 
     Mirrors the row-major rot6d convention used in `_rotation_matrix_to_rot6d`
-    (first two columns of R flattened as [c0, c1] in shape (..., 6)).
+    (first two columns of R flattened from shape (..., 3, 2)).
     """
-    a1 = rot6d[..., :3]
-    a2 = rot6d[..., 3:6]
+    rot6d = rot6d.reshape(*rot6d.shape[:-1], 3, 2)
+    a1 = rot6d[..., :, 0]
+    a2 = rot6d[..., :, 1]
     b1 = F.normalize(a1, dim=-1, eps=1e-8)
     proj = (b1 * a2).sum(dim=-1, keepdim=True) * b1
     b2 = F.normalize(a2 - proj, dim=-1, eps=1e-8)
@@ -188,7 +189,9 @@ def _rotation_loss(
     pose_rep:
       - "rot6d":     vector loss (L1/L2) directly on the 6D representation.
                      Cheap and stable, but not a true SO(3) distance — model
-                     can game it by scaling output columns.
+                     can game it by scaling output columns. This preserves the
+                     legacy training behavior and does not call
+                     `_rot6d_to_rotation_matrix`.
       - "frobenius": ||R_pred - R_gt||_F^2 after Gram-Schmidt projection.
                      Equals 4(1 - cos θ); smooth, monotone in geodesic angle,
                      no arccos singularity. Recommended over geodesic.

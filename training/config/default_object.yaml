@@ -3,7 +3,7 @@ defaults:
 
 # torchrun --master_port=29200 --nproc_per_node=1 launch.py  --config default_object
 
-exp_name: baseline_ov9d_multi_object_pose_mask_rot6d_0505v1
+exp_name: baseline_ov9d_multi_object_pose_mask_frobenius_0506v2
 img_size: 518
 num_workers: 0
 seed_value: 30
@@ -13,8 +13,8 @@ val_epoch_freq: 5
 max_img_per_gpu: 80
 
 limit_train_batches: 112 # sample 幾次 (一次 per gpu / img num)
-# limit_train_batches:  100
-# limit_train_batches:  50
+# limit_train_batches:  8
+# limit_val_batches:  1
 limit_val_batches: 22
 
 debug:
@@ -141,7 +141,8 @@ logging:
 checkpoint:
   save_dir: logs/${exp_name}/ckpts
   save_freq: 10
-  resume_checkpoint_path: /logs/baseline_0417_14000_shuffle_v2/ckpts/checkpoint_60.pt
+  resume_checkpoint_path: /all_data/model/model.pt
+  # resume_checkpoint_path: /logs/baseline_0417_14000_shuffle_v2/ckpts/checkpoint_60.pt
   # resume_checkpoint_path: /mnt/train-data-4-hdd/yian/freepose/vggt_model/model.pt
   load_optimizer_state: False
   load_training_state: False
@@ -169,7 +170,7 @@ loss:
   object_srt:
     weight: 1.0
     loss_type: l1            # used for translation always; used for rotation only when pose_rep == rot6d
-    pose_rep: rot6d     # rot6d | frobenius | cosine | geodesic
+    pose_rep: frobenius # rot6d | frobenius | cosine | geodesic
     weight_pose: 1.0
     weight_translation: 1.0
     # init_w: 1.0  # disabled because loss_object_pose_init is removed
