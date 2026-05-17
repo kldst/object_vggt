@@ -4,19 +4,19 @@ defaults:
 
 # torchrun --master_port=29200 --nproc_per_node=1 launch.py  --config default_object_oo9d
 
-exp_name: baseline_ov9d_multi_object_pose_mask_symmetric_rot6d_0507_2gpu_test
+exp_name: baseline_oo9d_multi_single_0518
 img_size: 518
 num_workers: 0
 seed_value: 30
 accum_steps: 1    # We did not use gradient accumulation in our training, while if you suffer from OOM, you can try to use it.
 patch_size: 14
 val_epoch_freq: 5
-max_img_per_gpu: 4
+max_img_per_gpu: 80
 
-limit_train_batches: 168 # sample 幾次 (一次 per gpu / img num)
+limit_train_batches: 3040 # sample 幾次 (一次 per gpu / img num)
 # limit_train_batches:  8
 # limit_val_batches:  1
-limit_val_batches: 33
+limit_val_batches: 374
 
 debug:
   force_model_output_to_ground_truth: False
@@ -96,7 +96,7 @@ data:
 
 logging:
   log_dir: logs/${exp_name}
-  use_wandb: False
+  use_wandb: True
   log_visuals: False
   log_freq: 1
   log_level_primary: DEBUG
