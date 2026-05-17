@@ -286,10 +286,9 @@ def _symmetric_rot6d_loss(
     symmetry_info_path: str,
     symmetry_continuous_steps: int,
 ) -> torch.Tensor:
-    if symmetry_info_path is None:
-        raise ValueError("pose_rep='symmetric_rot6d' requires symmetry_info_path in object_srt config.")
-    if object_ids is None:
-        raise ValueError("pose_rep='symmetric_rot6d' requires batch['object_id'].")
+    if not symmetry_info_path or object_ids is None:
+        gt_rot6d = _rotation_matrix_to_rot6d(gt_R)
+        return _vector_loss(pred_rot6d, gt_rot6d, loss_type=loss_type)
 
     ids = _object_ids_to_list(object_ids)
     if len(ids) != pred_rot6d.shape[0]:
@@ -383,6 +382,7 @@ def compute_object_srt_loss(
     batch,
     loss_type="l1",
     pose_rep="rot6d",
+    use_symmetric_rot6d=False,
     symmetry_info_path=None,
     symmetry_continuous_steps=36,
     weight_pose=1.0,
@@ -404,8 +404,9 @@ def compute_object_srt_loss(
       - has_object: (B,) bool mask
 
     pose_rep: rotation loss representation. See `_rotation_loss`.
-              "rot6d" preserves legacy behavior. "frobenius" is the
-              recommended SO(3)-aware default.
+              "rot6d" trains the predicted 6D vector against the first two
+              columns of the GT rotation. Set use_symmetric_rot6d=True to use
+              symmetry-aware rot6d candidates without changing pose_rep.
     loss_type: applies to translation always, and to rotation only when
                pose_rep == "rot6d".
     """
@@ -416,6 +417,8 @@ def compute_object_srt_loss(
     gt_R = batch["object_rotation"]
     gt_translation = batch["object_translation"]
     object_ids = batch.get("object_id", None)
+    if use_symmetric_rot6d:
+        pose_rep = "symmetric_rot6d"
 
     if debug_force_model_output_to_ground_truth and not getattr(
         compute_object_srt_loss, "_dtype_logged_once", False

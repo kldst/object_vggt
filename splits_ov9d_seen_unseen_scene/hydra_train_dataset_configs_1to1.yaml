@@ -1,0 +1,30 @@
+# Dataset override fragment for 1:1 single:multi training.
+# Train split policy:
+#   single/train object ids == multi/train target object ids.
+- _target_: data.datasets.ov9d_single_pose_normalize.OV9DSinglePoseNormalizeDataset
+  split: train
+  DATA_ROOT: /mnt/train-data-4-hdd/yian/freepose/ov9d/ov9d
+  SPLIT_JSON: /mnt/train-data-4-hdd/yian/freepose/baseline_0503/splits_ov9d_seen_unseen_scene/single/train.json
+  len_train: 23318
+  num_scene_views: 4
+  num_object_views: 4
+  min_view_gap: 5
+  object_view_min_gap: 6
+  object_view_max_gap: 9
+  load_point_map: false
+  scale_by_points: true
+  negative_object_prob: 0.3
+- _target_: data.datasets.ov9d_multi_pose_normalize.OV9DMultiPoseNormalizeDataset
+  split: train
+  DATA_ROOT: /mnt/train-data-4-hdd/yian/freepose/ov9d/ov9d
+  SPLIT_JSON: /mnt/train-data-4-hdd/yian/freepose/baseline_0503/splits_ov9d_seen_unseen_scene/multi/train.json
+  len_train: 23318
+  num_scene_views: 4
+  num_object_views: 4
+  fixed_object_view_ids: [10, 20, 30, 40]
+  min_view_gap: 5
+  object_view_min_gap: 6
+  object_view_max_gap: 9
+  load_point_map: false
+  scale_by_points: true
+  negative_object_prob: 0.3

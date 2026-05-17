@@ -7,7 +7,7 @@ import time
 from pathlib import Path
 from types import SimpleNamespace
 
-os.environ.setdefault("CUDA_VISIBLE_DEVICES", "0")
+os.environ.setdefault("CUDA_VISIBLE_DEVICES", "1")
 os.environ.setdefault("GRADIO_TEMP_DIR", "/mnt/train-data-4-hdd/yian/freepose/baseline/tmp")
 
 # OV9D_DEMO_DISABLE_ANCHORS=1 python /mnt/train-data-4-hdd/yian/freepose/baseline/demo_gradio_ov9d.py
@@ -29,6 +29,9 @@ from vggt.models.vggt import VGGT
 
 
 DATA_ROOT = Path(os.environ.get("OV9D_DATA_ROOT", "/mnt/train-data-4-hdd/yian/freepose/ov9d/ov9d"))
+SYMMETRY_INFO_PATH = Path(
+    os.environ.get("OV9D_SYMMETRY_INFO", str(DATA_ROOT / "models_info_with_symmetry.json"))
+)
 SPLIT_JSON_ROOT = Path(
     os.environ.get(
         "OV9D_SPLIT_JSON_ROOT",
@@ -70,6 +73,7 @@ def make_common_conf():
 
 DATASET_CACHE = {}
 SPLIT_MANIFEST_CACHE = {}
+SYMMETRY_INFO_CACHE = None
 
 
 def build_dataset(split: str):
@@ -99,6 +103,62 @@ def split_manifest_by_scene(split: str):
             str(item["scene_name"]): item for item in payload.get("scenes", [])
         }
     return SPLIT_MANIFEST_CACHE[split]
+
+
+def load_symmetry_info():
+    global SYMMETRY_INFO_CACHE
+    if SYMMETRY_INFO_CACHE is None:
+        if SYMMETRY_INFO_PATH.is_file():
+            SYMMETRY_INFO_CACHE = json.loads(SYMMETRY_INFO_PATH.read_text(encoding="utf-8"))
+        else:
+            SYMMETRY_INFO_CACHE = {}
+    return SYMMETRY_INFO_CACHE
+
+
+def symmetry_bucket(object_id: int):
+    info = load_symmetry_info().get(str(int(object_id)), {})
+    discrete = info.get("symmetries_discrete") or []
+    continuous = info.get("symmetries_continuous") or []
+    has_discrete = bool(discrete)
+    has_continuous = bool(continuous)
+    if has_discrete and has_continuous:
+        bucket = "discrete + continuous"
+    elif has_discrete:
+        bucket = "discrete only"
+    elif has_continuous:
+        bucket = "continuous only"
+    else:
+        bucket = "none"
+    return bucket, discrete, continuous
+
+
+def format_symmetry_info(object_id: int, category: str = ""):
+    bucket, discrete, continuous = symmetry_bucket(object_id)
+    continuous_axes = [
+        item.get("axis", "?")
+        for item in continuous
+        if isinstance(item, dict)
+    ]
+    lines = [
+        "**Object Symmetry**",
+        f"- object id: `obj_{int(object_id):06d}`",
+        f"- category: `{category or 'unknown'}`",
+        f"- type: `{bucket}`",
+        f"- discrete transforms: `{len(discrete)}`",
+        f"- continuous axes: `{len(continuous)}`",
+    ]
+    if continuous_axes:
+        lines.append(f"- continuous axis list: `{continuous_axes}`")
+    if bucket == "none":
+        lines.append("- bucket: `non-symmetric`")
+    else:
+        lines.append("- bucket: `symmetric`")
+    return "  \n".join(lines)
+
+
+def symmetry_info_for_label(sample_label: str, seed: int):
+    _, _, _, batch = load_batch(sample_label, seed)
+    return format_symmetry_info(int(batch["object_id"]), batch.get("category", ""))
 
 
 def _format_sample_label(split: str, idx: int, rec: dict) -> str:
@@ -422,6 +482,7 @@ def describe_selection(sample_label: str, seed: int):
         gallery_images(processed_images, scene_captions),
         gallery_images(batch["object_images"], object_captions),
         message,
+        format_symmetry_info(int(batch["object_id"]), batch.get("category", "")),
         "No inference yet.",
         None,
         [],
@@ -512,7 +573,7 @@ def build_viewer_from_state(inference_state: dict, overlay_mode: str, object_sca
     return glb_path, log
 
 
-def run_inference(sample_label: str, seed: int, object_scale_multiplier: float):
+def run_inference(sample_label: str, seed: int, overlay_mode: str, object_scale_multiplier: float):
     if not torch.cuda.is_available():
         raise ValueError("CUDA is not available. This checkpoint is too large for CPU demo inference.")
     if model is None:
@@ -540,6 +601,16 @@ def run_inference(sample_label: str, seed: int, object_scale_multiplier: float):
     pred_bbox = transform_points(bbox_obj, pred_pose, pred_translation)
     gt_bbox = transform_points(bbox_obj, gt_pose, gt_translation)
     projection = build_projection_gallery(batch, pred_bbox, gt_bbox)
+    glb_path, scene_point_count = build_glb(
+        batch,
+        pred_bbox,
+        gt_bbox,
+        pred_pose,
+        gt_pose,
+        pred_translation,
+        gt_translation,
+        overlay_mode,
+    )
 
     rot_err = rotation_error_degrees(pred_pose, gt_rotation)
     trans_err = translation_error(pred_translation, gt_translation)
@@ -556,12 +627,15 @@ def run_inference(sample_label: str, seed: int, object_scale_multiplier: float):
         f"Pred Translation: `{[round(float(v), 6) for v in pred_translation.tolist()]}`  \n"
         f"GT Translation: `{[round(float(v), 6) for v in gt_translation.tolist()]}`  \n"
         f"Inference Time: `{elapsed:.2f}s`  \n"
-        f"3D Viewer: `not built yet`"
+        f"3D Viewer: `{glb_path}`  \n"
+        f"Scene Points: `{scene_point_count}`"
     )
+    symmetry_markdown = format_symmetry_info(object_id, batch.get("category", ""))
     log = (
         f"Done. split={split}, sample={parse_sample_index(sample_label)}, "
         f"scene={batch['scene_name']}, object={batch['object_name']}, "
-        f"scene_views={batch['ids'].tolist()}, object_views={batch['object_cam_indices'].tolist()}."
+        f"scene_views={batch['ids'].tolist()}, object_views={batch['object_cam_indices'].tolist()}, "
+        f"overlay={overlay_mode}, glb={glb_path}."
     )
 
     report = {
@@ -601,7 +675,7 @@ def run_inference(sample_label: str, seed: int, object_scale_multiplier: float):
         "gt_pose": gt_pose,
         "gt_translation": gt_translation,
     }
-    return log, metrics, None, projection, inference_state
+    return log, metrics, symmetry_markdown, glb_path, projection, inference_state
 
 
 theme = gr.themes.Ocean()
@@ -642,6 +716,7 @@ with gr.Blocks(theme=theme) as demo:
             update_projection_btn = gr.Button("Update 2D Projection")
             build_viewer_btn = gr.Button("Build 3D Viewer")
             log_output = gr.Markdown("Select a sample, then click Generate.")
+            symmetry_output = gr.Markdown("Object symmetry will appear after a sample is loaded.")
             metrics_output = gr.Markdown("No inference yet.")
         with gr.Column(scale=2):
             with gr.Tabs():
@@ -656,37 +731,93 @@ with gr.Blocks(theme=theme) as demo:
     demo.load(
         fn=lambda: describe_selection(initial_sample, 42),
         inputs=[],
-        outputs=[scene_gallery, object_gallery, log_output, metrics_output, model_viewer, projection_gallery, inference_state],
+        outputs=[
+            scene_gallery,
+            object_gallery,
+            log_output,
+            symmetry_output,
+            metrics_output,
+            model_viewer,
+            projection_gallery,
+            inference_state,
+        ],
     )
     split_dropdown.change(
         fn=refresh_split,
         inputs=[split_dropdown, sample_dropdown, same_object_check, seed_input],
-        outputs=[sample_dropdown, scene_gallery, object_gallery, log_output, metrics_output, model_viewer, projection_gallery, inference_state],
+        outputs=[
+            sample_dropdown,
+            scene_gallery,
+            object_gallery,
+            log_output,
+            symmetry_output,
+            metrics_output,
+            model_viewer,
+            projection_gallery,
+            inference_state,
+        ],
     )
     same_object_check.change(
         fn=toggle_same_object,
         inputs=[same_object_check, split_dropdown, sample_dropdown, seed_input],
-        outputs=[sample_dropdown, scene_gallery, object_gallery, log_output, metrics_output, model_viewer, projection_gallery, inference_state],
+        outputs=[
+            sample_dropdown,
+            scene_gallery,
+            object_gallery,
+            log_output,
+            symmetry_output,
+            metrics_output,
+            model_viewer,
+            projection_gallery,
+            inference_state,
+        ],
     )
     sample_dropdown.change(
         fn=refresh_sample,
         inputs=[sample_dropdown, seed_input],
-        outputs=[scene_gallery, object_gallery, log_output, metrics_output, model_viewer, projection_gallery, inference_state],
+        outputs=[
+            scene_gallery,
+            object_gallery,
+            log_output,
+            symmetry_output,
+            metrics_output,
+            model_viewer,
+            projection_gallery,
+            inference_state,
+        ],
     )
     seed_input.change(
         fn=refresh_sample,
         inputs=[sample_dropdown, seed_input],
-        outputs=[scene_gallery, object_gallery, log_output, metrics_output, model_viewer, projection_gallery, inference_state],
+        outputs=[
+            scene_gallery,
+            object_gallery,
+            log_output,
+            symmetry_output,
+            metrics_output,
+            model_viewer,
+            projection_gallery,
+            inference_state,
+        ],
     )
     refresh_btn.click(
         fn=refresh_sample,
         inputs=[sample_dropdown, seed_input],
-        outputs=[scene_gallery, object_gallery, log_output, metrics_output, model_viewer, projection_gallery, inference_state],
+        outputs=[
+            scene_gallery,
+            object_gallery,
+            log_output,
+            symmetry_output,
+            metrics_output,
+            model_viewer,
+            projection_gallery,
+            inference_state,
+        ],
     )
     generate_btn.click(
         fn=run_inference,
-        inputs=[sample_dropdown, seed_input, scale_slider],
-        outputs=[log_output, metrics_output, model_viewer, projection_gallery, inference_state],
+        inputs=[sample_dropdown, seed_input, overlay_mode, scale_slider],
+        outputs=[log_output, metrics_output, symmetry_output, model_viewer, projection_gallery, inference_state],
     )
     update_projection_btn.click(
         fn=update_projection_from_state,
@@ -706,4 +837,8 @@ if __name__ == "__main__":
         server_port=SERVER_PORT,
         share=GRADIO_SHARE,
         show_error=True,
+        allowed_paths=[
+            str(VIEWER_CACHE_ROOT),
+            os.environ["GRADIO_TEMP_DIR"],
+        ],
     )

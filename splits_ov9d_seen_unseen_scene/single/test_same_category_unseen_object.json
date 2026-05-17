@@ -1,0 +1,4722 @@
+{
+  "split": "test_same_category_unseen_object",
+  "single_dir": "/mnt/train-data-4-hdd/yian/freepose/ov9d/ov9d/oo3d9dsingle",
+  "split_policy": {
+    "unit": "scene folder",
+    "train_ratio": 0.8,
+    "val_ratio": 0.1,
+    "test_ratio": 0.1,
+    "seed": 42
+  },
+  "count": 523,
+  "scenes": [
+    {
+      "scene_name": "anise_001_v2n9r2d8ekghl8bii7y0plagwwksi4u1",
+      "category": "anise",
+      "object_instance": "anise_001",
+      "relative_path": "oo3d9dsingle/anise_001_v2n9r2d8ekghl8bii7y0plagwwksi4u1",
+      "rgb_count": 50,
+      "object_id": 1,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "anise_004_nay201mid8cnassyf7a2628ue3qdc4j2",
+      "category": "anise",
+      "object_instance": "anise_004",
+      "relative_path": "oo3d9dsingle/anise_004_nay201mid8cnassyf7a2628ue3qdc4j2",
+      "rgb_count": 50,
+      "object_id": 4,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "anise_022_7akmamvtkez7lg4tl3uz7erugtmjc1j0",
+      "category": "anise",
+      "object_instance": "anise_022",
+      "relative_path": "oo3d9dsingle/anise_022_7akmamvtkez7lg4tl3uz7erugtmjc1j0",
+      "rgb_count": 50,
+      "object_id": 21,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "antique_021_o3o87k8qnp27d1svcqsz45mpuh5b3nty",
+      "category": "antique",
+      "object_instance": "antique_021",
+      "relative_path": "oo3d9dsingle/antique_021_o3o87k8qnp27d1svcqsz45mpuh5b3nty",
+      "rgb_count": 50,
+      "object_id": 38,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "apple_007_jy55lxstmvepq5alqmdto06e1v0znot3",
+      "category": "apple",
+      "object_instance": "apple_007",
+      "relative_path": "oo3d9dsingle/apple_007_jy55lxstmvepq5alqmdto06e1v0znot3",
+      "rgb_count": 50,
+      "object_id": 44,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "apple_008_3manvyhtzdk769h32l5q531tbodxkpnl",
+      "category": "apple",
+      "object_instance": "apple_008",
+      "relative_path": "oo3d9dsingle/apple_008_3manvyhtzdk769h32l5q531tbodxkpnl",
+      "rgb_count": 50,
+      "object_id": 45,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "apple_015_8k9mp0nqvpexav7sskhabi3szpi0to9v",
+      "category": "apple",
+      "object_instance": "apple_015",
+      "relative_path": "oo3d9dsingle/apple_015_8k9mp0nqvpexav7sskhabi3szpi0to9v",
+      "rgb_count": 50,
+      "object_id": 52,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "apple_024_bxbfj3d6n8fy5ito2v21rozujsj73hcm",
+      "category": "apple",
+      "object_instance": "apple_024",
+      "relative_path": "oo3d9dsingle/apple_024_bxbfj3d6n8fy5ito2v21rozujsj73hcm",
+      "rgb_count": 50,
+      "object_id": 60,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "apple_027_660n29xconbrv83mhso00xlxm41dyntw",
+      "category": "apple",
+      "object_instance": "apple_027",
+      "relative_path": "oo3d9dsingle/apple_027_660n29xconbrv83mhso00xlxm41dyntw",
+      "rgb_count": 50,
+      "object_id": 63,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "apple_053_g6xk948ijx5kc4akj34m51i6x3ekgl7j",
+      "category": "apple",
+      "object_instance": "apple_053",
+      "relative_path": "oo3d9dsingle/apple_053_g6xk948ijx5kc4akj34m51i6x3ekgl7j",
+      "rgb_count": 50,
+      "object_id": 87,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "asparagus_005_5f5ekzpevtv9w4hvmp3cnnbryzxrk9hn",
+      "category": "asparagus",
+      "object_instance": "asparagus_005",
+      "relative_path": "oo3d9dsingle/asparagus_005_5f5ekzpevtv9w4hvmp3cnnbryzxrk9hn",
+      "rgb_count": 50,
+      "object_id": 104,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "asparagus_007_p0ycm1sud0tgh0677zb56ksc7e46bdbv",
+      "category": "asparagus",
+      "object_instance": "asparagus_007",
+      "relative_path": "oo3d9dsingle/asparagus_007_p0ycm1sud0tgh0677zb56ksc7e46bdbv",
+      "rgb_count": 50,
+      "object_id": 106,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "backpack_015_0xcywz5a6fe4ik8ljgjygs9fwg7q8bbt",
+      "category": "backpack",
+      "object_instance": "backpack_015",
+      "relative_path": "oo3d9dsingle/backpack_015_0xcywz5a6fe4ik8ljgjygs9fwg7q8bbt",
+      "rgb_count": 49,
+      "object_id": 119,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "backpack_018_bpuicdsxiauwabyrdr6f7r0n0v429e4z",
+      "category": "backpack",
+      "object_instance": "backpack_018",
+      "relative_path": "oo3d9dsingle/backpack_018_bpuicdsxiauwabyrdr6f7r0n0v429e4z",
+      "rgb_count": 50,
+      "object_id": 122,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "ball_003_c4te8s69suf21tx4jik8dobpwv8y6uq1",
+      "category": "ball",
+      "object_instance": "ball_003",
+      "relative_path": "oo3d9dsingle/ball_003_c4te8s69suf21tx4jik8dobpwv8y6uq1",
+      "rgb_count": 50,
+      "object_id": 138,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "ball_020_wd706urvalhwtpbqzm4fe8678cmxgi6g",
+      "category": "ball",
+      "object_instance": "ball_020",
+      "relative_path": "oo3d9dsingle/ball_020_wd706urvalhwtpbqzm4fe8678cmxgi6g",
+      "rgb_count": 50,
+      "object_id": 149,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "bamboo_shoots_001_w8y1iivepdedhnwuoymbkjdgqnxwp04i",
+      "category": "bamboo_shoots",
+      "object_instance": "bamboo_shoots_001",
+      "relative_path": "oo3d9dsingle/bamboo_shoots_001_w8y1iivepdedhnwuoymbkjdgqnxwp04i",
+      "rgb_count": 50,
+      "object_id": 155,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "bamboo_shoots_011_vxdumlxge015t7upa28xp8yae3rwfdry",
+      "category": "bamboo_shoots",
+      "object_instance": "bamboo_shoots_011",
+      "relative_path": "oo3d9dsingle/bamboo_shoots_011_vxdumlxge015t7upa28xp8yae3rwfdry",
+      "rgb_count": 50,
+      "object_id": 165,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "bamboo_shoots_030_mrvlgkvn84afx3jokikpoxc8rz7oxvaf",
+      "category": "bamboo_shoots",
+      "object_instance": "bamboo_shoots_030",
+      "relative_path": "oo3d9dsingle/bamboo_shoots_030_mrvlgkvn84afx3jokikpoxc8rz7oxvaf",
+      "rgb_count": 50,
+      "object_id": 184,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "banana_005_65t6b30sk6nzqvkpsi92nq6mvj2v83ap",
+      "category": "banana",
+      "object_instance": "banana_005",
+      "relative_path": "oo3d9dsingle/banana_005_65t6b30sk6nzqvkpsi92nq6mvj2v83ap",
+      "rgb_count": 50,
+      "object_id": 196,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "banana_009_3foug0gwhuklyi4w5m3cd12f8tf0mqb9",
+      "category": "banana",
+      "object_instance": "banana_009",
+      "relative_path": "oo3d9dsingle/banana_009_3foug0gwhuklyi4w5m3cd12f8tf0mqb9",
+      "rgb_count": 50,
+      "object_id": 200,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "banana_044_5lw34yk8p1wyaiihk2591n66ynfx0rd7",
+      "category": "banana",
+      "object_instance": "banana_044",
+      "relative_path": "oo3d9dsingle/banana_044_5lw34yk8p1wyaiihk2591n66ynfx0rd7",
+      "rgb_count": 50,
+      "object_id": 226,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "battery_001_4vyruv75rcb17pafpujd6q0o1trh7cww",
+      "category": "battery",
+      "object_instance": "battery_001",
+      "relative_path": "oo3d9dsingle/battery_001_4vyruv75rcb17pafpujd6q0o1trh7cww",
+      "rgb_count": 50,
+      "object_id": 228,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "belt_003_l4mtmgh3mbn4dxhsxerwuhitwyb0j2ij",
+      "category": "belt",
+      "object_instance": "belt_003",
+      "relative_path": "oo3d9dsingle/belt_003_l4mtmgh3mbn4dxhsxerwuhitwyb0j2ij",
+      "rgb_count": 50,
+      "object_id": 237,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "belt_011_b1gk3t9xfcqmh4e2625egs1ucawdsj75",
+      "category": "belt",
+      "object_instance": "belt_011",
+      "relative_path": "oo3d9dsingle/belt_011_b1gk3t9xfcqmh4e2625egs1ucawdsj75",
+      "rgb_count": 50,
+      "object_id": 245,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "biscuit_007_312ww9xi3sl3k663a9iqqg3iwo4oh5j9",
+      "category": "biscuit",
+      "object_instance": "biscuit_007",
+      "relative_path": "oo3d9dsingle/biscuit_007_312ww9xi3sl3k663a9iqqg3iwo4oh5j9",
+      "rgb_count": 50,
+      "object_id": 266,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "biscuit_010_gi1fxw7bsmeg7ngkv73g090te25xh8ge",
+      "category": "biscuit",
+      "object_instance": "biscuit_010",
+      "relative_path": "oo3d9dsingle/biscuit_010_gi1fxw7bsmeg7ngkv73g090te25xh8ge",
+      "rgb_count": 50,
+      "object_id": 269,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "biscuit_036_mjrikmbfr8khzxbttwassq7gvi1ws9oh",
+      "category": "biscuit",
+      "object_instance": "biscuit_036",
+      "relative_path": "oo3d9dsingle/biscuit_036_mjrikmbfr8khzxbttwassq7gvi1ws9oh",
+      "rgb_count": 50,
+      "object_id": 288,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "biscuit_052_vznec1qsvngarpyack0dz5kb2a2uz3rt",
+      "category": "biscuit",
+      "object_instance": "biscuit_052",
+      "relative_path": "oo3d9dsingle/biscuit_052_vznec1qsvngarpyack0dz5kb2a2uz3rt",
+      "rgb_count": 50,
+      "object_id": 304,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "biscuit_054_qa4fk3gdrs5tvgf8xehnrvjv34upamak",
+      "category": "biscuit",
+      "object_instance": "biscuit_054",
+      "relative_path": "oo3d9dsingle/biscuit_054_qa4fk3gdrs5tvgf8xehnrvjv34upamak",
+      "rgb_count": 50,
+      "object_id": 306,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "biscuit_070_92slj1zh1r96jcf6caiu7x8nugcljngr",
+      "category": "biscuit",
+      "object_instance": "biscuit_070",
+      "relative_path": "oo3d9dsingle/biscuit_070_92slj1zh1r96jcf6caiu7x8nugcljngr",
+      "rgb_count": 50,
+      "object_id": 322,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "book_019_vraxaqmc643ynk56hkd9euj6l3bib694",
+      "category": "book",
+      "object_instance": "book_019",
+      "relative_path": "oo3d9dsingle/book_019_vraxaqmc643ynk56hkd9euj6l3bib694",
+      "rgb_count": 49,
+      "object_id": 340,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "book_027_rrt0voqkaafh85jk1nl1gzjbvtjz1bqt",
+      "category": "book",
+      "object_instance": "book_027",
+      "relative_path": "oo3d9dsingle/book_027_rrt0voqkaafh85jk1nl1gzjbvtjz1bqt",
+      "rgb_count": 50,
+      "object_id": 347,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "bottle_057_v0hk3ct81las3mp02zsr8sm9thz9z28g",
+      "category": "bottle",
+      "object_instance": "bottle_057",
+      "relative_path": "oo3d9dsingle/bottle_057_v0hk3ct81las3mp02zsr8sm9thz9z28g",
+      "rgb_count": 50,
+      "object_id": 369,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "bottle_058_rms7virpm1qbxtx1cxg1atgw3yx78zkh",
+      "category": "bottle",
+      "object_instance": "bottle_058",
+      "relative_path": "oo3d9dsingle/bottle_058_rms7virpm1qbxtx1cxg1atgw3yx78zkh",
+      "rgb_count": 50,
+      "object_id": 370,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "bowl_009_bzjd4iqeis01suwwhsk0anphfsyioivk",
+      "category": "bowl",
+      "object_instance": "bowl_009",
+      "relative_path": "oo3d9dsingle/bowl_009_bzjd4iqeis01suwwhsk0anphfsyioivk",
+      "rgb_count": 50,
+      "object_id": 379,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "box_014_7pcrupftsqvlg33lvywmeke6ldpr93ro",
+      "category": "box",
+      "object_instance": "box_014",
+      "relative_path": "oo3d9dsingle/box_014_7pcrupftsqvlg33lvywmeke6ldpr93ro",
+      "rgb_count": 50,
+      "object_id": 399,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "box_015_i71tdkuscmjzttcr3nynl51c0xzy476i",
+      "category": "box",
+      "object_instance": "box_015",
+      "relative_path": "oo3d9dsingle/box_015_i71tdkuscmjzttcr3nynl51c0xzy476i",
+      "rgb_count": 50,
+      "object_id": 400,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "box_018_ucy76dmpdvu7uk11reu7pcdyl48120ud",
+      "category": "box",
+      "object_instance": "box_018",
+      "relative_path": "oo3d9dsingle/box_018_ucy76dmpdvu7uk11reu7pcdyl48120ud",
+      "rgb_count": 50,
+      "object_id": 403,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "box_020_3kf9gu66bkcbk9b33mgp0f75sv1o5ho0",
+      "category": "box",
+      "object_instance": "box_020",
+      "relative_path": "oo3d9dsingle/box_020_3kf9gu66bkcbk9b33mgp0f75sv1o5ho0",
+      "rgb_count": 50,
+      "object_id": 405,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "box_036_ikvyl8bxxpcug34zh0vt0vxzlbwhmxz2",
+      "category": "box",
+      "object_instance": "box_036",
+      "relative_path": "oo3d9dsingle/box_036_ikvyl8bxxpcug34zh0vt0vxzlbwhmxz2",
+      "rgb_count": 36,
+      "object_id": 419,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "box_037_th1o5qxjw7mbp3dwnt1a4ynyi7w7qluc",
+      "category": "box",
+      "object_instance": "box_037",
+      "relative_path": "oo3d9dsingle/box_037_th1o5qxjw7mbp3dwnt1a4ynyi7w7qluc",
+      "rgb_count": 50,
+      "object_id": 420,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "box_073_45mn53lextxwe22gcyps8c1bslqkzasd",
+      "category": "box",
+      "object_instance": "box_073",
+      "relative_path": "oo3d9dsingle/box_073_45mn53lextxwe22gcyps8c1bslqkzasd",
+      "rgb_count": 50,
+      "object_id": 456,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "box_080_lk9hewa5wx60psj39be0hn3y28yjmo5p",
+      "category": "box",
+      "object_instance": "box_080",
+      "relative_path": "oo3d9dsingle/box_080_lk9hewa5wx60psj39be0hn3y28yjmo5p",
+      "rgb_count": 50,
+      "object_id": 463,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "boxed_beverage_007_q25igc6dph4zekiynqv4z5d2fku9db3e",
+      "category": "boxed_beverage",
+      "object_instance": "boxed_beverage_007",
+      "relative_path": "oo3d9dsingle/boxed_beverage_007_q25igc6dph4zekiynqv4z5d2fku9db3e",
+      "rgb_count": 50,
+      "object_id": 470,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "bread_007_ibeooguuvi6mhnjzrdm1aborz4r2gl49",
+      "category": "bread",
+      "object_instance": "bread_007",
+      "relative_path": "oo3d9dsingle/bread_007_ibeooguuvi6mhnjzrdm1aborz4r2gl49",
+      "rgb_count": 50,
+      "object_id": 480,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "bread_008_fpubkpm0an16xxyip4z6g80vgtsakxi5",
+      "category": "bread",
+      "object_instance": "bread_008",
+      "relative_path": "oo3d9dsingle/bread_008_fpubkpm0an16xxyip4z6g80vgtsakxi5",
+      "rgb_count": 50,
+      "object_id": 481,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "bread_020_szalktulibcfn6gwztn3taiybjdu0s0z",
+      "category": "bread",
+      "object_instance": "bread_020",
+      "relative_path": "oo3d9dsingle/bread_020_szalktulibcfn6gwztn3taiybjdu0s0z",
+      "rgb_count": 50,
+      "object_id": 491,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "bread_040_p67beovlfbp3jvkod7y5d6lmipoenup6",
+      "category": "bread",
+      "object_instance": "bread_040",
+      "relative_path": "oo3d9dsingle/bread_040_p67beovlfbp3jvkod7y5d6lmipoenup6",
+      "rgb_count": 50,
+      "object_id": 503,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "bread_072_9qgzwcr18iqzlzyrke0jdhy78313cuhe",
+      "category": "bread",
+      "object_instance": "bread_072",
+      "relative_path": "oo3d9dsingle/bread_072_9qgzwcr18iqzlzyrke0jdhy78313cuhe",
+      "rgb_count": 50,
+      "object_id": 523,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "bread_081_xcb77iwvlb52lu2ixk5mz86l26scm493",
+      "category": "bread",
+      "object_instance": "bread_081",
+      "relative_path": "oo3d9dsingle/bread_081_xcb77iwvlb52lu2ixk5mz86l26scm493",
+      "rgb_count": 50,
+      "object_id": 531,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "bread_095_5zbyo2c1pgawbfae10a14mqxkqlsmm8t",
+      "category": "bread",
+      "object_instance": "bread_095",
+      "relative_path": "oo3d9dsingle/bread_095_5zbyo2c1pgawbfae10a14mqxkqlsmm8t",
+      "rgb_count": 50,
+      "object_id": 545,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "bread_113_ekio77j5j7wao970rrzrqa0vm9x714bu",
+      "category": "bread",
+      "object_instance": "bread_113",
+      "relative_path": "oo3d9dsingle/bread_113_ekio77j5j7wao970rrzrqa0vm9x714bu",
+      "rgb_count": 50,
+      "object_id": 558,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "bread_125_fccuznwc7p4s0eucoys691icwzsxxepd",
+      "category": "bread",
+      "object_instance": "bread_125",
+      "relative_path": "oo3d9dsingle/bread_125_fccuznwc7p4s0eucoys691icwzsxxepd",
+      "rgb_count": 50,
+      "object_id": 563,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "bread_138_5xam503tup4vwthau1zrc0azqu8sf17c",
+      "category": "bread",
+      "object_instance": "bread_138",
+      "relative_path": "oo3d9dsingle/bread_138_5xam503tup4vwthau1zrc0azqu8sf17c",
+      "rgb_count": 50,
+      "object_id": 576,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "bread_168_k468u0gr9oxzoh96sqiz6f7jgbl0bwiz",
+      "category": "bread",
+      "object_instance": "bread_168",
+      "relative_path": "oo3d9dsingle/bread_168_k468u0gr9oxzoh96sqiz6f7jgbl0bwiz",
+      "rgb_count": 50,
+      "object_id": 604,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "bread_175_tng3vthoh0ex71ovtqczr4w016mthn27",
+      "category": "bread",
+      "object_instance": "bread_175",
+      "relative_path": "oo3d9dsingle/bread_175_tng3vthoh0ex71ovtqczr4w016mthn27",
+      "rgb_count": 50,
+      "object_id": 611,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "bread_188_7chke00yfufrmzehp73nsue14d86cacp",
+      "category": "bread",
+      "object_instance": "bread_188",
+      "relative_path": "oo3d9dsingle/bread_188_7chke00yfufrmzehp73nsue14d86cacp",
+      "rgb_count": 50,
+      "object_id": 624,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "bread_189_eoxddxdmg5aw9rcr60qefx9qoepmsxxg",
+      "category": "bread",
+      "object_instance": "bread_189",
+      "relative_path": "oo3d9dsingle/bread_189_eoxddxdmg5aw9rcr60qefx9qoepmsxxg",
+      "rgb_count": 50,
+      "object_id": 625,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "bread_190_knb3fw7n0s7ype9wp5y0qddlr10oknj2",
+      "category": "bread",
+      "object_instance": "bread_190",
+      "relative_path": "oo3d9dsingle/bread_190_knb3fw7n0s7ype9wp5y0qddlr10oknj2",
+      "rgb_count": 50,
+      "object_id": 626,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "broad_bean_009_0zzgpwr6fcjjn8e6pzytcbnv08iwea4v",
+      "category": "broad_bean",
+      "object_instance": "broad_bean_009",
+      "relative_path": "oo3d9dsingle/broad_bean_009_0zzgpwr6fcjjn8e6pzytcbnv08iwea4v",
+      "rgb_count": 50,
+      "object_id": 638,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "broad_bean_015_740nb6m78ao0c026kkobwpvj43yucy6h",
+      "category": "broad_bean",
+      "object_instance": "broad_bean_015",
+      "relative_path": "oo3d9dsingle/broad_bean_015_740nb6m78ao0c026kkobwpvj43yucy6h",
+      "rgb_count": 50,
+      "object_id": 644,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "broccoli_003_c3yffkzgj92tluj77zpd3czj4dpoosau",
+      "category": "broccoli",
+      "object_instance": "broccoli_003",
+      "relative_path": "oo3d9dsingle/broccoli_003_c3yffkzgj92tluj77zpd3czj4dpoosau",
+      "rgb_count": 50,
+      "object_id": 650,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "broccoli_007_68kr66l0kgzs8ocbvmijtba28khy9cx0",
+      "category": "broccoli",
+      "object_instance": "broccoli_007",
+      "relative_path": "oo3d9dsingle/broccoli_007_68kr66l0kgzs8ocbvmijtba28khy9cx0",
+      "rgb_count": 50,
+      "object_id": 654,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "broccoli_024_qs3spz2h4fwxn3vnlhl1h9t3qh6h0au0",
+      "category": "broccoli",
+      "object_instance": "broccoli_024",
+      "relative_path": "oo3d9dsingle/broccoli_024_qs3spz2h4fwxn3vnlhl1h9t3qh6h0au0",
+      "rgb_count": 50,
+      "object_id": 670,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "broccolini_005_wyfcbxufq944bz27dthqwzlyveooswk7",
+      "category": "broccolini",
+      "object_instance": "broccolini_005",
+      "relative_path": "oo3d9dsingle/broccolini_005_wyfcbxufq944bz27dthqwzlyveooswk7",
+      "rgb_count": 50,
+      "object_id": 681,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "brush_005_oswbpm2gikbgk1qkx3kgdjczvki75nto",
+      "category": "brush",
+      "object_instance": "brush_005",
+      "relative_path": "oo3d9dsingle/brush_005_oswbpm2gikbgk1qkx3kgdjczvki75nto",
+      "rgb_count": 50,
+      "object_id": 691,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "brush_015_1mzideqqygx2rvutt576lvt82g3ba60a",
+      "category": "brush",
+      "object_instance": "brush_015",
+      "relative_path": "oo3d9dsingle/brush_015_1mzideqqygx2rvutt576lvt82g3ba60a",
+      "rgb_count": 50,
+      "object_id": 701,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "brush_027_hh5ods1v50uol5pi9150gkdt1cjghoox",
+      "category": "brush",
+      "object_instance": "brush_027",
+      "relative_path": "oo3d9dsingle/brush_027_hh5ods1v50uol5pi9150gkdt1cjghoox",
+      "rgb_count": 50,
+      "object_id": 713,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "brussels_sprout_003_3w16gn78fzeu460vxyfpcw4jnvimu6cf",
+      "category": "brussels_sprout",
+      "object_instance": "brussels_sprout_003",
+      "relative_path": "oo3d9dsingle/brussels_sprout_003_3w16gn78fzeu460vxyfpcw4jnvimu6cf",
+      "rgb_count": 50,
+      "object_id": 717,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "brussels_sprout_009_zr455by5vreublpesk6uxdxsbild4mgi",
+      "category": "brussels_sprout",
+      "object_instance": "brussels_sprout_009",
+      "relative_path": "oo3d9dsingle/brussels_sprout_009_zr455by5vreublpesk6uxdxsbild4mgi",
+      "rgb_count": 50,
+      "object_id": 723,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "bucket_noodle_001_er35ytf5o7rswint3q7dhsmno9rffehv",
+      "category": "bucket_noodle",
+      "object_instance": "bucket_noodle_001",
+      "relative_path": "oo3d9dsingle/bucket_noodle_001_er35ytf5o7rswint3q7dhsmno9rffehv",
+      "rgb_count": 50,
+      "object_id": 732,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "bucket_noodle_021_ixqrk8u8olxub4zfxmffh0pq7fpi78o6",
+      "category": "bucket_noodle",
+      "object_instance": "bucket_noodle_021",
+      "relative_path": "oo3d9dsingle/bucket_noodle_021_ixqrk8u8olxub4zfxmffh0pq7fpi78o6",
+      "rgb_count": 50,
+      "object_id": 751,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "bucket_noodle_028_c5p0t0ebesrkovj4sscyhsvsbvj94sx2",
+      "category": "bucket_noodle",
+      "object_instance": "bucket_noodle_028",
+      "relative_path": "oo3d9dsingle/bucket_noodle_028_c5p0t0ebesrkovj4sscyhsvsbvj94sx2",
+      "rgb_count": 50,
+      "object_id": 758,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "bumbag_002_vpmkdcyd9wpjour4g084zmhtdrd9qohv",
+      "category": "bumbag",
+      "object_instance": "bumbag_002",
+      "relative_path": "oo3d9dsingle/bumbag_002_vpmkdcyd9wpjour4g084zmhtdrd9qohv",
+      "rgb_count": 50,
+      "object_id": 762,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "bun_023_02isp8rx4qtv4e5cm6zp6x82t1h56k1p",
+      "category": "bun",
+      "object_instance": "bun_023",
+      "relative_path": "oo3d9dsingle/bun_023_02isp8rx4qtv4e5cm6zp6x82t1h56k1p",
+      "rgb_count": 50,
+      "object_id": 792,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "bun_029_harn1y75lcjysnfyrlh5w0zok2rctvx4",
+      "category": "bun",
+      "object_instance": "bun_029",
+      "relative_path": "oo3d9dsingle/bun_029_harn1y75lcjysnfyrlh5w0zok2rctvx4",
+      "rgb_count": 50,
+      "object_id": 797,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "bun_038_savkrkbbuw4uy8cw4du4z45nn2tfyew3",
+      "category": "bun",
+      "object_instance": "bun_038",
+      "relative_path": "oo3d9dsingle/bun_038_savkrkbbuw4uy8cw4du4z45nn2tfyew3",
+      "rgb_count": 50,
+      "object_id": 804,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "burrito_001_cytxaurhyciiiz9s4mnxlhjxazwppkoz",
+      "category": "burrito",
+      "object_instance": "burrito_001",
+      "relative_path": "oo3d9dsingle/burrito_001_cytxaurhyciiiz9s4mnxlhjxazwppkoz",
+      "rgb_count": 50,
+      "object_id": 807,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "burrito_011_d6gbut63bypoby0rqkfboygmxjwug0ot",
+      "category": "burrito",
+      "object_instance": "burrito_011",
+      "relative_path": "oo3d9dsingle/burrito_011_d6gbut63bypoby0rqkfboygmxjwug0ot",
+      "rgb_count": 50,
+      "object_id": 817,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "cabinet_005_r5vpe5gn34mbl8rqxlabj0elxcid80ra",
+      "category": "cabinet",
+      "object_instance": "cabinet_005",
+      "relative_path": "oo3d9dsingle/cabinet_005_r5vpe5gn34mbl8rqxlabj0elxcid80ra",
+      "rgb_count": 38,
+      "object_id": 826,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "cake_003_rct85s90tml4ibfl0w92eu4zr272q5xg",
+      "category": "cake",
+      "object_instance": "cake_003",
+      "relative_path": "oo3d9dsingle/cake_003_rct85s90tml4ibfl0w92eu4zr272q5xg",
+      "rgb_count": 50,
+      "object_id": 833,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "cake_008_mgqk2eqz8ivs7qygcpgm7cqlpgac74o9",
+      "category": "cake",
+      "object_instance": "cake_008",
+      "relative_path": "oo3d9dsingle/cake_008_mgqk2eqz8ivs7qygcpgm7cqlpgac74o9",
+      "rgb_count": 50,
+      "object_id": 838,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "calculator_014_e33r2fe5tpbukxqjfibgnnlguxr1ke3i",
+      "category": "calculator",
+      "object_instance": "calculator_014",
+      "relative_path": "oo3d9dsingle/calculator_014_e33r2fe5tpbukxqjfibgnnlguxr1ke3i",
+      "rgb_count": 50,
+      "object_id": 867,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "calculator_018_37intyb24b1joe8yg4hr6bmobv32gkej",
+      "category": "calculator",
+      "object_instance": "calculator_018",
+      "relative_path": "oo3d9dsingle/calculator_018_37intyb24b1joe8yg4hr6bmobv32gkej",
+      "rgb_count": 50,
+      "object_id": 871,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "candle_002_ev2kan8c1pvt13zz2c3cv9tbhipkp5pr",
+      "category": "candle",
+      "object_instance": "candle_002",
+      "relative_path": "oo3d9dsingle/candle_002_ev2kan8c1pvt13zz2c3cv9tbhipkp5pr",
+      "rgb_count": 50,
+      "object_id": 876,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "candy_003_xu2vmyrmwuj2965cd8mzk05b9prjr5et",
+      "category": "candy",
+      "object_instance": "candy_003",
+      "relative_path": "oo3d9dsingle/candy_003_xu2vmyrmwuj2965cd8mzk05b9prjr5et",
+      "rgb_count": 50,
+      "object_id": 886,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "candy_009_ntshu5zf03pqpcmqv3ztdp36o8q2k4hg",
+      "category": "candy",
+      "object_instance": "candy_009",
+      "relative_path": "oo3d9dsingle/candy_009_ntshu5zf03pqpcmqv3ztdp36o8q2k4hg",
+      "rgb_count": 50,
+      "object_id": 892,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "candy_020_fsrp25f055xo0p790fixhhze1dgmo7hc",
+      "category": "candy",
+      "object_instance": "candy_020",
+      "relative_path": "oo3d9dsingle/candy_020_fsrp25f055xo0p790fixhhze1dgmo7hc",
+      "rgb_count": 50,
+      "object_id": 901,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "candy_043_xzsp5dordttot2jrsm36o74g9xi5pf7t",
+      "category": "candy",
+      "object_instance": "candy_043",
+      "relative_path": "oo3d9dsingle/candy_043_xzsp5dordttot2jrsm36o74g9xi5pf7t",
+      "rgb_count": 50,
+      "object_id": 918,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "candy_054_yfyri8hd7klijivxztm8mxiqgu8r2ccj",
+      "category": "candy",
+      "object_instance": "candy_054",
+      "relative_path": "oo3d9dsingle/candy_054_yfyri8hd7klijivxztm8mxiqgu8r2ccj",
+      "rgb_count": 50,
+      "object_id": 929,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "carrot_014_tsebd0oyubdalxtq3y0ogwrybsmy8nyl",
+      "category": "carrot",
+      "object_instance": "carrot_014",
+      "relative_path": "oo3d9dsingle/carrot_014_tsebd0oyubdalxtq3y0ogwrybsmy8nyl",
+      "rgb_count": 50,
+      "object_id": 948,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "carrot_017_6ebjmfmw15f2brctfdiolmwudglrfi4s",
+      "category": "carrot",
+      "object_instance": "carrot_017",
+      "relative_path": "oo3d9dsingle/carrot_017_6ebjmfmw15f2brctfdiolmwudglrfi4s",
+      "rgb_count": 50,
+      "object_id": 951,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "carrot_040_ixvzlzptb4ycf15gr3lvv59jk1dw1naf",
+      "category": "carrot",
+      "object_instance": "carrot_040",
+      "relative_path": "oo3d9dsingle/carrot_040_ixvzlzptb4ycf15gr3lvv59jk1dw1naf",
+      "rgb_count": 50,
+      "object_id": 971,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "cauliflower_001_cmvfezh6d6l9hheg6tprbltfoiq6w9la",
+      "category": "cauliflower",
+      "object_instance": "cauliflower_001",
+      "relative_path": "oo3d9dsingle/cauliflower_001_cmvfezh6d6l9hheg6tprbltfoiq6w9la",
+      "rgb_count": 50,
+      "object_id": 972,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "chair_010_m6emnuejj84f1ngpvift3zf1kltd7zno",
+      "category": "chair",
+      "object_instance": "chair_010",
+      "relative_path": "oo3d9dsingle/chair_010_m6emnuejj84f1ngpvift3zf1kltd7zno",
+      "rgb_count": 49,
+      "object_id": 984,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "cheese_023_h62sjk6sn9hzslvrrkgfz5ip4sudr0dq",
+      "category": "cheese",
+      "object_instance": "cheese_023",
+      "relative_path": "oo3d9dsingle/cheese_023_h62sjk6sn9hzslvrrkgfz5ip4sudr0dq",
+      "rgb_count": 50,
+      "object_id": 1020,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "cheese_034_ye02it2h4q8ipu1me14agmrhuimaqmz1",
+      "category": "cheese",
+      "object_instance": "cheese_034",
+      "relative_path": "oo3d9dsingle/cheese_034_ye02it2h4q8ipu1me14agmrhuimaqmz1",
+      "rgb_count": 50,
+      "object_id": 1030,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "cheese_042_l3xhzqfshvddwqjxxucik5s5atpia07k",
+      "category": "cheese",
+      "object_instance": "cheese_042",
+      "relative_path": "oo3d9dsingle/cheese_042_l3xhzqfshvddwqjxxucik5s5atpia07k",
+      "rgb_count": 50,
+      "object_id": 1038,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "cheese_044_kl71gi4ieb7vld48cwi6f3ox5zb3pc58",
+      "category": "cheese",
+      "object_instance": "cheese_044",
+      "relative_path": "oo3d9dsingle/cheese_044_kl71gi4ieb7vld48cwi6f3ox5zb3pc58",
+      "rgb_count": 50,
+      "object_id": 1040,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "cherry_006_obwosua4k1d8sjaeaqmyqhsi1p68vrkd",
+      "category": "cherry",
+      "object_instance": "cherry_006",
+      "relative_path": "oo3d9dsingle/cherry_006_obwosua4k1d8sjaeaqmyqhsi1p68vrkd",
+      "rgb_count": 50,
+      "object_id": 1048,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "cherry_007_1sn132g0ek78yliri4neerkwbkhpyvz4",
+      "category": "cherry",
+      "object_instance": "cherry_007",
+      "relative_path": "oo3d9dsingle/cherry_007_1sn132g0ek78yliri4neerkwbkhpyvz4",
+      "rgb_count": 50,
+      "object_id": 1049,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "chess_002_9c980g8p07l4qzmulpjqajja23g3qe75",
+      "category": "chess",
+      "object_instance": "chess_002",
+      "relative_path": "oo3d9dsingle/chess_002_9c980g8p07l4qzmulpjqajja23g3qe75",
+      "rgb_count": 50,
+      "object_id": 1057,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "chess_033_7trjf7tv3i0g6lmndbdv8v9p37u1ywdh",
+      "category": "chess",
+      "object_instance": "chess_033",
+      "relative_path": "oo3d9dsingle/chess_033_7trjf7tv3i0g6lmndbdv8v9p37u1ywdh",
+      "rgb_count": 50,
+      "object_id": 1073,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "chicken_leg_002_il4lsv61kj7smbybe7mx5n3d37p2jtx6",
+      "category": "chicken_leg",
+      "object_instance": "chicken_leg_002",
+      "relative_path": "oo3d9dsingle/chicken_leg_002_il4lsv61kj7smbybe7mx5n3d37p2jtx6",
+      "rgb_count": 50,
+      "object_id": 1078,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "chicken_leg_015_jcjkaa1irzy4hegmi2rhjxs0qpt0zu7x",
+      "category": "chicken_leg",
+      "object_instance": "chicken_leg_015",
+      "relative_path": "oo3d9dsingle/chicken_leg_015_jcjkaa1irzy4hegmi2rhjxs0qpt0zu7x",
+      "rgb_count": 50,
+      "object_id": 1091,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "chili_007_t8i3ky72ejwbl47b0xnwgzpws4xf1f1r",
+      "category": "chili",
+      "object_instance": "chili_007",
+      "relative_path": "oo3d9dsingle/chili_007_t8i3ky72ejwbl47b0xnwgzpws4xf1f1r",
+      "rgb_count": 50,
+      "object_id": 1101,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "chili_017_04orid033b4vdo22iwlnquqq52x3qj7w",
+      "category": "chili",
+      "object_instance": "chili_017",
+      "relative_path": "oo3d9dsingle/chili_017_04orid033b4vdo22iwlnquqq52x3qj7w",
+      "rgb_count": 50,
+      "object_id": 1110,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "chili_030_wxcr74s3azztiqxaffhjwhxxfkh7jjnq",
+      "category": "chili",
+      "object_instance": "chili_030",
+      "relative_path": "oo3d9dsingle/chili_030_wxcr74s3azztiqxaffhjwhxxfkh7jjnq",
+      "rgb_count": 50,
+      "object_id": 1122,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "china_001_5lvbyytkh0g6pptrgus84rjibvlkintx",
+      "category": "china",
+      "object_instance": "china_001",
+      "relative_path": "oo3d9dsingle/china_001_5lvbyytkh0g6pptrgus84rjibvlkintx",
+      "rgb_count": 50,
+      "object_id": 1129,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "chinese_chess_008_lwpxgj1thn37v9tf9f36iuy44qfx4t4j",
+      "category": "chinese_chess",
+      "object_instance": "chinese_chess_008",
+      "relative_path": "oo3d9dsingle/chinese_chess_008_lwpxgj1thn37v9tf9f36iuy44qfx4t4j",
+      "rgb_count": 50,
+      "object_id": 1146,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "chinese_chess_009_3nico2ajb7uvgyi905ffsm7nvko8wvfw",
+      "category": "chinese_chess",
+      "object_instance": "chinese_chess_009",
+      "relative_path": "oo3d9dsingle/chinese_chess_009_3nico2ajb7uvgyi905ffsm7nvko8wvfw",
+      "rgb_count": 50,
+      "object_id": 1147,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "chocolate_004_da821o9shdlr0mwnjqibskmdai6fzpl8",
+      "category": "chocolate",
+      "object_instance": "chocolate_004",
+      "relative_path": "oo3d9dsingle/chocolate_004_da821o9shdlr0mwnjqibskmdai6fzpl8",
+      "rgb_count": 50,
+      "object_id": 1155,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "chocolate_014_3b25s8qboajtg5e8b92xvvir1a2s00hg",
+      "category": "chocolate",
+      "object_instance": "chocolate_014",
+      "relative_path": "oo3d9dsingle/chocolate_014_3b25s8qboajtg5e8b92xvvir1a2s00hg",
+      "rgb_count": 50,
+      "object_id": 1165,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "chocolates_011_y9tqi6udwn9j730fxx1399qq5yuf7eek",
+      "category": "chocolates",
+      "object_instance": "chocolates_011",
+      "relative_path": "oo3d9dsingle/chocolates_011_y9tqi6udwn9j730fxx1399qq5yuf7eek",
+      "rgb_count": 50,
+      "object_id": 1175,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "chocolates_012_1ggumk5n63zxcpz1hplmpkdohgixa3b8",
+      "category": "chocolates",
+      "object_instance": "chocolates_012",
+      "relative_path": "oo3d9dsingle/chocolates_012_1ggumk5n63zxcpz1hplmpkdohgixa3b8",
+      "rgb_count": 50,
+      "object_id": 1176,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "clock_005_hcn2g8rcdd6wqji2d30ax5fogteoq0bs",
+      "category": "clock",
+      "object_instance": "clock_005",
+      "relative_path": "oo3d9dsingle/clock_005_hcn2g8rcdd6wqji2d30ax5fogteoq0bs",
+      "rgb_count": 50,
+      "object_id": 1186,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "clock_018_ubfpzqj757qx7jkpiw5lpobfboswkj1y",
+      "category": "clock",
+      "object_instance": "clock_018",
+      "relative_path": "oo3d9dsingle/clock_018_ubfpzqj757qx7jkpiw5lpobfboswkj1y",
+      "rgb_count": 50,
+      "object_id": 1198,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "clock_023_xdq6f24ligodt08dn1mucvdxqxt9j8zr",
+      "category": "clock",
+      "object_instance": "clock_023",
+      "relative_path": "oo3d9dsingle/clock_023_xdq6f24ligodt08dn1mucvdxqxt9j8zr",
+      "rgb_count": 50,
+      "object_id": 1203,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "clock_032_uov8e6v52l1xp86g9m0xq8oqihjm3kq2",
+      "category": "clock",
+      "object_instance": "clock_032",
+      "relative_path": "oo3d9dsingle/clock_032_uov8e6v52l1xp86g9m0xq8oqihjm3kq2",
+      "rgb_count": 50,
+      "object_id": 1212,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "clock_041_wsegul0px13df2aygnjce606go032hzt",
+      "category": "clock",
+      "object_instance": "clock_041",
+      "relative_path": "oo3d9dsingle/clock_041_wsegul0px13df2aygnjce606go032hzt",
+      "rgb_count": 50,
+      "object_id": 1221,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "clock_052_3sit4zvje5dhfl9mojp0944m92en31fj",
+      "category": "clock",
+      "object_instance": "clock_052",
+      "relative_path": "oo3d9dsingle/clock_052_3sit4zvje5dhfl9mojp0944m92en31fj",
+      "rgb_count": 50,
+      "object_id": 1232,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "coconut_009_uvuc552338vg7ha5cso5cf45th51solt",
+      "category": "coconut",
+      "object_instance": "coconut_009",
+      "relative_path": "oo3d9dsingle/coconut_009_uvuc552338vg7ha5cso5cf45th51solt",
+      "rgb_count": 50,
+      "object_id": 1248,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "coconut_016_hchna6jqbg6jyrjn9lvuoa9l18d35v0f",
+      "category": "coconut",
+      "object_instance": "coconut_016",
+      "relative_path": "oo3d9dsingle/coconut_016_hchna6jqbg6jyrjn9lvuoa9l18d35v0f",
+      "rgb_count": 50,
+      "object_id": 1255,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "coconut_022_09mvil4vriy6lwp02q3uhbz8j7wqd0z9",
+      "category": "coconut",
+      "object_instance": "coconut_022",
+      "relative_path": "oo3d9dsingle/coconut_022_09mvil4vriy6lwp02q3uhbz8j7wqd0z9",
+      "rgb_count": 50,
+      "object_id": 1261,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "conch_010_i39b9a9ap9dlszyu396olna7gd9fasqi",
+      "category": "conch",
+      "object_instance": "conch_010",
+      "relative_path": "oo3d9dsingle/conch_010_i39b9a9ap9dlszyu396olna7gd9fasqi",
+      "rgb_count": 50,
+      "object_id": 1280,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "conch_020_givnsvg6d2h6l9ld9ry7bgfzm2gqal0y",
+      "category": "conch",
+      "object_instance": "conch_020",
+      "relative_path": "oo3d9dsingle/conch_020_givnsvg6d2h6l9ld9ry7bgfzm2gqal0y",
+      "rgb_count": 50,
+      "object_id": 1289,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "conch_024_0lrpqvdqhxcv9b5gzqs8ru30de3073q5",
+      "category": "conch",
+      "object_instance": "conch_024",
+      "relative_path": "oo3d9dsingle/conch_024_0lrpqvdqhxcv9b5gzqs8ru30de3073q5",
+      "rgb_count": 50,
+      "object_id": 1293,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "corn_005_wmqf1u8630yetqvltpae2d414t8gnijz",
+      "category": "corn",
+      "object_instance": "corn_005",
+      "relative_path": "oo3d9dsingle/corn_005_wmqf1u8630yetqvltpae2d414t8gnijz",
+      "rgb_count": 50,
+      "object_id": 1304,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "corn_024_pkmrp1ffgqad9e28p1p0qhtluenoqbd6",
+      "category": "corn",
+      "object_instance": "corn_024",
+      "relative_path": "oo3d9dsingle/corn_024_pkmrp1ffgqad9e28p1p0qhtluenoqbd6",
+      "rgb_count": 50,
+      "object_id": 1323,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "corn_033_zsockpxzbeys4g9apj6hpkjvzekkuhaf",
+      "category": "corn",
+      "object_instance": "corn_033",
+      "relative_path": "oo3d9dsingle/corn_033_zsockpxzbeys4g9apj6hpkjvzekkuhaf",
+      "rgb_count": 50,
+      "object_id": 1331,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "cucumber_001_wwre1wbyd1rhbgncdzllmv408g82jqem",
+      "category": "cucumber",
+      "object_instance": "cucumber_001",
+      "relative_path": "oo3d9dsingle/cucumber_001_wwre1wbyd1rhbgncdzllmv408g82jqem",
+      "rgb_count": 50,
+      "object_id": 1332,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "cucumber_010_oic2ihwb2d7rdjdv8584efxbx63rfyc1",
+      "category": "cucumber",
+      "object_instance": "cucumber_010",
+      "relative_path": "oo3d9dsingle/cucumber_010_oic2ihwb2d7rdjdv8584efxbx63rfyc1",
+      "rgb_count": 50,
+      "object_id": 1340,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "cucumber_022_vou9neiz1u7xelvu4ozy4u94n66qwmnd",
+      "category": "cucumber",
+      "object_instance": "cucumber_022",
+      "relative_path": "oo3d9dsingle/cucumber_022_vou9neiz1u7xelvu4ozy4u94n66qwmnd",
+      "rgb_count": 50,
+      "object_id": 1349,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "cup_003_7t3mvxjjdfoo57s4wrkoi4c0rwhm3x32",
+      "category": "cup",
+      "object_instance": "cup_003",
+      "relative_path": "oo3d9dsingle/cup_003_7t3mvxjjdfoo57s4wrkoi4c0rwhm3x32",
+      "rgb_count": 50,
+      "object_id": 1365,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "cup_008_9qaa9ubkn65dl0n93t7oofe37pkjr245",
+      "category": "cup",
+      "object_instance": "cup_008",
+      "relative_path": "oo3d9dsingle/cup_008_9qaa9ubkn65dl0n93t7oofe37pkjr245",
+      "rgb_count": 50,
+      "object_id": 1370,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "cup_020_2s0m6v38weft15hx4ir3b0xdowlyi852",
+      "category": "cup",
+      "object_instance": "cup_020",
+      "relative_path": "oo3d9dsingle/cup_020_2s0m6v38weft15hx4ir3b0xdowlyi852",
+      "rgb_count": 50,
+      "object_id": 1382,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "cup_032_ioqesyiww0ca2smlo92ye4zzg2ihix3f",
+      "category": "cup",
+      "object_instance": "cup_032",
+      "relative_path": "oo3d9dsingle/cup_032_ioqesyiww0ca2smlo92ye4zzg2ihix3f",
+      "rgb_count": 50,
+      "object_id": 1394,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "dice_007_gwpnvx3p8uhrpsaca0xwzh64fm0ps7lm",
+      "category": "dice",
+      "object_instance": "dice_007",
+      "relative_path": "oo3d9dsingle/dice_007_gwpnvx3p8uhrpsaca0xwzh64fm0ps7lm",
+      "rgb_count": 50,
+      "object_id": 1408,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "dinosaur_004_itp7jj5v9vjczcfmkwgj5aujuzalhv0i",
+      "category": "dinosaur",
+      "object_instance": "dinosaur_004",
+      "relative_path": "oo3d9dsingle/dinosaur_004_itp7jj5v9vjczcfmkwgj5aujuzalhv0i",
+      "rgb_count": 50,
+      "object_id": 1421,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "dinosaur_008_x55hpxfhn9ds2o03s81wfozfi0hxw39a",
+      "category": "dinosaur",
+      "object_instance": "dinosaur_008",
+      "relative_path": "oo3d9dsingle/dinosaur_008_x55hpxfhn9ds2o03s81wfozfi0hxw39a",
+      "rgb_count": 50,
+      "object_id": 1425,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "dinosaur_023_ucmjjanffedd65qi69vqkhe2fn9idajt",
+      "category": "dinosaur",
+      "object_instance": "dinosaur_023",
+      "relative_path": "oo3d9dsingle/dinosaur_023_ucmjjanffedd65qi69vqkhe2fn9idajt",
+      "rgb_count": 50,
+      "object_id": 1439,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "dish_001_zkw770lipjzvi7ngmreim1xrogtu6fel",
+      "category": "dish",
+      "object_instance": "dish_001",
+      "relative_path": "oo3d9dsingle/dish_001_zkw770lipjzvi7ngmreim1xrogtu6fel",
+      "rgb_count": 50,
+      "object_id": 1451,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "dish_006_n9sh4hiac491sueul2xv5nucqxe3m9uh",
+      "category": "dish",
+      "object_instance": "dish_006",
+      "relative_path": "oo3d9dsingle/dish_006_n9sh4hiac491sueul2xv5nucqxe3m9uh",
+      "rgb_count": 50,
+      "object_id": 1456,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "doll_004_3apqwxx1s152f30wabd0oj7wctl1je2i",
+      "category": "doll",
+      "object_instance": "doll_004",
+      "relative_path": "oo3d9dsingle/doll_004_3apqwxx1s152f30wabd0oj7wctl1je2i",
+      "rgb_count": 50,
+      "object_id": 1472,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "doll_006_bploinbodyxttfqbf9lqg41do14umvi3",
+      "category": "doll",
+      "object_instance": "doll_006",
+      "relative_path": "oo3d9dsingle/doll_006_bploinbodyxttfqbf9lqg41do14umvi3",
+      "rgb_count": 50,
+      "object_id": 1474,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "doll_008_nkpid2x4mlprmqbqzb9kvjm99l4pys0i",
+      "category": "doll",
+      "object_instance": "doll_008",
+      "relative_path": "oo3d9dsingle/doll_008_nkpid2x4mlprmqbqzb9kvjm99l4pys0i",
+      "rgb_count": 50,
+      "object_id": 1476,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "doll_041_lkiyqd53yerh81r9ngghzb9ubwpnl8ur",
+      "category": "doll",
+      "object_instance": "doll_041",
+      "relative_path": "oo3d9dsingle/doll_041_lkiyqd53yerh81r9ngghzb9ubwpnl8ur",
+      "rgb_count": 50,
+      "object_id": 1508,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "doll_061_rhdo2j83cwts4mo3uc0wgh5npo3kbiar",
+      "category": "doll",
+      "object_instance": "doll_061",
+      "relative_path": "oo3d9dsingle/doll_061_rhdo2j83cwts4mo3uc0wgh5npo3kbiar",
+      "rgb_count": 50,
+      "object_id": 1528,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "doll_064_pim0oxv29y0jhof2qtuvhoexk990r2n3",
+      "category": "doll",
+      "object_instance": "doll_064",
+      "relative_path": "oo3d9dsingle/doll_064_pim0oxv29y0jhof2qtuvhoexk990r2n3",
+      "rgb_count": 50,
+      "object_id": 1531,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "doll_069_62sb5nb6z1puzqkup2c06c3mei6zyiv3",
+      "category": "doll",
+      "object_instance": "doll_069",
+      "relative_path": "oo3d9dsingle/doll_069_62sb5nb6z1puzqkup2c06c3mei6zyiv3",
+      "rgb_count": 50,
+      "object_id": 1536,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "doll_081_znm1c43vt5t9xcul0vin55izl580pdt4",
+      "category": "doll",
+      "object_instance": "doll_081",
+      "relative_path": "oo3d9dsingle/doll_081_znm1c43vt5t9xcul0vin55izl580pdt4",
+      "rgb_count": 50,
+      "object_id": 1548,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "donut_007_5qsbomxc7qkrn0be2hppm5unpeytqe1m",
+      "category": "donut",
+      "object_instance": "donut_007",
+      "relative_path": "oo3d9dsingle/donut_007_5qsbomxc7qkrn0be2hppm5unpeytqe1m",
+      "rgb_count": 50,
+      "object_id": 1559,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "donut_019_y57xqd7u7q9i1jtg281f7jgu9f32k7zr",
+      "category": "donut",
+      "object_instance": "donut_019",
+      "relative_path": "oo3d9dsingle/donut_019_y57xqd7u7q9i1jtg281f7jgu9f32k7zr",
+      "rgb_count": 50,
+      "object_id": 1571,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "donut_025_n0e4ybe22nw2q7ooxyxc0t51vatwemqp",
+      "category": "donut",
+      "object_instance": "donut_025",
+      "relative_path": "oo3d9dsingle/donut_025_n0e4ybe22nw2q7ooxyxc0t51vatwemqp",
+      "rgb_count": 50,
+      "object_id": 1575,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "drawing_004_1noyw78iwy9okeztydde0h5ow6yeof5v",
+      "category": "drawing",
+      "object_instance": "drawing_004",
+      "relative_path": "oo3d9dsingle/drawing_004_1noyw78iwy9okeztydde0h5ow6yeof5v",
+      "rgb_count": 50,
+      "object_id": 1589,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "drawing_007_9onj6bm9vms0oy6ry2v17od77ovjauby",
+      "category": "drawing",
+      "object_instance": "drawing_007",
+      "relative_path": "oo3d9dsingle/drawing_007_9onj6bm9vms0oy6ry2v17od77ovjauby",
+      "rgb_count": 50,
+      "object_id": 1592,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "dumbbell_014_oyydxw10d5e873t5ezomoc7wt51ynwso",
+      "category": "dumbbell",
+      "object_instance": "dumbbell_014",
+      "relative_path": "oo3d9dsingle/dumbbell_014_oyydxw10d5e873t5ezomoc7wt51ynwso",
+      "rgb_count": 50,
+      "object_id": 1629,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "dumbbell_015_0v1nve51j9ljfjdcgfk478e5aj5owxo7",
+      "category": "dumbbell",
+      "object_instance": "dumbbell_015",
+      "relative_path": "oo3d9dsingle/dumbbell_015_0v1nve51j9ljfjdcgfk478e5aj5owxo7",
+      "rgb_count": 50,
+      "object_id": 1630,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "dumpling_002_cpo237r4yapnm6go3e6k937aj2jxma9x",
+      "category": "dumpling",
+      "object_instance": "dumpling_002",
+      "relative_path": "oo3d9dsingle/dumpling_002_cpo237r4yapnm6go3e6k937aj2jxma9x",
+      "rgb_count": 50,
+      "object_id": 1635,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "dumpling_013_pun5pct8xmiw5gp4mu1r07hlnmscowsr",
+      "category": "dumpling",
+      "object_instance": "dumpling_013",
+      "relative_path": "oo3d9dsingle/dumpling_013_pun5pct8xmiw5gp4mu1r07hlnmscowsr",
+      "rgb_count": 50,
+      "object_id": 1641,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "durian_008_lqln0x3vj7ir6kl5ye558rz9013rv1wu",
+      "category": "durian",
+      "object_instance": "durian_008",
+      "relative_path": "oo3d9dsingle/durian_008_lqln0x3vj7ir6kl5ye558rz9013rv1wu",
+      "rgb_count": 50,
+      "object_id": 1663,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "durian_018_a3y4ukenyvpuijirbwnrc4lsqaxvix9s",
+      "category": "durian",
+      "object_instance": "durian_018",
+      "relative_path": "oo3d9dsingle/durian_018_a3y4ukenyvpuijirbwnrc4lsqaxvix9s",
+      "rgb_count": 50,
+      "object_id": 1673,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "durian_023_xmrmdy729u9i2a9tjy3453xi9msjrjzf",
+      "category": "durian",
+      "object_instance": "durian_023",
+      "relative_path": "oo3d9dsingle/durian_023_xmrmdy729u9i2a9tjy3453xi9msjrjzf",
+      "rgb_count": 50,
+      "object_id": 1678,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "dustbin_003_ckkxes7in6i47kqzxweqptf8fts2iapb",
+      "category": "dustbin",
+      "object_instance": "dustbin_003",
+      "relative_path": "oo3d9dsingle/dustbin_003_ckkxes7in6i47kqzxweqptf8fts2iapb",
+      "rgb_count": 50,
+      "object_id": 1688,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "dustbin_012_9c51xof5cyvdbr6jacxps2cvrae18vp4",
+      "category": "dustbin",
+      "object_instance": "dustbin_012",
+      "relative_path": "oo3d9dsingle/dustbin_012_9c51xof5cyvdbr6jacxps2cvrae18vp4",
+      "rgb_count": 50,
+      "object_id": 1697,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "egg_013_d8ggna104jj54d55jx7vczqey1z0n2u7",
+      "category": "egg",
+      "object_instance": "egg_013",
+      "relative_path": "oo3d9dsingle/egg_013_d8ggna104jj54d55jx7vczqey1z0n2u7",
+      "rgb_count": 50,
+      "object_id": 1718,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "egg_023_0e3yoxmv11incmk1ytdkq0iibp7rh2nv",
+      "category": "egg",
+      "object_instance": "egg_023",
+      "relative_path": "oo3d9dsingle/egg_023_0e3yoxmv11incmk1ytdkq0iibp7rh2nv",
+      "rgb_count": 50,
+      "object_id": 1728,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "egg_035_37bv3xqvgc8v04bj6l67zzv3yzm6l5wk",
+      "category": "egg",
+      "object_instance": "egg_035",
+      "relative_path": "oo3d9dsingle/egg_035_37bv3xqvgc8v04bj6l67zzv3yzm6l5wk",
+      "rgb_count": 50,
+      "object_id": 1738,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "egg_036_193qy3n7u4vp44ze36siu1bbtf9j31vm",
+      "category": "egg",
+      "object_instance": "egg_036",
+      "relative_path": "oo3d9dsingle/egg_036_193qy3n7u4vp44ze36siu1bbtf9j31vm",
+      "rgb_count": 50,
+      "object_id": 1739,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "egg_046_12826x38zt1f01wbeao39rgebut2rvtu",
+      "category": "egg",
+      "object_instance": "egg_046",
+      "relative_path": "oo3d9dsingle/egg_046_12826x38zt1f01wbeao39rgebut2rvtu",
+      "rgb_count": 50,
+      "object_id": 1749,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "egg_tart_002_r37vynlfgtydop5lrjdpi7aqqqqxk8wg",
+      "category": "egg_tart",
+      "object_instance": "egg_tart_002",
+      "relative_path": "oo3d9dsingle/egg_tart_002_r37vynlfgtydop5lrjdpi7aqqqqxk8wg",
+      "rgb_count": 50,
+      "object_id": 1754,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "egg_tart_014_dnkrgm9afqdi26xeqwdwf9qagr6tcq33",
+      "category": "egg_tart",
+      "object_instance": "egg_tart_014",
+      "relative_path": "oo3d9dsingle/egg_tart_014_dnkrgm9afqdi26xeqwdwf9qagr6tcq33",
+      "rgb_count": 50,
+      "object_id": 1764,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "egg_tart_029_8yl0hvflp7rpnld7qjl3tm393p7vc28v",
+      "category": "egg_tart",
+      "object_instance": "egg_tart_029",
+      "relative_path": "oo3d9dsingle/egg_tart_029_8yl0hvflp7rpnld7qjl3tm393p7vc28v",
+      "rgb_count": 50,
+      "object_id": 1779,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "eraser_006_fis30422vonb1ncfixey3oz3x6x751a7",
+      "category": "eraser",
+      "object_instance": "eraser_006",
+      "relative_path": "oo3d9dsingle/eraser_006_fis30422vonb1ncfixey3oz3x6x751a7",
+      "rgb_count": 50,
+      "object_id": 1787,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "eraser_017_wvggj4mq19p1597shbd06ku4if1tzbke",
+      "category": "eraser",
+      "object_instance": "eraser_017",
+      "relative_path": "oo3d9dsingle/eraser_017_wvggj4mq19p1597shbd06ku4if1tzbke",
+      "rgb_count": 50,
+      "object_id": 1798,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "eraser_021_19ksgszs8mbuzyyv17kmb9mmnx5wu4u8",
+      "category": "eraser",
+      "object_instance": "eraser_021",
+      "relative_path": "oo3d9dsingle/eraser_021_19ksgszs8mbuzyyv17kmb9mmnx5wu4u8",
+      "rgb_count": 50,
+      "object_id": 1802,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "facial_cream_012_tpwpvi804bqa2c54ijt7k4kwmg8ei4dy",
+      "category": "facial_cream",
+      "object_instance": "facial_cream_012",
+      "relative_path": "oo3d9dsingle/facial_cream_012_tpwpvi804bqa2c54ijt7k4kwmg8ei4dy",
+      "rgb_count": 50,
+      "object_id": 1823,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "facial_cream_014_urvnsgen2vlge5kf9r0wd2zca2ecvsvt",
+      "category": "facial_cream",
+      "object_instance": "facial_cream_014",
+      "relative_path": "oo3d9dsingle/facial_cream_014_urvnsgen2vlge5kf9r0wd2zca2ecvsvt",
+      "rgb_count": 50,
+      "object_id": 1825,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "fan_007_0o8c96feedrgi1iu9l7z7h2rjn0cep8b",
+      "category": "fan",
+      "object_instance": "fan_007",
+      "relative_path": "oo3d9dsingle/fan_007_0o8c96feedrgi1iu9l7z7h2rjn0cep8b",
+      "rgb_count": 47,
+      "object_id": 1833,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "fire_extinguisher_013_zkrq7kcm5rba2wqpsp63ts8jaott8kav",
+      "category": "fire_extinguisher",
+      "object_instance": "fire_extinguisher_013",
+      "relative_path": "oo3d9dsingle/fire_extinguisher_013_zkrq7kcm5rba2wqpsp63ts8jaott8kav",
+      "rgb_count": 50,
+      "object_id": 1852,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "fire_extinguisher_018_f58wwvdaviz1cis1a0e7lhfjxxxx478r",
+      "category": "fire_extinguisher",
+      "object_instance": "fire_extinguisher_018",
+      "relative_path": "oo3d9dsingle/fire_extinguisher_018_f58wwvdaviz1cis1a0e7lhfjxxxx478r",
+      "rgb_count": 50,
+      "object_id": 1857,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "flash_light_006_q20781l3j5twnhhyi5hp27m133uwf7nb",
+      "category": "flash_light",
+      "object_instance": "flash_light_006",
+      "relative_path": "oo3d9dsingle/flash_light_006_q20781l3j5twnhhyi5hp27m133uwf7nb",
+      "rgb_count": 50,
+      "object_id": 1865,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "flower_pot_005_jziwj6mnprtrr7qln3460lat2os0jsqk",
+      "category": "flower_pot",
+      "object_instance": "flower_pot_005",
+      "relative_path": "oo3d9dsingle/flower_pot_005_jziwj6mnprtrr7qln3460lat2os0jsqk",
+      "rgb_count": 50,
+      "object_id": 1871,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "flower_pot_006_vmjexozr2ejkqcwvjtwee4hwo7oz5m4h",
+      "category": "flower_pot",
+      "object_instance": "flower_pot_006",
+      "relative_path": "oo3d9dsingle/flower_pot_006_vmjexozr2ejkqcwvjtwee4hwo7oz5m4h",
+      "rgb_count": 50,
+      "object_id": 1872,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "fork_002_jm9yyxvr6yssfxr24b96kwdazp28tg1r",
+      "category": "fork",
+      "object_instance": "fork_002",
+      "relative_path": "oo3d9dsingle/fork_002_jm9yyxvr6yssfxr24b96kwdazp28tg1r",
+      "rgb_count": 50,
+      "object_id": 1892,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "frisbee_004_mgqbgeri9i0jkutacnhrhoqkikj4b22o",
+      "category": "frisbee",
+      "object_instance": "frisbee_004",
+      "relative_path": "oo3d9dsingle/frisbee_004_mgqbgeri9i0jkutacnhrhoqkikj4b22o",
+      "rgb_count": 50,
+      "object_id": 1897,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "garage_kit_010_tk8prsow3hq31o6c2x1ugmutuxefx245",
+      "category": "garage_kit",
+      "object_instance": "garage_kit_010",
+      "relative_path": "oo3d9dsingle/garage_kit_010_tk8prsow3hq31o6c2x1ugmutuxefx245",
+      "rgb_count": 50,
+      "object_id": 1910,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "garlic_013_ktv28qay4h1i0xue8enkw55uphl1a63z",
+      "category": "garlic",
+      "object_instance": "garlic_013",
+      "relative_path": "oo3d9dsingle/garlic_013_ktv28qay4h1i0xue8enkw55uphl1a63z",
+      "rgb_count": 50,
+      "object_id": 1922,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "ginger_003_tsuy07w4rfujw0uwn2ski89w1jfo3l3d",
+      "category": "ginger",
+      "object_instance": "ginger_003",
+      "relative_path": "oo3d9dsingle/ginger_003_tsuy07w4rfujw0uwn2ski89w1jfo3l3d",
+      "rgb_count": 50,
+      "object_id": 1925,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "ginger_015_0ntou3m2jjwevzspuqseasebvxvqbclx",
+      "category": "ginger",
+      "object_instance": "ginger_015",
+      "relative_path": "oo3d9dsingle/ginger_015_0ntou3m2jjwevzspuqseasebvxvqbclx",
+      "rgb_count": 50,
+      "object_id": 1936,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "glasses_003_cfegl66qxx36kr1b3jor61olxk4hzsbe",
+      "category": "glasses",
+      "object_instance": "glasses_003",
+      "relative_path": "oo3d9dsingle/glasses_003_cfegl66qxx36kr1b3jor61olxk4hzsbe",
+      "rgb_count": 50,
+      "object_id": 1944,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "glasses_case_005_ksiz21zm0ljkvdtfgrj6mb5wxxj4happ",
+      "category": "glasses_case",
+      "object_instance": "glasses_case_005",
+      "relative_path": "oo3d9dsingle/glasses_case_005_ksiz21zm0ljkvdtfgrj6mb5wxxj4happ",
+      "rgb_count": 50,
+      "object_id": 1951,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "glasses_case_020_tl5wnncaxzk1qr5efymo25y2oet694n4",
+      "category": "glasses_case",
+      "object_instance": "glasses_case_020",
+      "relative_path": "oo3d9dsingle/glasses_case_020_tl5wnncaxzk1qr5efymo25y2oet694n4",
+      "rgb_count": 50,
+      "object_id": 1966,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "gloves_004_dpnkh6lis08nz964dcdki9iv0hc7zevk",
+      "category": "gloves",
+      "object_instance": "gloves_004",
+      "relative_path": "oo3d9dsingle/gloves_004_dpnkh6lis08nz964dcdki9iv0hc7zevk",
+      "rgb_count": 50,
+      "object_id": 1970,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "gloves_010_swrkk8cgl148f8n17tge1imfh4f8vs4u",
+      "category": "gloves",
+      "object_instance": "gloves_010",
+      "relative_path": "oo3d9dsingle/gloves_010_swrkk8cgl148f8n17tge1imfh4f8vs4u",
+      "rgb_count": 50,
+      "object_id": 1976,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "green_bean_cake_005_wpo9ceif5xz0qr5j4an137ci71nvqjqm",
+      "category": "green_bean_cake",
+      "object_instance": "green_bean_cake_005",
+      "relative_path": "oo3d9dsingle/green_bean_cake_005_wpo9ceif5xz0qr5j4an137ci71nvqjqm",
+      "rgb_count": 50,
+      "object_id": 1988,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "green_bean_cake_026_ajut872kz3z5trhp0iwfskud8hmp1w41",
+      "category": "green_bean_cake",
+      "object_instance": "green_bean_cake_026",
+      "relative_path": "oo3d9dsingle/green_bean_cake_026_ajut872kz3z5trhp0iwfskud8hmp1w41",
+      "rgb_count": 50,
+      "object_id": 1999,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "hair_dryer_003_7r4odj30n99c79vpok29r4lytu1qiyw8",
+      "category": "hair_dryer",
+      "object_instance": "hair_dryer_003",
+      "relative_path": "oo3d9dsingle/hair_dryer_003_7r4odj30n99c79vpok29r4lytu1qiyw8",
+      "rgb_count": 50,
+      "object_id": 2004,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "hair_dryer_026_3r956bc8g4gib1rn4l78me8ua9mikf5k",
+      "category": "hair_dryer",
+      "object_instance": "hair_dryer_026",
+      "relative_path": "oo3d9dsingle/hair_dryer_026_3r956bc8g4gib1rn4l78me8ua9mikf5k",
+      "rgb_count": 50,
+      "object_id": 2026,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "hair_dryer_032_d1ds5e0313vo7prkdo9lt28m8zwhn3hd",
+      "category": "hair_dryer",
+      "object_instance": "hair_dryer_032",
+      "relative_path": "oo3d9dsingle/hair_dryer_032_d1ds5e0313vo7prkdo9lt28m8zwhn3hd",
+      "rgb_count": 50,
+      "object_id": 2032,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "hair_dryer_039_jb870lxgcxl2sqa5y2ogdohhcyq7p3xa",
+      "category": "hair_dryer",
+      "object_instance": "hair_dryer_039",
+      "relative_path": "oo3d9dsingle/hair_dryer_039_jb870lxgcxl2sqa5y2ogdohhcyq7p3xa",
+      "rgb_count": 50,
+      "object_id": 2039,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "hairpin_007_othfuwk10dkq3l67mhlxkxcfc78c9ar2",
+      "category": "hairpin",
+      "object_instance": "hairpin_007",
+      "relative_path": "oo3d9dsingle/hairpin_007_othfuwk10dkq3l67mhlxkxcfc78c9ar2",
+      "rgb_count": 50,
+      "object_id": 2046,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "hairpin_028_aqyytsnhzp8imrc87fukfc5p0zvvhk8e",
+      "category": "hairpin",
+      "object_instance": "hairpin_028",
+      "relative_path": "oo3d9dsingle/hairpin_028_aqyytsnhzp8imrc87fukfc5p0zvvhk8e",
+      "rgb_count": 50,
+      "object_id": 2065,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "hamburger_013_rnsdl0tis6hwpa7sw1muiiny3jsxfe2x",
+      "category": "hamburger",
+      "object_instance": "hamburger_013",
+      "relative_path": "oo3d9dsingle/hamburger_013_rnsdl0tis6hwpa7sw1muiiny3jsxfe2x",
+      "rgb_count": 50,
+      "object_id": 2077,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "hamburger_025_njbsqlbhgvt3gxwdu12xkhzjvha2zfkg",
+      "category": "hamburger",
+      "object_instance": "hamburger_025",
+      "relative_path": "oo3d9dsingle/hamburger_025_njbsqlbhgvt3gxwdu12xkhzjvha2zfkg",
+      "rgb_count": 50,
+      "object_id": 2087,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "hamburger_028_iwych4fkz74muvkb4z5v85yrxxl0vccx",
+      "category": "hamburger",
+      "object_instance": "hamburger_028",
+      "relative_path": "oo3d9dsingle/hamburger_028_iwych4fkz74muvkb4z5v85yrxxl0vccx",
+      "rgb_count": 50,
+      "object_id": 2090,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "hamburger_038_hahsicca2vlclhd7l7dwq927vk8mu4fb",
+      "category": "hamburger",
+      "object_instance": "hamburger_038",
+      "relative_path": "oo3d9dsingle/hamburger_038_hahsicca2vlclhd7l7dwq927vk8mu4fb",
+      "rgb_count": 50,
+      "object_id": 2097,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "hamburger_051_ij8kjhym03nlhkhzb41ymkbuwk2z4q3m",
+      "category": "hamburger",
+      "object_instance": "hamburger_051",
+      "relative_path": "oo3d9dsingle/hamburger_051_ij8kjhym03nlhkhzb41ymkbuwk2z4q3m",
+      "rgb_count": 50,
+      "object_id": 2110,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "hami_melon_003_jbbkb296flizlpp4hkgq9eq5omns6h2n",
+      "category": "hami_melon",
+      "object_instance": "hami_melon_003",
+      "relative_path": "oo3d9dsingle/hami_melon_003_jbbkb296flizlpp4hkgq9eq5omns6h2n",
+      "rgb_count": 50,
+      "object_id": 2119,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "hami_melon_008_5wz9tejupu3ctt5ou23gebgziucrfxte",
+      "category": "hami_melon",
+      "object_instance": "hami_melon_008",
+      "relative_path": "oo3d9dsingle/hami_melon_008_5wz9tejupu3ctt5ou23gebgziucrfxte",
+      "rgb_count": 50,
+      "object_id": 2124,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "hammer_011_oyo9usm6fo5okp3e0prgoaazgsl11rym",
+      "category": "hammer",
+      "object_instance": "hammer_011",
+      "relative_path": "oo3d9dsingle/hammer_011_oyo9usm6fo5okp3e0prgoaazgsl11rym",
+      "rgb_count": 50,
+      "object_id": 2145,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "hammer_014_2on80hy3xem87tiyiz8bchto9qqqyd3e",
+      "category": "hammer",
+      "object_instance": "hammer_014",
+      "relative_path": "oo3d9dsingle/hammer_014_2on80hy3xem87tiyiz8bchto9qqqyd3e",
+      "rgb_count": 50,
+      "object_id": 2147,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "hand_cream_003_jsglxe2oaq0i1hvbu79nrl4ma9t9ggfq",
+      "category": "hand_cream",
+      "object_instance": "hand_cream_003",
+      "relative_path": "oo3d9dsingle/hand_cream_003_jsglxe2oaq0i1hvbu79nrl4ma9t9ggfq",
+      "rgb_count": 50,
+      "object_id": 2159,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "hand_cream_005_1z4vvd378c0vqbgmd0rpslgeh68y8o9y",
+      "category": "hand_cream",
+      "object_instance": "hand_cream_005",
+      "relative_path": "oo3d9dsingle/hand_cream_005_1z4vvd378c0vqbgmd0rpslgeh68y8o9y",
+      "rgb_count": 50,
+      "object_id": 2161,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "handbag_010_ec546ft7oaabzr86c8sar7oyvfnke30s",
+      "category": "handbag",
+      "object_instance": "handbag_010",
+      "relative_path": "oo3d9dsingle/handbag_010_ec546ft7oaabzr86c8sar7oyvfnke30s",
+      "rgb_count": 50,
+      "object_id": 2186,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "handbag_012_774rdk1hadz7u931kcxjee6sg6fd1bjw",
+      "category": "handbag",
+      "object_instance": "handbag_012",
+      "relative_path": "oo3d9dsingle/handbag_012_774rdk1hadz7u931kcxjee6sg6fd1bjw",
+      "rgb_count": 50,
+      "object_id": 2187,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "handbag_017_wr9qljxfr1lwbcvg33curjs1vxsgjuz3",
+      "category": "handbag",
+      "object_instance": "handbag_017",
+      "relative_path": "oo3d9dsingle/handbag_017_wr9qljxfr1lwbcvg33curjs1vxsgjuz3",
+      "rgb_count": 50,
+      "object_id": 2191,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "handbag_021_56alnxizi3zlmvl27nq0r08u4y7badjl",
+      "category": "handbag",
+      "object_instance": "handbag_021",
+      "relative_path": "oo3d9dsingle/handbag_021_56alnxizi3zlmvl27nq0r08u4y7badjl",
+      "rgb_count": 50,
+      "object_id": 2194,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "handbag_038_jfd718zmdizo5wiftim36wzd6mgdxkri",
+      "category": "handbag",
+      "object_instance": "handbag_038",
+      "relative_path": "oo3d9dsingle/handbag_038_jfd718zmdizo5wiftim36wzd6mgdxkri",
+      "rgb_count": 50,
+      "object_id": 2210,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "hat_006_dmam39f06xazxaf3mh8olw1ac91nr83s",
+      "category": "hat",
+      "object_instance": "hat_006",
+      "relative_path": "oo3d9dsingle/hat_006_dmam39f06xazxaf3mh8olw1ac91nr83s",
+      "rgb_count": 50,
+      "object_id": 2232,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "hat_010_o9vmc3qxo3p02tii3xd3ny46fla6y4vv",
+      "category": "hat",
+      "object_instance": "hat_010",
+      "relative_path": "oo3d9dsingle/hat_010_o9vmc3qxo3p02tii3xd3ny46fla6y4vv",
+      "rgb_count": 50,
+      "object_id": 2236,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "hat_030_g4nflnc16cfv7r957om9mvum8zdugxhj",
+      "category": "hat",
+      "object_instance": "hat_030",
+      "relative_path": "oo3d9dsingle/hat_030_g4nflnc16cfv7r957om9mvum8zdugxhj",
+      "rgb_count": 50,
+      "object_id": 2254,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "haw_thorn_002_9rrqk5bgt21rz4edh0opd9limtfoe3rm",
+      "category": "haw_thorn",
+      "object_instance": "haw_thorn_002",
+      "relative_path": "oo3d9dsingle/haw_thorn_002_9rrqk5bgt21rz4edh0opd9limtfoe3rm",
+      "rgb_count": 50,
+      "object_id": 2257,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "haw_thorn_003_rhan3myohq2qd992vcveb4197e6ylnr5",
+      "category": "haw_thorn",
+      "object_instance": "haw_thorn_003",
+      "relative_path": "oo3d9dsingle/haw_thorn_003_rhan3myohq2qd992vcveb4197e6ylnr5",
+      "rgb_count": 50,
+      "object_id": 2258,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "haw_thorn_006_n8vgmsjy9y91yqbl7qggz9hgd8se1jab",
+      "category": "haw_thorn",
+      "object_instance": "haw_thorn_006",
+      "relative_path": "oo3d9dsingle/haw_thorn_006_n8vgmsjy9y91yqbl7qggz9hgd8se1jab",
+      "rgb_count": 50,
+      "object_id": 2261,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "haw_thorn_040_8lyzaprhra3zgowvwurbtgn6y1t8zaba",
+      "category": "haw_thorn",
+      "object_instance": "haw_thorn_040",
+      "relative_path": "oo3d9dsingle/haw_thorn_040_8lyzaprhra3zgowvwurbtgn6y1t8zaba",
+      "rgb_count": 50,
+      "object_id": 2292,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "haw_thorn_045_h5n6hud9hvtksgom6k6mspo21y9yqa49",
+      "category": "haw_thorn",
+      "object_instance": "haw_thorn_045",
+      "relative_path": "oo3d9dsingle/haw_thorn_045_h5n6hud9hvtksgom6k6mspo21y9yqa49",
+      "rgb_count": 50,
+      "object_id": 2297,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "helmet_002_qh5k4vzst7k0efilfdl9wyba5al84u8y",
+      "category": "helmet",
+      "object_instance": "helmet_002",
+      "relative_path": "oo3d9dsingle/helmet_002_qh5k4vzst7k0efilfdl9wyba5al84u8y",
+      "rgb_count": 50,
+      "object_id": 2304,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "helmet_008_e51dr47sdcuqzuyo13ltkirkzzksqrao",
+      "category": "helmet",
+      "object_instance": "helmet_008",
+      "relative_path": "oo3d9dsingle/helmet_008_e51dr47sdcuqzuyo13ltkirkzzksqrao",
+      "rgb_count": 50,
+      "object_id": 2310,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "hot_dog_062_6rz4wbkhbin6sxvbfopnlclwli3ryv3h",
+      "category": "hot_dog",
+      "object_instance": "hot_dog_062",
+      "relative_path": "oo3d9dsingle/hot_dog_062_6rz4wbkhbin6sxvbfopnlclwli3ryv3h",
+      "rgb_count": 50,
+      "object_id": 2329,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "hot_dog_070_iddfxtgmb713d04ocq6ahj2s16mjo5wa",
+      "category": "hot_dog",
+      "object_instance": "hot_dog_070",
+      "relative_path": "oo3d9dsingle/hot_dog_070_iddfxtgmb713d04ocq6ahj2s16mjo5wa",
+      "rgb_count": 50,
+      "object_id": 2337,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "hot_dog_087_6ys0p8buetd1jciv6fg1jtemu4ekc7e7",
+      "category": "hot_dog",
+      "object_instance": "hot_dog_087",
+      "relative_path": "oo3d9dsingle/hot_dog_087_6ys0p8buetd1jciv6fg1jtemu4ekc7e7",
+      "rgb_count": 50,
+      "object_id": 2353,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "hot_dog_090_l982ww04m2jpn77gvx3n14o3476hydco",
+      "category": "hot_dog",
+      "object_instance": "hot_dog_090",
+      "relative_path": "oo3d9dsingle/hot_dog_090_l982ww04m2jpn77gvx3n14o3476hydco",
+      "rgb_count": 50,
+      "object_id": 2356,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "house_003_y646xl7rupkz3h660umg65xreuoutyy6",
+      "category": "house",
+      "object_instance": "house_003",
+      "relative_path": "oo3d9dsingle/house_003_y646xl7rupkz3h660umg65xreuoutyy6",
+      "rgb_count": 50,
+      "object_id": 2359,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "house_024_593ugtb5w5xoftihjds0qr6v2i82n8cd",
+      "category": "house",
+      "object_instance": "house_024",
+      "relative_path": "oo3d9dsingle/house_024_593ugtb5w5xoftihjds0qr6v2i82n8cd",
+      "rgb_count": 50,
+      "object_id": 2380,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "house_026_h6s85har5vilpt3h530e581thfqctehq",
+      "category": "house",
+      "object_instance": "house_026",
+      "relative_path": "oo3d9dsingle/house_026_h6s85har5vilpt3h530e581thfqctehq",
+      "rgb_count": 50,
+      "object_id": 2382,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "house_044_vesoywheucqphqyfrpnwhd4a4pxx20fe",
+      "category": "house",
+      "object_instance": "house_044",
+      "relative_path": "oo3d9dsingle/house_044_vesoywheucqphqyfrpnwhd4a4pxx20fe",
+      "rgb_count": 50,
+      "object_id": 2399,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "insole_003_vhv7de5391wfawk6t9xqvqpauifslfcx",
+      "category": "insole",
+      "object_instance": "insole_003",
+      "relative_path": "oo3d9dsingle/insole_003_vhv7de5391wfawk6t9xqvqpauifslfcx",
+      "rgb_count": 50,
+      "object_id": 2402,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "kennel_003_wukeh68l5euahp1980nj57u3yxq3zm04",
+      "category": "kennel",
+      "object_instance": "kennel_003",
+      "relative_path": "oo3d9dsingle/kennel_003_wukeh68l5euahp1980nj57u3yxq3zm04",
+      "rgb_count": 48,
+      "object_id": 2416,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "kettle_011_90i45hh1cemgg5e08w80we9dpm0qsuxc",
+      "category": "kettle",
+      "object_instance": "kettle_011",
+      "relative_path": "oo3d9dsingle/kettle_011_90i45hh1cemgg5e08w80we9dpm0qsuxc",
+      "rgb_count": 50,
+      "object_id": 2426,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "keyboard_010_dyrvbgvlq69n8r1uwqw4v82732bovnaq",
+      "category": "keyboard",
+      "object_instance": "keyboard_010",
+      "relative_path": "oo3d9dsingle/keyboard_010_dyrvbgvlq69n8r1uwqw4v82732bovnaq",
+      "rgb_count": 50,
+      "object_id": 2439,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "keyboard_014_ap3pbqys9gr1wmzr8lcug8wcap931lv3",
+      "category": "keyboard",
+      "object_instance": "keyboard_014",
+      "relative_path": "oo3d9dsingle/keyboard_014_ap3pbqys9gr1wmzr8lcug8wcap931lv3",
+      "rgb_count": 50,
+      "object_id": 2443,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "kite_014_nyayv4k9ebqx9zqyakguws9b5cjms3zj",
+      "category": "kite",
+      "object_instance": "kite_014",
+      "relative_path": "oo3d9dsingle/kite_014_nyayv4k9ebqx9zqyakguws9b5cjms3zj",
+      "rgb_count": 49,
+      "object_id": 2459,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "knife_008_kinzqmhks9znxc79vvknod650kgw7bid",
+      "category": "knife",
+      "object_instance": "knife_008",
+      "relative_path": "oo3d9dsingle/knife_008_kinzqmhks9znxc79vvknod650kgw7bid",
+      "rgb_count": 50,
+      "object_id": 2478,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "knife_022_1u6y1ac7hnre675fdbg2ftuhvnqg6lg3",
+      "category": "knife",
+      "object_instance": "knife_022",
+      "relative_path": "oo3d9dsingle/knife_022_1u6y1ac7hnre675fdbg2ftuhvnqg6lg3",
+      "rgb_count": 50,
+      "object_id": 2492,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "knife_029_xt42cmz1yg9cggobf7schl32c58wiv8c",
+      "category": "knife",
+      "object_instance": "knife_029",
+      "relative_path": "oo3d9dsingle/knife_029_xt42cmz1yg9cggobf7schl32c58wiv8c",
+      "rgb_count": 50,
+      "object_id": 2497,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "laptop_004_8i0au9qbnh4keclzjiasui8nv3k499gd",
+      "category": "laptop",
+      "object_instance": "laptop_004",
+      "relative_path": "oo3d9dsingle/laptop_004_8i0au9qbnh4keclzjiasui8nv3k499gd",
+      "rgb_count": 50,
+      "object_id": 2503,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "laundry_detergent_008_ts6kmp3g1la4hoce2d105idvx4ekwehv",
+      "category": "laundry_detergent",
+      "object_instance": "laundry_detergent_008",
+      "relative_path": "oo3d9dsingle/laundry_detergent_008_ts6kmp3g1la4hoce2d105idvx4ekwehv",
+      "rgb_count": 50,
+      "object_id": 2511,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "lemon_010_yvh756kb60fbqwy0esdbuq8u1bb12h5f",
+      "category": "lemon",
+      "object_instance": "lemon_010",
+      "relative_path": "oo3d9dsingle/lemon_010_yvh756kb60fbqwy0esdbuq8u1bb12h5f",
+      "rgb_count": 50,
+      "object_id": 2522,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "lemon_011_0ujozzy1kw45wh5hvt9neop6sfce593e",
+      "category": "lemon",
+      "object_instance": "lemon_011",
+      "relative_path": "oo3d9dsingle/lemon_011_0ujozzy1kw45wh5hvt9neop6sfce593e",
+      "rgb_count": 50,
+      "object_id": 2523,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "lemon_019_7wx7dj1q9ixf480h429q2lvntg1z940o",
+      "category": "lemon",
+      "object_instance": "lemon_019",
+      "relative_path": "oo3d9dsingle/lemon_019_7wx7dj1q9ixf480h429q2lvntg1z940o",
+      "rgb_count": 50,
+      "object_id": 2531,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "light_013_bud9bfhj9syow93tl8t26a0ea8oijpma",
+      "category": "light",
+      "object_instance": "light_013",
+      "relative_path": "oo3d9dsingle/light_013_bud9bfhj9syow93tl8t26a0ea8oijpma",
+      "rgb_count": 50,
+      "object_id": 2555,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "light_014_ne6dukm95szwecwcw8h2zbm3iy5utocq",
+      "category": "light",
+      "object_instance": "light_014",
+      "relative_path": "oo3d9dsingle/light_014_ne6dukm95szwecwcw8h2zbm3iy5utocq",
+      "rgb_count": 50,
+      "object_id": 2556,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "light_017_d75wta7hjrhjwrvpd170cl35jj1cng9z",
+      "category": "light",
+      "object_instance": "light_017",
+      "relative_path": "oo3d9dsingle/light_017_d75wta7hjrhjwrvpd170cl35jj1cng9z",
+      "rgb_count": 50,
+      "object_id": 2559,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "light_031_hqcbf7x4sypmsz8nhpzpqyuxma45yml8",
+      "category": "light",
+      "object_instance": "light_031",
+      "relative_path": "oo3d9dsingle/light_031_hqcbf7x4sypmsz8nhpzpqyuxma45yml8",
+      "rgb_count": 50,
+      "object_id": 2573,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "lipstick_010_55r0z8gexgp38qvijywouizfxav6owrn",
+      "category": "lipstick",
+      "object_instance": "lipstick_010",
+      "relative_path": "oo3d9dsingle/lipstick_010_55r0z8gexgp38qvijywouizfxav6owrn",
+      "rgb_count": 50,
+      "object_id": 2591,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "lipstick_011_bxcbrojac896l3hi5bo525grieoi7p8u",
+      "category": "lipstick",
+      "object_instance": "lipstick_011",
+      "relative_path": "oo3d9dsingle/lipstick_011_bxcbrojac896l3hi5bo525grieoi7p8u",
+      "rgb_count": 50,
+      "object_id": 2592,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "litchi_007_vs9mrprsw1bcjemtevc0i8dgdqpurdxt",
+      "category": "litchi",
+      "object_instance": "litchi_007",
+      "relative_path": "oo3d9dsingle/litchi_007_vs9mrprsw1bcjemtevc0i8dgdqpurdxt",
+      "rgb_count": 50,
+      "object_id": 2604,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "litchi_011_o9lwd8fxpw4qgj47qfbfrqqi2tsvnrvi",
+      "category": "litchi",
+      "object_instance": "litchi_011",
+      "relative_path": "oo3d9dsingle/litchi_011_o9lwd8fxpw4qgj47qfbfrqqi2tsvnrvi",
+      "rgb_count": 50,
+      "object_id": 2608,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "longan_006_bsmqrcutxgpgi1vi6abvmpfw934cdh1t",
+      "category": "longan",
+      "object_instance": "longan_006",
+      "relative_path": "oo3d9dsingle/longan_006_bsmqrcutxgpgi1vi6abvmpfw934cdh1t",
+      "rgb_count": 50,
+      "object_id": 2624,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "longan_011_04mkf34y51r34r1vy4uqu1v5cz5c0ac7",
+      "category": "longan",
+      "object_instance": "longan_011",
+      "relative_path": "oo3d9dsingle/longan_011_04mkf34y51r34r1vy4uqu1v5cz5c0ac7",
+      "rgb_count": 50,
+      "object_id": 2629,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "loquat_004_t01xoqcoskuzgqr8lx1gzlaf4hf6jepq",
+      "category": "loquat",
+      "object_instance": "loquat_004",
+      "relative_path": "oo3d9dsingle/loquat_004_t01xoqcoskuzgqr8lx1gzlaf4hf6jepq",
+      "rgb_count": 50,
+      "object_id": 2642,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "loquat_006_p7fvv9hzdrz44irnf28pz0kfby3yq9dt",
+      "category": "loquat",
+      "object_instance": "loquat_006",
+      "relative_path": "oo3d9dsingle/loquat_006_p7fvv9hzdrz44irnf28pz0kfby3yq9dt",
+      "rgb_count": 50,
+      "object_id": 2644,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "lotus_root_016_utitc3mjpzfajdzn6cqodttupj56w913",
+      "category": "lotus_root",
+      "object_instance": "lotus_root_016",
+      "relative_path": "oo3d9dsingle/lotus_root_016_utitc3mjpzfajdzn6cqodttupj56w913",
+      "rgb_count": 50,
+      "object_id": 2672,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "lotus_root_017_55ryuh430ob8we6tgzsv0e0t3155tpxf",
+      "category": "lotus_root",
+      "object_instance": "lotus_root_017",
+      "relative_path": "oo3d9dsingle/lotus_root_017_55ryuh430ob8we6tgzsv0e0t3155tpxf",
+      "rgb_count": 50,
+      "object_id": 2673,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "lotus_root_024_ontmdltjoocktk3oc4252dhhjhpvdtfc",
+      "category": "lotus_root",
+      "object_instance": "lotus_root_024",
+      "relative_path": "oo3d9dsingle/lotus_root_024_ontmdltjoocktk3oc4252dhhjhpvdtfc",
+      "rgb_count": 50,
+      "object_id": 2680,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "lotus_root_048_zxwols1511n7s3xrn5j4bmf0uvnd6ows",
+      "category": "lotus_root",
+      "object_instance": "lotus_root_048",
+      "relative_path": "oo3d9dsingle/lotus_root_048_zxwols1511n7s3xrn5j4bmf0uvnd6ows",
+      "rgb_count": 50,
+      "object_id": 2698,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "magnet_002_bainvowsrybg21274n68aenynmd5rant",
+      "category": "magnet",
+      "object_instance": "magnet_002",
+      "relative_path": "oo3d9dsingle/magnet_002_bainvowsrybg21274n68aenynmd5rant",
+      "rgb_count": 50,
+      "object_id": 2701,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "mango_008_4wdnv5d4up8j0fg371xhkz3lc9r1k5r4",
+      "category": "mango",
+      "object_instance": "mango_008",
+      "relative_path": "oo3d9dsingle/mango_008_4wdnv5d4up8j0fg371xhkz3lc9r1k5r4",
+      "rgb_count": 50,
+      "object_id": 2711,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "mango_030_60pmne2z2h9rja8pk26cmwugv789c3sl",
+      "category": "mango",
+      "object_instance": "mango_030",
+      "relative_path": "oo3d9dsingle/mango_030_60pmne2z2h9rja8pk26cmwugv789c3sl",
+      "rgb_count": 50,
+      "object_id": 2732,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "mango_039_7igbl0tdjxwjr8ehb2x9gs6p8l7579ck",
+      "category": "mango",
+      "object_instance": "mango_039",
+      "relative_path": "oo3d9dsingle/mango_039_7igbl0tdjxwjr8ehb2x9gs6p8l7579ck",
+      "rgb_count": 50,
+      "object_id": 2737,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "mango_053_uv016nebh3juduned9tqqgqby6o2kubl",
+      "category": "mango",
+      "object_instance": "mango_053",
+      "relative_path": "oo3d9dsingle/mango_053_uv016nebh3juduned9tqqgqby6o2kubl",
+      "rgb_count": 50,
+      "object_id": 2747,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "mango_064_j5c5nevwrmuxge1ookuawbrcfawhl5td",
+      "category": "mango",
+      "object_instance": "mango_064",
+      "relative_path": "oo3d9dsingle/mango_064_j5c5nevwrmuxge1ookuawbrcfawhl5td",
+      "rgb_count": 50,
+      "object_id": 2758,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "mangosteen_012_hxk8rxd3npd9b3a8xq00bd9ljt8rhhv4",
+      "category": "mangosteen",
+      "object_instance": "mangosteen_012",
+      "relative_path": "oo3d9dsingle/mangosteen_012_hxk8rxd3npd9b3a8xq00bd9ljt8rhhv4",
+      "rgb_count": 50,
+      "object_id": 2771,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "mangosteen_022_1sb99i2aua4qezdtn07lnp45dg0molc3",
+      "category": "mangosteen",
+      "object_instance": "mangosteen_022",
+      "relative_path": "oo3d9dsingle/mangosteen_022_1sb99i2aua4qezdtn07lnp45dg0molc3",
+      "rgb_count": 50,
+      "object_id": 2780,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "mangosteen_029_zy0kgr3frq4o4e35q4gbtmcumyoz189j",
+      "category": "mangosteen",
+      "object_instance": "mangosteen_029",
+      "relative_path": "oo3d9dsingle/mangosteen_029_zy0kgr3frq4o4e35q4gbtmcumyoz189j",
+      "rgb_count": 50,
+      "object_id": 2787,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "medicine_bottle_002_wqyx14421qzfrjv1lp3w0poghtwqlq0u",
+      "category": "medicine_bottle",
+      "object_instance": "medicine_bottle_002",
+      "relative_path": "oo3d9dsingle/medicine_bottle_002_wqyx14421qzfrjv1lp3w0poghtwqlq0u",
+      "rgb_count": 50,
+      "object_id": 2791,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "medicine_bottle_044_9pqc82qkmlqpc1fyr2hzasnaojxpzfx6",
+      "category": "medicine_bottle",
+      "object_instance": "medicine_bottle_044",
+      "relative_path": "oo3d9dsingle/medicine_bottle_044_9pqc82qkmlqpc1fyr2hzasnaojxpzfx6",
+      "rgb_count": 50,
+      "object_id": 2829,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "medicine_bottle_054_2jqm843efipkn8k3ihxw61q6jyit8wej",
+      "category": "medicine_bottle",
+      "object_instance": "medicine_bottle_054",
+      "relative_path": "oo3d9dsingle/medicine_bottle_054_2jqm843efipkn8k3ihxw61q6jyit8wej",
+      "rgb_count": 50,
+      "object_id": 2839,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "medicine_bottle_061_fhxh1bk8vtxp3gf2s8nwcsz69t5z02b1",
+      "category": "medicine_bottle",
+      "object_instance": "medicine_bottle_061",
+      "relative_path": "oo3d9dsingle/medicine_bottle_061_fhxh1bk8vtxp3gf2s8nwcsz69t5z02b1",
+      "rgb_count": 50,
+      "object_id": 2846,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "medicine_bottle_063_4abfetta4uqrbiobaz8wmqtv6oh9arbm",
+      "category": "medicine_bottle",
+      "object_instance": "medicine_bottle_063",
+      "relative_path": "oo3d9dsingle/medicine_bottle_063_4abfetta4uqrbiobaz8wmqtv6oh9arbm",
+      "rgb_count": 50,
+      "object_id": 2848,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "medicine_bottle_064_hdvirhfeszxl9gtrtipwcv6w17az1emm",
+      "category": "medicine_bottle",
+      "object_instance": "medicine_bottle_064",
+      "relative_path": "oo3d9dsingle/medicine_bottle_064_hdvirhfeszxl9gtrtipwcv6w17az1emm",
+      "rgb_count": 50,
+      "object_id": 2849,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "microwaveoven_006_4r6aqacejh72w0293d0x16eidr9ets5k",
+      "category": "microwaveoven",
+      "object_instance": "microwaveoven_006",
+      "relative_path": "oo3d9dsingle/microwaveoven_006_4r6aqacejh72w0293d0x16eidr9ets5k",
+      "rgb_count": 48,
+      "object_id": 2855,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "monitor_004_b8se2zmkru8jckzdzgzo9ramxh1dwn8h",
+      "category": "monitor",
+      "object_instance": "monitor_004",
+      "relative_path": "oo3d9dsingle/monitor_004_b8se2zmkru8jckzdzgzo9ramxh1dwn8h",
+      "rgb_count": 50,
+      "object_id": 2863,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "mooncake_008_jzcmovbago1bou2u1oknpgsbott1c8rt",
+      "category": "mooncake",
+      "object_instance": "mooncake_008",
+      "relative_path": "oo3d9dsingle/mooncake_008_jzcmovbago1bou2u1oknpgsbott1c8rt",
+      "rgb_count": 50,
+      "object_id": 2871,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "mooncake_013_5wpfko3vznwjjg76l55k2pcexqvtoahg",
+      "category": "mooncake",
+      "object_instance": "mooncake_013",
+      "relative_path": "oo3d9dsingle/mooncake_013_5wpfko3vznwjjg76l55k2pcexqvtoahg",
+      "rgb_count": 50,
+      "object_id": 2876,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "mouse_019_7ti02s5qmcdfpl9fffw2thh0uj5lzhpv",
+      "category": "mouse",
+      "object_instance": "mouse_019",
+      "relative_path": "oo3d9dsingle/mouse_019_7ti02s5qmcdfpl9fffw2thh0uj5lzhpv",
+      "rgb_count": 50,
+      "object_id": 2902,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "mouse_025_1zvcjxppgt3ljcmkz73atwu0rei0d5wh",
+      "category": "mouse",
+      "object_instance": "mouse_025",
+      "relative_path": "oo3d9dsingle/mouse_025_1zvcjxppgt3ljcmkz73atwu0rei0d5wh",
+      "rgb_count": 50,
+      "object_id": 2908,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "mouse_027_e22t4f637o95m32d1sxtse75np5pkv9o",
+      "category": "mouse",
+      "object_instance": "mouse_027",
+      "relative_path": "oo3d9dsingle/mouse_027_e22t4f637o95m32d1sxtse75np5pkv9o",
+      "rgb_count": 50,
+      "object_id": 2909,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "mushroom_017_hsgciza68knj9qiiairchondaejydzzx",
+      "category": "mushroom",
+      "object_instance": "mushroom_017",
+      "relative_path": "oo3d9dsingle/mushroom_017_hsgciza68knj9qiiairchondaejydzzx",
+      "rgb_count": 50,
+      "object_id": 2928,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "mushroom_020_t90bycp99tz8lwe7mn4v15th6bozr10s",
+      "category": "mushroom",
+      "object_instance": "mushroom_020",
+      "relative_path": "oo3d9dsingle/mushroom_020_t90bycp99tz8lwe7mn4v15th6bozr10s",
+      "rgb_count": 50,
+      "object_id": 2931,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "mushroom_023_146eftt7qx5joibg9qmum77iunte6yrh",
+      "category": "mushroom",
+      "object_instance": "mushroom_023",
+      "relative_path": "oo3d9dsingle/mushroom_023_146eftt7qx5joibg9qmum77iunte6yrh",
+      "rgb_count": 50,
+      "object_id": 2934,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "mushroom_024_0fzipi4ozgx6oser7pk0pnjwgcs3qqnm",
+      "category": "mushroom",
+      "object_instance": "mushroom_024",
+      "relative_path": "oo3d9dsingle/mushroom_024_0fzipi4ozgx6oser7pk0pnjwgcs3qqnm",
+      "rgb_count": 50,
+      "object_id": 2935,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "mushroom_043_ziwmbvmdzzainne3s1jaz499td56bi2z",
+      "category": "mushroom",
+      "object_instance": "mushroom_043",
+      "relative_path": "oo3d9dsingle/mushroom_043_ziwmbvmdzzainne3s1jaz499td56bi2z",
+      "rgb_count": 50,
+      "object_id": 2946,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "mushroom_050_6lg4dtagk7chy2q268eptuh46tcaw9kg",
+      "category": "mushroom",
+      "object_instance": "mushroom_050",
+      "relative_path": "oo3d9dsingle/mushroom_050_6lg4dtagk7chy2q268eptuh46tcaw9kg",
+      "rgb_count": 50,
+      "object_id": 2953,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "nipple_003_vt8ft8mtic1rw88slvznf6yz1273v53a",
+      "category": "nipple",
+      "object_instance": "nipple_003",
+      "relative_path": "oo3d9dsingle/nipple_003_vt8ft8mtic1rw88slvznf6yz1273v53a",
+      "rgb_count": 50,
+      "object_id": 2976,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "onion_001_5s3ahentuliino3tezpw3lucs7ths3vw",
+      "category": "onion",
+      "object_instance": "onion_001",
+      "relative_path": "oo3d9dsingle/onion_001_5s3ahentuliino3tezpw3lucs7ths3vw",
+      "rgb_count": 50,
+      "object_id": 2982,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "onion_014_9h3ql4wvsi25btbzo7k4jqvv3l514vhg",
+      "category": "onion",
+      "object_instance": "onion_014",
+      "relative_path": "oo3d9dsingle/onion_014_9h3ql4wvsi25btbzo7k4jqvv3l514vhg",
+      "rgb_count": 50,
+      "object_id": 2995,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "onion_030_j9o14v4v94ssj13jbscjjq1mlrk9owov",
+      "category": "onion",
+      "object_instance": "onion_030",
+      "relative_path": "oo3d9dsingle/onion_030_j9o14v4v94ssj13jbscjjq1mlrk9owov",
+      "rgb_count": 50,
+      "object_id": 3011,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "orange_013_rg95diu7a13gkujj09xujcltxk0viyt6",
+      "category": "orange",
+      "object_instance": "orange_013",
+      "relative_path": "oo3d9dsingle/orange_013_rg95diu7a13gkujj09xujcltxk0viyt6",
+      "rgb_count": 50,
+      "object_id": 3028,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "orange_016_2d3egu7fie0qrt3sxxha9dyz42c6itqe",
+      "category": "orange",
+      "object_instance": "orange_016",
+      "relative_path": "oo3d9dsingle/orange_016_2d3egu7fie0qrt3sxxha9dyz42c6itqe",
+      "rgb_count": 50,
+      "object_id": 3031,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "orange_035_em5uvhjnqo1bevtqafta1bl1rou52huy",
+      "category": "orange",
+      "object_instance": "orange_035",
+      "relative_path": "oo3d9dsingle/orange_035_em5uvhjnqo1bevtqafta1bl1rou52huy",
+      "rgb_count": 50,
+      "object_id": 3050,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "ornament_002_yuxhgsh2k2nt3f7jgcwqsdsx3f88omqa",
+      "category": "ornament",
+      "object_instance": "ornament_002",
+      "relative_path": "oo3d9dsingle/ornament_002_yuxhgsh2k2nt3f7jgcwqsdsx3f88omqa",
+      "rgb_count": 50,
+      "object_id": 3054,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "ornaments_003_lzqj6wuzzdog1f26rf4znz7ilimadd9n",
+      "category": "ornaments",
+      "object_instance": "ornaments_003",
+      "relative_path": "oo3d9dsingle/ornaments_003_lzqj6wuzzdog1f26rf4znz7ilimadd9n",
+      "rgb_count": 50,
+      "object_id": 3060,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "oyster_005_iy5tsi1ipf1gw2209wf1imhhjrmlwb3x",
+      "category": "oyster",
+      "object_instance": "oyster_005",
+      "relative_path": "oo3d9dsingle/oyster_005_iy5tsi1ipf1gw2209wf1imhhjrmlwb3x",
+      "rgb_count": 50,
+      "object_id": 3072,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "oyster_007_5x8t8hxh9jbpvjspyiyl9aosigg8x448",
+      "category": "oyster",
+      "object_instance": "oyster_007",
+      "relative_path": "oo3d9dsingle/oyster_007_5x8t8hxh9jbpvjspyiyl9aosigg8x448",
+      "rgb_count": 50,
+      "object_id": 3074,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "oyster_023_npo25qxkyoyn57x60aysalyjsgnunis5",
+      "category": "oyster",
+      "object_instance": "oyster_023",
+      "relative_path": "oo3d9dsingle/oyster_023_npo25qxkyoyn57x60aysalyjsgnunis5",
+      "rgb_count": 50,
+      "object_id": 3086,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "package_001_2k2szvonbzgyrc23avfr7fahy8y7492h",
+      "category": "package",
+      "object_instance": "package_001",
+      "relative_path": "oo3d9dsingle/package_001_2k2szvonbzgyrc23avfr7fahy8y7492h",
+      "rgb_count": 50,
+      "object_id": 3097,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "package_011_h6bapvkghkefv94swb37yt95pnyc3b6f",
+      "category": "package",
+      "object_instance": "package_011",
+      "relative_path": "oo3d9dsingle/package_011_h6bapvkghkefv94swb37yt95pnyc3b6f",
+      "rgb_count": 50,
+      "object_id": 3107,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "pad_006_vj77oq6c5eoj5x2f62iil5fbiq4l92hh",
+      "category": "pad",
+      "object_instance": "pad_006",
+      "relative_path": "oo3d9dsingle/pad_006_vj77oq6c5eoj5x2f62iil5fbiq4l92hh",
+      "rgb_count": 48,
+      "object_id": 3118,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "pan_003_t0aw97zgy6fhle8osw5qmwm3txv47zfa",
+      "category": "pan",
+      "object_instance": "pan_003",
+      "relative_path": "oo3d9dsingle/pan_003_t0aw97zgy6fhle8osw5qmwm3txv47zfa",
+      "rgb_count": 50,
+      "object_id": 3134,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "pancake_001_mi9uek9xhs1xf0u9n4u4d9rj5ht12ou4",
+      "category": "pancake",
+      "object_instance": "pancake_001",
+      "relative_path": "oo3d9dsingle/pancake_001_mi9uek9xhs1xf0u9n4u4d9rj5ht12ou4",
+      "rgb_count": 50,
+      "object_id": 3136,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "pancake_003_4c7eazswj8vy6jmu1w6cymqzw6ulc5f1",
+      "category": "pancake",
+      "object_instance": "pancake_003",
+      "relative_path": "oo3d9dsingle/pancake_003_4c7eazswj8vy6jmu1w6cymqzw6ulc5f1",
+      "rgb_count": 50,
+      "object_id": 3138,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "pastry_020_mcpdadth22helohhyoutn42j0k6orwza",
+      "category": "pastry",
+      "object_instance": "pastry_020",
+      "relative_path": "oo3d9dsingle/pastry_020_mcpdadth22helohhyoutn42j0k6orwza",
+      "rgb_count": 50,
+      "object_id": 3178,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "pastry_025_3ipvvhh6gq8gt6etp1dyx9jdpuokn5mh",
+      "category": "pastry",
+      "object_instance": "pastry_025",
+      "relative_path": "oo3d9dsingle/pastry_025_3ipvvhh6gq8gt6etp1dyx9jdpuokn5mh",
+      "rgb_count": 50,
+      "object_id": 3183,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "peach_009_kfemqtabsmgbp4s6r7vqwy21l78kn755",
+      "category": "peach",
+      "object_instance": "peach_009",
+      "relative_path": "oo3d9dsingle/peach_009_kfemqtabsmgbp4s6r7vqwy21l78kn755",
+      "rgb_count": 50,
+      "object_id": 3192,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "peach_016_uo5jy0ia86e258a0hmybnaafz4lskfoq",
+      "category": "peach",
+      "object_instance": "peach_016",
+      "relative_path": "oo3d9dsingle/peach_016_uo5jy0ia86e258a0hmybnaafz4lskfoq",
+      "rgb_count": 50,
+      "object_id": 3197,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "peach_044_9t7krwzublmqipp3ymkqdgz40wa8vzpy",
+      "category": "peach",
+      "object_instance": "peach_044",
+      "relative_path": "oo3d9dsingle/peach_044_9t7krwzublmqipp3ymkqdgz40wa8vzpy",
+      "rgb_count": 50,
+      "object_id": 3214,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "peanut_007_3oal6u9b0gq28e1d1ui0ziapxs9as7cw",
+      "category": "peanut",
+      "object_instance": "peanut_007",
+      "relative_path": "oo3d9dsingle/peanut_007_3oal6u9b0gq28e1d1ui0ziapxs9as7cw",
+      "rgb_count": 50,
+      "object_id": 3221,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "peanut_021_73v9q6rwnkoujaln5qblb1s0je2ei1no",
+      "category": "peanut",
+      "object_instance": "peanut_021",
+      "relative_path": "oo3d9dsingle/peanut_021_73v9q6rwnkoujaln5qblb1s0je2ei1no",
+      "rgb_count": 50,
+      "object_id": 3235,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "peanut_024_qf6t4gtr4c3l10heh127lbzf9zrrr636",
+      "category": "peanut",
+      "object_instance": "peanut_024",
+      "relative_path": "oo3d9dsingle/peanut_024_qf6t4gtr4c3l10heh127lbzf9zrrr636",
+      "rgb_count": 50,
+      "object_id": 3238,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "pear_005_p0yl9bpnzdaeu3m2kc8odk85gudj8arw",
+      "category": "pear",
+      "object_instance": "pear_005",
+      "relative_path": "oo3d9dsingle/pear_005_p0yl9bpnzdaeu3m2kc8odk85gudj8arw",
+      "rgb_count": 50,
+      "object_id": 3250,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "pear_019_ciqwyd9e0w58jlbl6tj0hgxxhbhsfcy0",
+      "category": "pear",
+      "object_instance": "pear_019",
+      "relative_path": "oo3d9dsingle/pear_019_ciqwyd9e0w58jlbl6tj0hgxxhbhsfcy0",
+      "rgb_count": 50,
+      "object_id": 3264,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "pear_030_yzu6q7ngksnk7x9812evcyfeu5u7pvwo",
+      "category": "pear",
+      "object_instance": "pear_030",
+      "relative_path": "oo3d9dsingle/pear_030_yzu6q7ngksnk7x9812evcyfeu5u7pvwo",
+      "rgb_count": 50,
+      "object_id": 3274,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "pen_005_7iirxhgj0qukit88b11eyypvqw64iw75",
+      "category": "pen",
+      "object_instance": "pen_005",
+      "relative_path": "oo3d9dsingle/pen_005_7iirxhgj0qukit88b11eyypvqw64iw75",
+      "rgb_count": 50,
+      "object_id": 3287,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "picnic_basket_001_p2qlgtchr77dls5kw1gh5ndpjycxji6d",
+      "category": "picnic_basket",
+      "object_instance": "picnic_basket_001",
+      "relative_path": "oo3d9dsingle/picnic_basket_001_p2qlgtchr77dls5kw1gh5ndpjycxji6d",
+      "rgb_count": 50,
+      "object_id": 3290,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "pie_015_65kz6td36779r83hikpw0oetw86mgu4n",
+      "category": "pie",
+      "object_instance": "pie_015",
+      "relative_path": "oo3d9dsingle/pie_015_65kz6td36779r83hikpw0oetw86mgu4n",
+      "rgb_count": 50,
+      "object_id": 3315,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "pie_025_4o26kcd0mtnotb0xjuqwwjo6uzjui4f9",
+      "category": "pie",
+      "object_instance": "pie_025",
+      "relative_path": "oo3d9dsingle/pie_025_4o26kcd0mtnotb0xjuqwwjo6uzjui4f9",
+      "rgb_count": 50,
+      "object_id": 3325,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "pie_026_jv7rl7aef9b51hvoq7n5njjtagxqe9vx",
+      "category": "pie",
+      "object_instance": "pie_026",
+      "relative_path": "oo3d9dsingle/pie_026_jv7rl7aef9b51hvoq7n5njjtagxqe9vx",
+      "rgb_count": 50,
+      "object_id": 3326,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "pillow_004_rbivd9s4bbsbtxt8r2bv8ltmvoa43cwm",
+      "category": "pillow",
+      "object_instance": "pillow_004",
+      "relative_path": "oo3d9dsingle/pillow_004_rbivd9s4bbsbtxt8r2bv8ltmvoa43cwm",
+      "rgb_count": 44,
+      "object_id": 3336,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "pillow_013_bxp2d6fsfkaxz4cmrjrkddi8wwb4l7ek",
+      "category": "pillow",
+      "object_instance": "pillow_013",
+      "relative_path": "oo3d9dsingle/pillow_013_bxp2d6fsfkaxz4cmrjrkddi8wwb4l7ek",
+      "rgb_count": 50,
+      "object_id": 3345,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "pineapple_007_eh3kiwpddm0c252vhe1ufn80g4n48z8p",
+      "category": "pineapple",
+      "object_instance": "pineapple_007",
+      "relative_path": "oo3d9dsingle/pineapple_007_eh3kiwpddm0c252vhe1ufn80g4n48z8p",
+      "rgb_count": 50,
+      "object_id": 3377,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "pineapple_021_i3rd1zifq49e8iezi9uj6vshup8qxzwh",
+      "category": "pineapple",
+      "object_instance": "pineapple_021",
+      "relative_path": "oo3d9dsingle/pineapple_021_i3rd1zifq49e8iezi9uj6vshup8qxzwh",
+      "rgb_count": 50,
+      "object_id": 3390,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "pineapple_027_kb79mmy4twnjzh10s7zim9n109iz61wb",
+      "category": "pineapple",
+      "object_instance": "pineapple_027",
+      "relative_path": "oo3d9dsingle/pineapple_027_kb79mmy4twnjzh10s7zim9n109iz61wb",
+      "rgb_count": 50,
+      "object_id": 3394,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "pinecone_012_szxj10phei4nv8ea13i6xr37etr9oimy",
+      "category": "pinecone",
+      "object_instance": "pinecone_012",
+      "relative_path": "oo3d9dsingle/pinecone_012_szxj10phei4nv8ea13i6xr37etr9oimy",
+      "rgb_count": 50,
+      "object_id": 3411,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "pinecone_019_y4s35sr0ie3e0cu2z3b0y6m1q72jlct0",
+      "category": "pinecone",
+      "object_instance": "pinecone_019",
+      "relative_path": "oo3d9dsingle/pinecone_019_y4s35sr0ie3e0cu2z3b0y6m1q72jlct0",
+      "rgb_count": 50,
+      "object_id": 3418,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "pitaya_010_gh6wy02teb9jw5fuptzv1qy2ijggtps2",
+      "category": "pitaya",
+      "object_instance": "pitaya_010",
+      "relative_path": "oo3d9dsingle/pitaya_010_gh6wy02teb9jw5fuptzv1qy2ijggtps2",
+      "rgb_count": 50,
+      "object_id": 3430,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "pitaya_024_fxioip7h0qzizkfyjlvguy5c1nkrqc56",
+      "category": "pitaya",
+      "object_instance": "pitaya_024",
+      "relative_path": "oo3d9dsingle/pitaya_024_fxioip7h0qzizkfyjlvguy5c1nkrqc56",
+      "rgb_count": 50,
+      "object_id": 3444,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "pitaya_025_ed5p494u90agzluscue92rs29euyazqq",
+      "category": "pitaya",
+      "object_instance": "pitaya_025",
+      "relative_path": "oo3d9dsingle/pitaya_025_ed5p494u90agzluscue92rs29euyazqq",
+      "rgb_count": 50,
+      "object_id": 3445,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "pitaya_033_hx7yld6gp9tj4ac0xhuhavdc8pw9xxc7",
+      "category": "pitaya",
+      "object_instance": "pitaya_033",
+      "relative_path": "oo3d9dsingle/pitaya_033_hx7yld6gp9tj4ac0xhuhavdc8pw9xxc7",
+      "rgb_count": 50,
+      "object_id": 3453,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "pitaya_045_gwdhztlzknzmhd1ab3foush2bnwces0e",
+      "category": "pitaya",
+      "object_instance": "pitaya_045",
+      "relative_path": "oo3d9dsingle/pitaya_045_gwdhztlzknzmhd1ab3foush2bnwces0e",
+      "rgb_count": 50,
+      "object_id": 3465,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "pizza_009_wpss6osr5xgvf0l2sjhrp531gb42430j",
+      "category": "pizza",
+      "object_instance": "pizza_009",
+      "relative_path": "oo3d9dsingle/pizza_009_wpss6osr5xgvf0l2sjhrp531gb42430j",
+      "rgb_count": 50,
+      "object_id": 3477,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "pizza_011_p3ietz00qk284i8svtf8rhgwmo8q9s05",
+      "category": "pizza",
+      "object_instance": "pizza_011",
+      "relative_path": "oo3d9dsingle/pizza_011_p3ietz00qk284i8svtf8rhgwmo8q9s05",
+      "rgb_count": 50,
+      "object_id": 3479,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "pizza_019_z0143bxsh6veq6rmd27wp9wv7w219foy",
+      "category": "pizza",
+      "object_instance": "pizza_019",
+      "relative_path": "oo3d9dsingle/pizza_019_z0143bxsh6veq6rmd27wp9wv7w219foy",
+      "rgb_count": 50,
+      "object_id": 3487,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "plant_005_wdxzfbzspjzldonfwvgfmo4ydxtorzq9",
+      "category": "plant",
+      "object_instance": "plant_005",
+      "relative_path": "oo3d9dsingle/plant_005_wdxzfbzspjzldonfwvgfmo4ydxtorzq9",
+      "rgb_count": 50,
+      "object_id": 3505,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "plant_006_vlehyvnqa2at9222hz6z1wqkaevq45al",
+      "category": "plant",
+      "object_instance": "plant_006",
+      "relative_path": "oo3d9dsingle/plant_006_vlehyvnqa2at9222hz6z1wqkaevq45al",
+      "rgb_count": 50,
+      "object_id": 3506,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "pomegranate_004_ft9ghuhemhp7znw6fu10kczq4uku0w1e",
+      "category": "pomegranate",
+      "object_instance": "pomegranate_004",
+      "relative_path": "oo3d9dsingle/pomegranate_004_ft9ghuhemhp7znw6fu10kczq4uku0w1e",
+      "rgb_count": 50,
+      "object_id": 3520,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "pomegranate_009_6idpb6h9e0jflo26ej9m9z1rg9j3pm27",
+      "category": "pomegranate",
+      "object_instance": "pomegranate_009",
+      "relative_path": "oo3d9dsingle/pomegranate_009_6idpb6h9e0jflo26ej9m9z1rg9j3pm27",
+      "rgb_count": 50,
+      "object_id": 3525,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "pomegranate_014_h2j6e5gvnpv91kaemss348yzs3fjuw9z",
+      "category": "pomegranate",
+      "object_instance": "pomegranate_014",
+      "relative_path": "oo3d9dsingle/pomegranate_014_h2j6e5gvnpv91kaemss348yzs3fjuw9z",
+      "rgb_count": 50,
+      "object_id": 3530,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "pomegranate_041_pz3w7mvp5zwasomg8ylbk4c7ffrka8to",
+      "category": "pomegranate",
+      "object_instance": "pomegranate_041",
+      "relative_path": "oo3d9dsingle/pomegranate_041_pz3w7mvp5zwasomg8ylbk4c7ffrka8to",
+      "rgb_count": 50,
+      "object_id": 3556,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "pomegranate_050_zhmkzxtq9oao6v5caudh62vfns2j7jij",
+      "category": "pomegranate",
+      "object_instance": "pomegranate_050",
+      "relative_path": "oo3d9dsingle/pomegranate_050_zhmkzxtq9oao6v5caudh62vfns2j7jij",
+      "rgb_count": 50,
+      "object_id": 3565,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "popcorn_005_vr71zgl4ol99jf5w6tezls8dqewaw6sj",
+      "category": "popcorn",
+      "object_instance": "popcorn_005",
+      "relative_path": "oo3d9dsingle/popcorn_005_vr71zgl4ol99jf5w6tezls8dqewaw6sj",
+      "rgb_count": 50,
+      "object_id": 3572,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "popcorn_006_8ygi5ev6xy7otm9sg7ilw1l6w1byl3bt",
+      "category": "popcorn",
+      "object_instance": "popcorn_006",
+      "relative_path": "oo3d9dsingle/popcorn_006_8ygi5ev6xy7otm9sg7ilw1l6w1byl3bt",
+      "rgb_count": 50,
+      "object_id": 3573,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "popcorn_023_f75zlzpkeh2jdx2gax7zgotnefva22gb",
+      "category": "popcorn",
+      "object_instance": "popcorn_023",
+      "relative_path": "oo3d9dsingle/popcorn_023_f75zlzpkeh2jdx2gax7zgotnefva22gb",
+      "rgb_count": 50,
+      "object_id": 3590,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "popcorn_030_o8rvg6qyipdammmcz1rhva7ykzxpat45",
+      "category": "popcorn",
+      "object_instance": "popcorn_030",
+      "relative_path": "oo3d9dsingle/popcorn_030_o8rvg6qyipdammmcz1rhva7ykzxpat45",
+      "rgb_count": 50,
+      "object_id": 3597,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "potato_006_0cupddx702eoaphe45do6xp3xoxmtw94",
+      "category": "potato",
+      "object_instance": "potato_006",
+      "relative_path": "oo3d9dsingle/potato_006_0cupddx702eoaphe45do6xp3xoxmtw94",
+      "rgb_count": 50,
+      "object_id": 3614,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "potato_017_jiudvyx9qb4ey4yxgdl9erxu54vuhflq",
+      "category": "potato",
+      "object_instance": "potato_017",
+      "relative_path": "oo3d9dsingle/potato_017_jiudvyx9qb4ey4yxgdl9erxu54vuhflq",
+      "rgb_count": 50,
+      "object_id": 3625,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "potato_024_b6evpiqr67beyidbtdv7c6asjedhrw21",
+      "category": "potato",
+      "object_instance": "potato_024",
+      "relative_path": "oo3d9dsingle/potato_024_b6evpiqr67beyidbtdv7c6asjedhrw21",
+      "rgb_count": 50,
+      "object_id": 3632,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "potato_043_swnueyb5nn3hw8eoay6ytbhiix9aw5ei",
+      "category": "potato",
+      "object_instance": "potato_043",
+      "relative_path": "oo3d9dsingle/potato_043_swnueyb5nn3hw8eoay6ytbhiix9aw5ei",
+      "rgb_count": 50,
+      "object_id": 3650,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "potato_chips_003_xupdk89nb4zagntm2y8pggpz7263dzbo",
+      "category": "potato_chips",
+      "object_instance": "potato_chips_003",
+      "relative_path": "oo3d9dsingle/potato_chips_003_xupdk89nb4zagntm2y8pggpz7263dzbo",
+      "rgb_count": 50,
+      "object_id": 3654,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "power_strip_014_o7idbruvorvmigk9rds0ad6unbp9ldh7",
+      "category": "power_strip",
+      "object_instance": "power_strip_014",
+      "relative_path": "oo3d9dsingle/power_strip_014_o7idbruvorvmigk9rds0ad6unbp9ldh7",
+      "rgb_count": 50,
+      "object_id": 3674,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "power_strip_023_ui2qwmvjvr30fxjjjm8hjbgdy2p380i1",
+      "category": "power_strip",
+      "object_instance": "power_strip_023",
+      "relative_path": "oo3d9dsingle/power_strip_023_ui2qwmvjvr30fxjjjm8hjbgdy2p380i1",
+      "rgb_count": 50,
+      "object_id": 3683,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "power_strip_029_bn2heajud3zkkvuaqeavc48jr6oaqsb6",
+      "category": "power_strip",
+      "object_instance": "power_strip_029",
+      "relative_path": "oo3d9dsingle/power_strip_029_bn2heajud3zkkvuaqeavc48jr6oaqsb6",
+      "rgb_count": 50,
+      "object_id": 3689,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "projector_007_9laaeoou59g7r6m1vtkmukljed55edr7",
+      "category": "projector",
+      "object_instance": "projector_007",
+      "relative_path": "oo3d9dsingle/projector_007_9laaeoou59g7r6m1vtkmukljed55edr7",
+      "rgb_count": 50,
+      "object_id": 3702,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "puff_021_mx22gmyf9zjmwesk5yj5k1ttbee5zqn5",
+      "category": "puff",
+      "object_instance": "puff_021",
+      "relative_path": "oo3d9dsingle/puff_021_mx22gmyf9zjmwesk5yj5k1ttbee5zqn5",
+      "rgb_count": 50,
+      "object_id": 3721,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "puff_026_4qt7nqtx0qcnfbfpgzwpgncpo7on7qo1",
+      "category": "puff",
+      "object_instance": "puff_026",
+      "relative_path": "oo3d9dsingle/puff_026_4qt7nqtx0qcnfbfpgzwpgncpo7on7qo1",
+      "rgb_count": 50,
+      "object_id": 3726,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "pumpkin_001_bpdc9mapgh9r1oappftfk7szp0vxfwfv",
+      "category": "pumpkin",
+      "object_instance": "pumpkin_001",
+      "relative_path": "oo3d9dsingle/pumpkin_001_bpdc9mapgh9r1oappftfk7szp0vxfwfv",
+      "rgb_count": 50,
+      "object_id": 3728,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "pumpkin_014_5z1gb5teevgw0jektoq85rhyawfdqtvv",
+      "category": "pumpkin",
+      "object_instance": "pumpkin_014",
+      "relative_path": "oo3d9dsingle/pumpkin_014_5z1gb5teevgw0jektoq85rhyawfdqtvv",
+      "rgb_count": 50,
+      "object_id": 3741,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "pumpkin_017_n4gsmmy3qukcsts4n2suzr6lxn8qzxlp",
+      "category": "pumpkin",
+      "object_instance": "pumpkin_017",
+      "relative_path": "oo3d9dsingle/pumpkin_017_n4gsmmy3qukcsts4n2suzr6lxn8qzxlp",
+      "rgb_count": 50,
+      "object_id": 3744,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "razor_012_c08t4vwg6ejdrarmqptomridpbhaq1wx",
+      "category": "razor",
+      "object_instance": "razor_012",
+      "relative_path": "oo3d9dsingle/razor_012_c08t4vwg6ejdrarmqptomridpbhaq1wx",
+      "rgb_count": 50,
+      "object_id": 3776,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "red_jujube_001_lqw96ldgxp1xt45sta5u02x1n2wawmak",
+      "category": "red_jujube",
+      "object_instance": "red_jujube_001",
+      "relative_path": "oo3d9dsingle/red_jujube_001_lqw96ldgxp1xt45sta5u02x1n2wawmak",
+      "rgb_count": 50,
+      "object_id": 3777,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "red_jujube_006_li9nnfxf626r1a71jkn2ulr5r49zsc0y",
+      "category": "red_jujube",
+      "object_instance": "red_jujube_006",
+      "relative_path": "oo3d9dsingle/red_jujube_006_li9nnfxf626r1a71jkn2ulr5r49zsc0y",
+      "rgb_count": 50,
+      "object_id": 3780,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "red_wine_glass_004_yvsobj2r5cnizcs545lhdua1orvyqmty",
+      "category": "red_wine_glass",
+      "object_instance": "red_wine_glass_004",
+      "relative_path": "oo3d9dsingle/red_wine_glass_004_yvsobj2r5cnizcs545lhdua1orvyqmty",
+      "rgb_count": 50,
+      "object_id": 3796,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "red_wine_glass_009_japg48k515zul83e4ueq96v57hp2msf0",
+      "category": "red_wine_glass",
+      "object_instance": "red_wine_glass_009",
+      "relative_path": "oo3d9dsingle/red_wine_glass_009_japg48k515zul83e4ueq96v57hp2msf0",
+      "rgb_count": 50,
+      "object_id": 3801,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "remote_control_006_c3k0fx83j9zqrks0hu6v4yhaqk3tsuj9",
+      "category": "remote_control",
+      "object_instance": "remote_control_006",
+      "relative_path": "oo3d9dsingle/remote_control_006_c3k0fx83j9zqrks0hu6v4yhaqk3tsuj9",
+      "rgb_count": 50,
+      "object_id": 3819,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "remote_control_009_uno9uod1sz3qoc6sjesyvegsczq9xhqh",
+      "category": "remote_control",
+      "object_instance": "remote_control_009",
+      "relative_path": "oo3d9dsingle/remote_control_009_uno9uod1sz3qoc6sjesyvegsczq9xhqh",
+      "rgb_count": 50,
+      "object_id": 3822,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "remote_control_012_vkzcmw2uwtnfmxfms45e8vqezobjkunr",
+      "category": "remote_control",
+      "object_instance": "remote_control_012",
+      "relative_path": "oo3d9dsingle/remote_control_012_vkzcmw2uwtnfmxfms45e8vqezobjkunr",
+      "rgb_count": 50,
+      "object_id": 3825,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "rice_cake_003_x22fx25p53nc8xhes13jl0qkw6i6he1l",
+      "category": "rice_cake",
+      "object_instance": "rice_cake_003",
+      "relative_path": "oo3d9dsingle/rice_cake_003_x22fx25p53nc8xhes13jl0qkw6i6he1l",
+      "rgb_count": 50,
+      "object_id": 3846,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "rice_cake_009_wjh9c703kzqmutmqx9lyut3vkg1yv7tc",
+      "category": "rice_cake",
+      "object_instance": "rice_cake_009",
+      "relative_path": "oo3d9dsingle/rice_cake_009_wjh9c703kzqmutmqx9lyut3vkg1yv7tc",
+      "rgb_count": 50,
+      "object_id": 3852,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "ricecooker_001_eqfq18prosbm6l0o1pqsposm42bar02l",
+      "category": "ricecooker",
+      "object_instance": "ricecooker_001",
+      "relative_path": "oo3d9dsingle/ricecooker_001_eqfq18prosbm6l0o1pqsposm42bar02l",
+      "rgb_count": 50,
+      "object_id": 3864,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "rubik_cube_019_wm2fk1zipkx6vazyb26e3itfgwuzlslp",
+      "category": "rubik_cube",
+      "object_instance": "rubik_cube_019",
+      "relative_path": "oo3d9dsingle/rubik_cube_019_wm2fk1zipkx6vazyb26e3itfgwuzlslp",
+      "rgb_count": 50,
+      "object_id": 3884,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "rubik_cube_030_o57qix6opso3ch0dft8ofn804jpu5igu",
+      "category": "rubik_cube",
+      "object_instance": "rubik_cube_030",
+      "relative_path": "oo3d9dsingle/rubik_cube_030_o57qix6opso3ch0dft8ofn804jpu5igu",
+      "rgb_count": 50,
+      "object_id": 3891,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "rubik_cube_043_ahlv8ta4gdhscpe8wp6iyx0izr9aof65",
+      "category": "rubik_cube",
+      "object_instance": "rubik_cube_043",
+      "relative_path": "oo3d9dsingle/rubik_cube_043_ahlv8ta4gdhscpe8wp6iyx0izr9aof65",
+      "rgb_count": 50,
+      "object_id": 3902,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "sandwich_013_2fapqmkpilh05rfvgh85ubr144azhw9d",
+      "category": "sandwich",
+      "object_instance": "sandwich_013",
+      "relative_path": "oo3d9dsingle/sandwich_013_2fapqmkpilh05rfvgh85ubr144azhw9d",
+      "rgb_count": 50,
+      "object_id": 3913,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "sandwich_027_twmgultr5g5cys6hzht3jidmcqr7jam1",
+      "category": "sandwich",
+      "object_instance": "sandwich_027",
+      "relative_path": "oo3d9dsingle/sandwich_027_twmgultr5g5cys6hzht3jidmcqr7jam1",
+      "rgb_count": 50,
+      "object_id": 3927,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "sausage_025_15j8gc3pykvhv4weqlbpwllhp9kvcdcr",
+      "category": "sausage",
+      "object_instance": "sausage_025",
+      "relative_path": "oo3d9dsingle/sausage_025_15j8gc3pykvhv4weqlbpwllhp9kvcdcr",
+      "rgb_count": 50,
+      "object_id": 3944,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "sausage_026_tbl87i4jnunfa6qv7d03h63qk0l633yl",
+      "category": "sausage",
+      "object_instance": "sausage_026",
+      "relative_path": "oo3d9dsingle/sausage_026_tbl87i4jnunfa6qv7d03h63qk0l633yl",
+      "rgb_count": 50,
+      "object_id": 3945,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "sausage_029_ko2nw1swypqbqkk0uvt3qk9xbivep3jk",
+      "category": "sausage",
+      "object_instance": "sausage_029",
+      "relative_path": "oo3d9dsingle/sausage_029_ko2nw1swypqbqkk0uvt3qk9xbivep3jk",
+      "rgb_count": 50,
+      "object_id": 3947,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "sausage_033_5kq47kvdlffb8np8dmpozt72k2t4ih3p",
+      "category": "sausage",
+      "object_instance": "sausage_033",
+      "relative_path": "oo3d9dsingle/sausage_033_5kq47kvdlffb8np8dmpozt72k2t4ih3p",
+      "rgb_count": 50,
+      "object_id": 3949,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "sausage_072_ogtafp7gsqhenr7jtgz2cjedmzngxcig",
+      "category": "sausage",
+      "object_instance": "sausage_072",
+      "relative_path": "oo3d9dsingle/sausage_072_ogtafp7gsqhenr7jtgz2cjedmzngxcig",
+      "rgb_count": 50,
+      "object_id": 3981,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "scissor_015_c45vm8cjrfvb7sqey0f3bu9wuzhmf4zm",
+      "category": "scissor",
+      "object_instance": "scissor_015",
+      "relative_path": "oo3d9dsingle/scissor_015_c45vm8cjrfvb7sqey0f3bu9wuzhmf4zm",
+      "rgb_count": 50,
+      "object_id": 4000,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "scissor_018_wlgkfid6jr8iuaqk59da7awuz7c5rdga",
+      "category": "scissor",
+      "object_instance": "scissor_018",
+      "relative_path": "oo3d9dsingle/scissor_018_wlgkfid6jr8iuaqk59da7awuz7c5rdga",
+      "rgb_count": 50,
+      "object_id": 4003,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "shampoo_002_md9zdpntjdjbfzgy8rjgfkv3whdmylbn",
+      "category": "shampoo",
+      "object_instance": "shampoo_002",
+      "relative_path": "oo3d9dsingle/shampoo_002_md9zdpntjdjbfzgy8rjgfkv3whdmylbn",
+      "rgb_count": 50,
+      "object_id": 4006,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "shampoo_005_fqnrdrq6v9wuwdqnruw727sedcu2ie2d",
+      "category": "shampoo",
+      "object_instance": "shampoo_005",
+      "relative_path": "oo3d9dsingle/shampoo_005_fqnrdrq6v9wuwdqnruw727sedcu2ie2d",
+      "rgb_count": 50,
+      "object_id": 4009,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "shampoo_017_iyjgutgqbtgw20utoc5ern997klntx71",
+      "category": "shampoo",
+      "object_instance": "shampoo_017",
+      "relative_path": "oo3d9dsingle/shampoo_017_iyjgutgqbtgw20utoc5ern997klntx71",
+      "rgb_count": 50,
+      "object_id": 4021,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "shaomai_010_ho5u188oc5lmv2nil22n7c1rc9amol6u",
+      "category": "shaomai",
+      "object_instance": "shaomai_010",
+      "relative_path": "oo3d9dsingle/shaomai_010_ho5u188oc5lmv2nil22n7c1rc9amol6u",
+      "rgb_count": 50,
+      "object_id": 4051,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "shaomai_016_2yb2x28ikjp3noe7v19u6ggtzysgvn3k",
+      "category": "shaomai",
+      "object_instance": "shaomai_016",
+      "relative_path": "oo3d9dsingle/shaomai_016_2yb2x28ikjp3noe7v19u6ggtzysgvn3k",
+      "rgb_count": 50,
+      "object_id": 4057,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "shoe_023_ech03crfpg579v5n69mhh2he6gs2w3s7",
+      "category": "shoe",
+      "object_instance": "shoe_023",
+      "relative_path": "oo3d9dsingle/shoe_023_ech03crfpg579v5n69mhh2he6gs2w3s7",
+      "rgb_count": 50,
+      "object_id": 4082,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "shoe_025_sp78zgtqrun17prg7rxhrht8lqgqzd99",
+      "category": "shoe",
+      "object_instance": "shoe_025",
+      "relative_path": "oo3d9dsingle/shoe_025_sp78zgtqrun17prg7rxhrht8lqgqzd99",
+      "rgb_count": 50,
+      "object_id": 4084,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "shoe_031_alm4u8jnojpufcgnp2481qylmiy72wyb",
+      "category": "shoe",
+      "object_instance": "shoe_031",
+      "relative_path": "oo3d9dsingle/shoe_031_alm4u8jnojpufcgnp2481qylmiy72wyb",
+      "rgb_count": 50,
+      "object_id": 4090,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "shoe_035_xhlfyrzcfr8izpw42n15vztuec9zoy17",
+      "category": "shoe",
+      "object_instance": "shoe_035",
+      "relative_path": "oo3d9dsingle/shoe_035_xhlfyrzcfr8izpw42n15vztuec9zoy17",
+      "rgb_count": 50,
+      "object_id": 4094,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "shrimp_002_xbqw9lmhtfkvc3b0b7t79o38fmtoq8vf",
+      "category": "shrimp",
+      "object_instance": "shrimp_002",
+      "relative_path": "oo3d9dsingle/shrimp_002_xbqw9lmhtfkvc3b0b7t79o38fmtoq8vf",
+      "rgb_count": 50,
+      "object_id": 4099,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "shrimp_023_dey9jvbr2r4ppi6qguiplkj8gkcl62pe",
+      "category": "shrimp",
+      "object_instance": "shrimp_023",
+      "relative_path": "oo3d9dsingle/shrimp_023_dey9jvbr2r4ppi6qguiplkj8gkcl62pe",
+      "rgb_count": 50,
+      "object_id": 4120,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "shrimp_038_27xalfkziagy77atyc20xw95t4tu8fbc",
+      "category": "shrimp",
+      "object_instance": "shrimp_038",
+      "relative_path": "oo3d9dsingle/shrimp_038_27xalfkziagy77atyc20xw95t4tu8fbc",
+      "rgb_count": 50,
+      "object_id": 4135,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "shrimp_045_tisq7we1lxmoybwhh3gp5turcbo4rl2x",
+      "category": "shrimp",
+      "object_instance": "shrimp_045",
+      "relative_path": "oo3d9dsingle/shrimp_045_tisq7we1lxmoybwhh3gp5turcbo4rl2x",
+      "rgb_count": 50,
+      "object_id": 4142,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "soap_007_a6iska1n7hwgkrrhwy9fpmng5xtst6ow",
+      "category": "soap",
+      "object_instance": "soap_007",
+      "relative_path": "oo3d9dsingle/soap_007_a6iska1n7hwgkrrhwy9fpmng5xtst6ow",
+      "rgb_count": 50,
+      "object_id": 4151,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "soap_020_8pdcyrvi5pa70cvc5kwckgoxegjzwawl",
+      "category": "soap",
+      "object_instance": "soap_020",
+      "relative_path": "oo3d9dsingle/soap_020_8pdcyrvi5pa70cvc5kwckgoxegjzwawl",
+      "rgb_count": 50,
+      "object_id": 4164,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "soap_022_tm0qp9vxoybip38zx7kd9fomwqabpqaz",
+      "category": "soap",
+      "object_instance": "soap_022",
+      "relative_path": "oo3d9dsingle/soap_022_tm0qp9vxoybip38zx7kd9fomwqabpqaz",
+      "rgb_count": 50,
+      "object_id": 4166,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "spanner_004_4m7nxpamv9dwu7g9t8eqg88nxzm64g04",
+      "category": "spanner",
+      "object_instance": "spanner_004",
+      "relative_path": "oo3d9dsingle/spanner_004_4m7nxpamv9dwu7g9t8eqg88nxzm64g04",
+      "rgb_count": 50,
+      "object_id": 4199,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "speaker_002_7h37a96phrfi91q0bosp24z19le6ovbx",
+      "category": "speaker",
+      "object_instance": "speaker_002",
+      "relative_path": "oo3d9dsingle/speaker_002_7h37a96phrfi91q0bosp24z19le6ovbx",
+      "rgb_count": 50,
+      "object_id": 4203,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "squash_001_ol6jyqgm13qvoihlbqygcd5v8cl5j40f",
+      "category": "squash",
+      "object_instance": "squash_001",
+      "relative_path": "oo3d9dsingle/squash_001_ol6jyqgm13qvoihlbqygcd5v8cl5j40f",
+      "rgb_count": 50,
+      "object_id": 4210,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "squash_022_b13aes3nr0cacow4nwwhagud63s10ghe",
+      "category": "squash",
+      "object_instance": "squash_022",
+      "relative_path": "oo3d9dsingle/squash_022_b13aes3nr0cacow4nwwhagud63s10ghe",
+      "rgb_count": 50,
+      "object_id": 4231,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "squash_029_kjwavoiwgta1ec2517f7lqoubfbzx2pr",
+      "category": "squash",
+      "object_instance": "squash_029",
+      "relative_path": "oo3d9dsingle/squash_029_kjwavoiwgta1ec2517f7lqoubfbzx2pr",
+      "rgb_count": 50,
+      "object_id": 4238,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "starfish_009_cg3zuszpn4ky89k0tn554x5gpanglwf4",
+      "category": "starfish",
+      "object_instance": "starfish_009",
+      "relative_path": "oo3d9dsingle/starfish_009_cg3zuszpn4ky89k0tn554x5gpanglwf4",
+      "rgb_count": 50,
+      "object_id": 4254,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "starfish_011_0i41a015c53okeeye1r5tb0qlk99jb44",
+      "category": "starfish",
+      "object_instance": "starfish_011",
+      "relative_path": "oo3d9dsingle/starfish_011_0i41a015c53okeeye1r5tb0qlk99jb44",
+      "rgb_count": 50,
+      "object_id": 4256,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "steamed_bun_015_z4r74ufedybk35zaoh7nw6wqpd4p87yn",
+      "category": "steamed_bun",
+      "object_instance": "steamed_bun_015",
+      "relative_path": "oo3d9dsingle/steamed_bun_015_z4r74ufedybk35zaoh7nw6wqpd4p87yn",
+      "rgb_count": 50,
+      "object_id": 4269,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "steamed_bun_023_7oz4qybe66hyj5r5lb6rs5cbaizr3ng8",
+      "category": "steamed_bun",
+      "object_instance": "steamed_bun_023",
+      "relative_path": "oo3d9dsingle/steamed_bun_023_7oz4qybe66hyj5r5lb6rs5cbaizr3ng8",
+      "rgb_count": 50,
+      "object_id": 4276,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "steamed_bun_048_fcghluxk0np4n7nbdxmypsqup2dcl4ii",
+      "category": "steamed_bun",
+      "object_instance": "steamed_bun_048",
+      "relative_path": "oo3d9dsingle/steamed_bun_048_fcghluxk0np4n7nbdxmypsqup2dcl4ii",
+      "rgb_count": 50,
+      "object_id": 4293,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "stool_001_xstk98uudj5rr57qxjynbbsff009vzj9",
+      "category": "stool",
+      "object_instance": "stool_001",
+      "relative_path": "oo3d9dsingle/stool_001_xstk98uudj5rr57qxjynbbsff009vzj9",
+      "rgb_count": 50,
+      "object_id": 4301,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "strawberry_009_ybh3y7a8i9444b205w545slqnp7348ps",
+      "category": "strawberry",
+      "object_instance": "strawberry_009",
+      "relative_path": "oo3d9dsingle/strawberry_009_ybh3y7a8i9444b205w545slqnp7348ps",
+      "rgb_count": 50,
+      "object_id": 4320,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "strawberry_016_df4c02b0iqki1prpvnb73sd1y1sanytv",
+      "category": "strawberry",
+      "object_instance": "strawberry_016",
+      "relative_path": "oo3d9dsingle/strawberry_016_df4c02b0iqki1prpvnb73sd1y1sanytv",
+      "rgb_count": 50,
+      "object_id": 4327,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "strawberry_022_dg48rb9fgzy0z59qnf7skxo3hgmt6tyu",
+      "category": "strawberry",
+      "object_instance": "strawberry_022",
+      "relative_path": "oo3d9dsingle/strawberry_022_dg48rb9fgzy0z59qnf7skxo3hgmt6tyu",
+      "rgb_count": 50,
+      "object_id": 4333,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "suitcase_009_a5dnflw1uhy50ccjbgz4s1b01eybh1gb",
+      "category": "suitcase",
+      "object_instance": "suitcase_009",
+      "relative_path": "oo3d9dsingle/suitcase_009_a5dnflw1uhy50ccjbgz4s1b01eybh1gb",
+      "rgb_count": 49,
+      "object_id": 4348,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "sushi_025_zecnn54enocj9g4yu9sxb1801a3nbru0",
+      "category": "sushi",
+      "object_instance": "sushi_025",
+      "relative_path": "oo3d9dsingle/sushi_025_zecnn54enocj9g4yu9sxb1801a3nbru0",
+      "rgb_count": 50,
+      "object_id": 4373,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "sushi_027_78859d7f8m9j47uxn5dob8ld6t1a16fe",
+      "category": "sushi",
+      "object_instance": "sushi_027",
+      "relative_path": "oo3d9dsingle/sushi_027_78859d7f8m9j47uxn5dob8ld6t1a16fe",
+      "rgb_count": 50,
+      "object_id": 4375,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "sushi_034_03hhzniaw1wvyc7o1qxd49hh4cm39p6t",
+      "category": "sushi",
+      "object_instance": "sushi_034",
+      "relative_path": "oo3d9dsingle/sushi_034_03hhzniaw1wvyc7o1qxd49hh4cm39p6t",
+      "rgb_count": 50,
+      "object_id": 4382,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "sushi_035_8j5wkjvp9na0dk1nv4ghouemtbho5qow",
+      "category": "sushi",
+      "object_instance": "sushi_035",
+      "relative_path": "oo3d9dsingle/sushi_035_8j5wkjvp9na0dk1nv4ghouemtbho5qow",
+      "rgb_count": 50,
+      "object_id": 4383,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "sweet_potato_003_mtl0aog7anna25chom9p6mr4eb4fexdz",
+      "category": "sweet_potato",
+      "object_instance": "sweet_potato_003",
+      "relative_path": "oo3d9dsingle/sweet_potato_003_mtl0aog7anna25chom9p6mr4eb4fexdz",
+      "rgb_count": 50,
+      "object_id": 4393,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "sweet_potato_013_ieaez4w4rst2zlwjpklprktibptwn86m",
+      "category": "sweet_potato",
+      "object_instance": "sweet_potato_013",
+      "relative_path": "oo3d9dsingle/sweet_potato_013_ieaez4w4rst2zlwjpklprktibptwn86m",
+      "rgb_count": 50,
+      "object_id": 4403,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "sweet_potato_018_5bcp0nuw9g4w3vlogucrtkppza5dcuje",
+      "category": "sweet_potato",
+      "object_instance": "sweet_potato_018",
+      "relative_path": "oo3d9dsingle/sweet_potato_018_5bcp0nuw9g4w3vlogucrtkppza5dcuje",
+      "rgb_count": 50,
+      "object_id": 4408,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "table_019_jjomq638zrkcmbe9rxecyv8lnxoow9gg",
+      "category": "table",
+      "object_instance": "table_019",
+      "relative_path": "oo3d9dsingle/table_019_jjomq638zrkcmbe9rxecyv8lnxoow9gg",
+      "rgb_count": 43,
+      "object_id": 4437,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "table_tennis_bat_005_nv2b900hj97dtwr6ydinwaw9hfl42fnd",
+      "category": "table_tennis_bat",
+      "object_instance": "table_tennis_bat_005",
+      "relative_path": "oo3d9dsingle/table_tennis_bat_005_nv2b900hj97dtwr6ydinwaw9hfl42fnd",
+      "rgb_count": 50,
+      "object_id": 4451,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "table_tennis_bat_013_5kat78hxboowws0zitnpm9g6tc4qsuzj",
+      "category": "table_tennis_bat",
+      "object_instance": "table_tennis_bat_013",
+      "relative_path": "oo3d9dsingle/table_tennis_bat_013_5kat78hxboowws0zitnpm9g6tc4qsuzj",
+      "rgb_count": 50,
+      "object_id": 4459,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "tape_measure_006_gv91a1v1c9khtj8z44i929g67kaukysd",
+      "category": "tape_measure",
+      "object_instance": "tape_measure_006",
+      "relative_path": "oo3d9dsingle/tape_measure_006_gv91a1v1c9khtj8z44i929g67kaukysd",
+      "rgb_count": 50,
+      "object_id": 4472,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "tape_measure_009_borvw70zir0ye14ib0bfq0gyw9jx14g3",
+      "category": "tape_measure",
+      "object_instance": "tape_measure_009",
+      "relative_path": "oo3d9dsingle/tape_measure_009_borvw70zir0ye14ib0bfq0gyw9jx14g3",
+      "rgb_count": 50,
+      "object_id": 4475,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "tape_measure_011_gxv2wy5ze3ny7ktgojo4499nqiij4kp7",
+      "category": "tape_measure",
+      "object_instance": "tape_measure_011",
+      "relative_path": "oo3d9dsingle/tape_measure_011_gxv2wy5ze3ny7ktgojo4499nqiij4kp7",
+      "rgb_count": 50,
+      "object_id": 4477,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "teapot_002_cshqoobbi17roahlay1mjbj1h7s6xvo2",
+      "category": "teapot",
+      "object_instance": "teapot_002",
+      "relative_path": "oo3d9dsingle/teapot_002_cshqoobbi17roahlay1mjbj1h7s6xvo2",
+      "rgb_count": 50,
+      "object_id": 4492,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "teapot_009_eza0w9gi2htqpu5n50qr3w4g6x3dneho",
+      "category": "teapot",
+      "object_instance": "teapot_009",
+      "relative_path": "oo3d9dsingle/teapot_009_eza0w9gi2htqpu5n50qr3w4g6x3dneho",
+      "rgb_count": 50,
+      "object_id": 4499,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "teapot_012_9yykifsigcoy87sqji6v4u7thj48vz89",
+      "category": "teapot",
+      "object_instance": "teapot_012",
+      "relative_path": "oo3d9dsingle/teapot_012_9yykifsigcoy87sqji6v4u7thj48vz89",
+      "rgb_count": 50,
+      "object_id": 4502,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "teddy_bear_005_51ep1m9m16j3tuegw0ot6r84046fqa5x",
+      "category": "teddy_bear",
+      "object_instance": "teddy_bear_005",
+      "relative_path": "oo3d9dsingle/teddy_bear_005_51ep1m9m16j3tuegw0ot6r84046fqa5x",
+      "rgb_count": 50,
+      "object_id": 4529,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "thermos_002_eb3ky57dw51zug23p70mlkle8u34q41t",
+      "category": "thermos",
+      "object_instance": "thermos_002",
+      "relative_path": "oo3d9dsingle/thermos_002_eb3ky57dw51zug23p70mlkle8u34q41t",
+      "rgb_count": 50,
+      "object_id": 4537,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "thimble_001_k5m747namfot0zm8v9j5liaifditn3yc",
+      "category": "thimble",
+      "object_instance": "thimble_001",
+      "relative_path": "oo3d9dsingle/thimble_001_k5m747namfot0zm8v9j5liaifditn3yc",
+      "rgb_count": 50,
+      "object_id": 4542,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "thimble_017_3scxexjamo7jzwo8mlrkyz5pc0a2bo7b",
+      "category": "thimble",
+      "object_instance": "thimble_017",
+      "relative_path": "oo3d9dsingle/thimble_017_3scxexjamo7jzwo8mlrkyz5pc0a2bo7b",
+      "rgb_count": 50,
+      "object_id": 4558,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "timer_010_336dtlnzy5kwp98tgdye6kuq1imeu4qk",
+      "category": "timer",
+      "object_instance": "timer_010",
+      "relative_path": "oo3d9dsingle/timer_010_336dtlnzy5kwp98tgdye6kuq1imeu4qk",
+      "rgb_count": 50,
+      "object_id": 4573,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "timer_017_naheyrzko8i01pkr10uo2xwdzjrbp0sw",
+      "category": "timer",
+      "object_instance": "timer_017",
+      "relative_path": "oo3d9dsingle/timer_017_naheyrzko8i01pkr10uo2xwdzjrbp0sw",
+      "rgb_count": 50,
+      "object_id": 4580,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "tissue_013_7h2niweipxe5rk7ozif3rw0s54l5v7ll",
+      "category": "tissue",
+      "object_instance": "tissue_013",
+      "relative_path": "oo3d9dsingle/tissue_013_7h2niweipxe5rk7ozif3rw0s54l5v7ll",
+      "rgb_count": 50,
+      "object_id": 4598,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "tissue_024_izyc3yyzgfoodeeokdotok067e6vqehw",
+      "category": "tissue",
+      "object_instance": "tissue_024",
+      "relative_path": "oo3d9dsingle/tissue_024_izyc3yyzgfoodeeokdotok067e6vqehw",
+      "rgb_count": 50,
+      "object_id": 4605,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "tissue_046_6fdf676wp4nl3aicsiuq8f9exesm0pg9",
+      "category": "tissue",
+      "object_instance": "tissue_046",
+      "relative_path": "oo3d9dsingle/tissue_046_6fdf676wp4nl3aicsiuq8f9exesm0pg9",
+      "rgb_count": 50,
+      "object_id": 4627,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "tissue_048_zj098i0bgx2mhf7siwe2lqv1wwgfc6yk",
+      "category": "tissue",
+      "object_instance": "tissue_048",
+      "relative_path": "oo3d9dsingle/tissue_048_zj098i0bgx2mhf7siwe2lqv1wwgfc6yk",
+      "rgb_count": 50,
+      "object_id": 4629,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "tomato_003_vrfrf1vh3o4433zmeilgiyfrt10uf26k",
+      "category": "tomato",
+      "object_instance": "tomato_003",
+      "relative_path": "oo3d9dsingle/tomato_003_vrfrf1vh3o4433zmeilgiyfrt10uf26k",
+      "rgb_count": 50,
+      "object_id": 4632,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "tomato_008_5oasxhjn51hcnpufpoj07o3oecckx5pv",
+      "category": "tomato",
+      "object_instance": "tomato_008",
+      "relative_path": "oo3d9dsingle/tomato_008_5oasxhjn51hcnpufpoj07o3oecckx5pv",
+      "rgb_count": 50,
+      "object_id": 4637,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "tomato_021_smvkk7glqi0f0s88qwutmde0ko7odo2k",
+      "category": "tomato",
+      "object_instance": "tomato_021",
+      "relative_path": "oo3d9dsingle/tomato_021_smvkk7glqi0f0s88qwutmde0ko7odo2k",
+      "rgb_count": 50,
+      "object_id": 4650,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "tooth_brush_002_yd3bjzq15ucdx31gxddo719y85pddz7q",
+      "category": "tooth_brush",
+      "object_instance": "tooth_brush_002",
+      "relative_path": "oo3d9dsingle/tooth_brush_002_yd3bjzq15ucdx31gxddo719y85pddz7q",
+      "rgb_count": 50,
+      "object_id": 4661,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "tooth_brush_005_4mfcxpddeqkqqnkr6as3k2e2iivw9tk9",
+      "category": "tooth_brush",
+      "object_instance": "tooth_brush_005",
+      "relative_path": "oo3d9dsingle/tooth_brush_005_4mfcxpddeqkqqnkr6as3k2e2iivw9tk9",
+      "rgb_count": 50,
+      "object_id": 4664,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "tooth_brush_014_20l66d42xpxxd0hx4bb1qoyyez36e0lr",
+      "category": "tooth_brush",
+      "object_instance": "tooth_brush_014",
+      "relative_path": "oo3d9dsingle/tooth_brush_014_20l66d42xpxxd0hx4bb1qoyyez36e0lr",
+      "rgb_count": 50,
+      "object_id": 4673,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "tooth_paste_016_tz2w6fublrq63hai5tot0dzyicm39tnk",
+      "category": "tooth_paste",
+      "object_instance": "tooth_paste_016",
+      "relative_path": "oo3d9dsingle/tooth_paste_016_tz2w6fublrq63hai5tot0dzyicm39tnk",
+      "rgb_count": 50,
+      "object_id": 4702,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "tooth_paste_026_ps9ch24wo0r09qeaxwig6yko61d5oat1",
+      "category": "tooth_paste",
+      "object_instance": "tooth_paste_026",
+      "relative_path": "oo3d9dsingle/tooth_paste_026_ps9ch24wo0r09qeaxwig6yko61d5oat1",
+      "rgb_count": 50,
+      "object_id": 4711,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "tooth_paste_027_6n2ix1e4pockti3c942dfqhvz867u4fx",
+      "category": "tooth_paste",
+      "object_instance": "tooth_paste_027",
+      "relative_path": "oo3d9dsingle/tooth_paste_027_6n2ix1e4pockti3c942dfqhvz867u4fx",
+      "rgb_count": 50,
+      "object_id": 4712,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "toy_animals_007_dro4nkpebc40h4ktdams6j234gchqc66",
+      "category": "toy_animals",
+      "object_instance": "toy_animals_007",
+      "relative_path": "oo3d9dsingle/toy_animals_007_dro4nkpebc40h4ktdams6j234gchqc66",
+      "rgb_count": 50,
+      "object_id": 4723,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "toy_animals_009_ohgxgq04m8r1bmihdv7pngwxyhxa2pwx",
+      "category": "toy_animals",
+      "object_instance": "toy_animals_009",
+      "relative_path": "oo3d9dsingle/toy_animals_009_ohgxgq04m8r1bmihdv7pngwxyhxa2pwx",
+      "rgb_count": 50,
+      "object_id": 4725,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "toy_animals_020_c4biyz0h551kcpuhuux0apjjf353ok4b",
+      "category": "toy_animals",
+      "object_instance": "toy_animals_020",
+      "relative_path": "oo3d9dsingle/toy_animals_020_c4biyz0h551kcpuhuux0apjjf353ok4b",
+      "rgb_count": 50,
+      "object_id": 4736,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "toy_animals_025_9jxxc4ris7b4dinaxnsmquchzsd3k4c2",
+      "category": "toy_animals",
+      "object_instance": "toy_animals_025",
+      "relative_path": "oo3d9dsingle/toy_animals_025_9jxxc4ris7b4dinaxnsmquchzsd3k4c2",
+      "rgb_count": 50,
+      "object_id": 4741,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "toy_animals_033_o6ui9b9iqck3zmjhjs5lhbveq7o4i1le",
+      "category": "toy_animals",
+      "object_instance": "toy_animals_033",
+      "relative_path": "oo3d9dsingle/toy_animals_033_o6ui9b9iqck3zmjhjs5lhbveq7o4i1le",
+      "rgb_count": 50,
+      "object_id": 4749,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "toy_animals_038_b5w2yuyfysx2gof7w0662djiwkstwv36",
+      "category": "toy_animals",
+      "object_instance": "toy_animals_038",
+      "relative_path": "oo3d9dsingle/toy_animals_038_b5w2yuyfysx2gof7w0662djiwkstwv36",
+      "rgb_count": 50,
+      "object_id": 4754,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "toy_boat_001_sptdyk8958qwyamzrsupw4d76zali000",
+      "category": "toy_boat",
+      "object_instance": "toy_boat_001",
+      "relative_path": "oo3d9dsingle/toy_boat_001_sptdyk8958qwyamzrsupw4d76zali000",
+      "rgb_count": 50,
+      "object_id": 4776,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "toy_boat_015_ymtnest13x1n4k56qaczaa5vwpabvvai",
+      "category": "toy_boat",
+      "object_instance": "toy_boat_015",
+      "relative_path": "oo3d9dsingle/toy_boat_015_ymtnest13x1n4k56qaczaa5vwpabvvai",
+      "rgb_count": 50,
+      "object_id": 4789,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "toy_boat_047_7hsfcjg0gj06hmdastittewp1u2id3la",
+      "category": "toy_boat",
+      "object_instance": "toy_boat_047",
+      "relative_path": "oo3d9dsingle/toy_boat_047_7hsfcjg0gj06hmdastittewp1u2id3la",
+      "rgb_count": 50,
+      "object_id": 4816,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "toy_boat_052_jmduik2clb9k0afwup0bxbdzg14ctzhf",
+      "category": "toy_boat",
+      "object_instance": "toy_boat_052",
+      "relative_path": "oo3d9dsingle/toy_boat_052_jmduik2clb9k0afwup0bxbdzg14ctzhf",
+      "rgb_count": 50,
+      "object_id": 4819,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "toy_boat_055_jh1xcd1kunwfxg7nt3z0vpjijy7mzqnr",
+      "category": "toy_boat",
+      "object_instance": "toy_boat_055",
+      "relative_path": "oo3d9dsingle/toy_boat_055_jh1xcd1kunwfxg7nt3z0vpjijy7mzqnr",
+      "rgb_count": 50,
+      "object_id": 4820,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "toy_bus_013_pieql81d9whivoaj4y9ehbb0xnwmpopk",
+      "category": "toy_bus",
+      "object_instance": "toy_bus_013",
+      "relative_path": "oo3d9dsingle/toy_bus_013_pieql81d9whivoaj4y9ehbb0xnwmpopk",
+      "rgb_count": 50,
+      "object_id": 4841,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "toy_bus_015_pve91vp16dz68ckawzxf7rc9w7j6wkbo",
+      "category": "toy_bus",
+      "object_instance": "toy_bus_015",
+      "relative_path": "oo3d9dsingle/toy_bus_015_pve91vp16dz68ckawzxf7rc9w7j6wkbo",
+      "rgb_count": 50,
+      "object_id": 4843,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "toy_bus_017_3q2hebbjhepxa1yc6a3c8czxvihq8gk1",
+      "category": "toy_bus",
+      "object_instance": "toy_bus_017",
+      "relative_path": "oo3d9dsingle/toy_bus_017_3q2hebbjhepxa1yc6a3c8czxvihq8gk1",
+      "rgb_count": 50,
+      "object_id": 4845,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "toy_bus_030_brsmzftkrn8w7pz1wyfu4egwxocebt7k",
+      "category": "toy_bus",
+      "object_instance": "toy_bus_030",
+      "relative_path": "oo3d9dsingle/toy_bus_030_brsmzftkrn8w7pz1wyfu4egwxocebt7k",
+      "rgb_count": 50,
+      "object_id": 4858,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "toy_bus_042_ruzue0ib9itn16v4mmyazol10l3ezrm6",
+      "category": "toy_bus",
+      "object_instance": "toy_bus_042",
+      "relative_path": "oo3d9dsingle/toy_bus_042_ruzue0ib9itn16v4mmyazol10l3ezrm6",
+      "rgb_count": 50,
+      "object_id": 4870,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "toy_bus_059_ov6a7odof983nwxabbl1100yf2ovfd09",
+      "category": "toy_bus",
+      "object_instance": "toy_bus_059",
+      "relative_path": "oo3d9dsingle/toy_bus_059_ov6a7odof983nwxabbl1100yf2ovfd09",
+      "rgb_count": 50,
+      "object_id": 4886,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "toy_car_016_pr8xtwapt3ofwrhps1tge0filldpkwge",
+      "category": "toy_car",
+      "object_instance": "toy_car_016",
+      "relative_path": "oo3d9dsingle/toy_car_016_pr8xtwapt3ofwrhps1tge0filldpkwge",
+      "rgb_count": 50,
+      "object_id": 4908,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "toy_car_017_5clqr81g9m865jfbxivd8cmpy1h08ie1",
+      "category": "toy_car",
+      "object_instance": "toy_car_017",
+      "relative_path": "oo3d9dsingle/toy_car_017_5clqr81g9m865jfbxivd8cmpy1h08ie1",
+      "rgb_count": 50,
+      "object_id": 4909,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "toy_motorcycle_007_cyfj56hnd9r317rwj8aqm7wm91pzc6gj",
+      "category": "toy_motorcycle",
+      "object_instance": "toy_motorcycle_007",
+      "relative_path": "oo3d9dsingle/toy_motorcycle_007_cyfj56hnd9r317rwj8aqm7wm91pzc6gj",
+      "rgb_count": 50,
+      "object_id": 4916,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "toy_motorcycle_038_fod937w8p0aimkb80kdwpy3hldhninop",
+      "category": "toy_motorcycle",
+      "object_instance": "toy_motorcycle_038",
+      "relative_path": "oo3d9dsingle/toy_motorcycle_038_fod937w8p0aimkb80kdwpy3hldhninop",
+      "rgb_count": 50,
+      "object_id": 4943,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "toy_motorcycle_040_q52wtrtmsw68zfxgo7wvxpxpaczpcmzw",
+      "category": "toy_motorcycle",
+      "object_instance": "toy_motorcycle_040",
+      "relative_path": "oo3d9dsingle/toy_motorcycle_040_q52wtrtmsw68zfxgo7wvxpxpaczpcmzw",
+      "rgb_count": 50,
+      "object_id": 4945,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "toy_plane_003_oaw2ygp1l3cryea3yfxxzozcb4ea9dn0",
+      "category": "toy_plane",
+      "object_instance": "toy_plane_003",
+      "relative_path": "oo3d9dsingle/toy_plane_003_oaw2ygp1l3cryea3yfxxzozcb4ea9dn0",
+      "rgb_count": 50,
+      "object_id": 4948,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "toy_plane_015_8dvu3gs9omcbgjid0ues72fhblsprbnd",
+      "category": "toy_plane",
+      "object_instance": "toy_plane_015",
+      "relative_path": "oo3d9dsingle/toy_plane_015_8dvu3gs9omcbgjid0ues72fhblsprbnd",
+      "rgb_count": 50,
+      "object_id": 4960,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "toy_plane_031_art5vv3ubtpb7r2ybj3ijpmsvmylqvd6",
+      "category": "toy_plane",
+      "object_instance": "toy_plane_031",
+      "relative_path": "oo3d9dsingle/toy_plane_031_art5vv3ubtpb7r2ybj3ijpmsvmylqvd6",
+      "rgb_count": 50,
+      "object_id": 4975,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "toy_plant_004_a616fczlib8063sa32q4yycuyoz2gqjt",
+      "category": "toy_plant",
+      "object_instance": "toy_plant_004",
+      "relative_path": "oo3d9dsingle/toy_plant_004_a616fczlib8063sa32q4yycuyoz2gqjt",
+      "rgb_count": 50,
+      "object_id": 4980,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "toy_train_007_2mzu3zbtivqvam05ph90kg0nnlx3tal3",
+      "category": "toy_train",
+      "object_instance": "toy_train_007",
+      "relative_path": "oo3d9dsingle/toy_train_007_2mzu3zbtivqvam05ph90kg0nnlx3tal3",
+      "rgb_count": 50,
+      "object_id": 4992,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "toy_train_008_vygvcazeisq8u716e4s4t6gmoncqt10g",
+      "category": "toy_train",
+      "object_instance": "toy_train_008",
+      "relative_path": "oo3d9dsingle/toy_train_008_vygvcazeisq8u716e4s4t6gmoncqt10g",
+      "rgb_count": 50,
+      "object_id": 4993,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "toy_train_029_0mifzbc3ejam1f1bstsfazxa7481k51a",
+      "category": "toy_train",
+      "object_instance": "toy_train_029",
+      "relative_path": "oo3d9dsingle/toy_train_029_0mifzbc3ejam1f1bstsfazxa7481k51a",
+      "rgb_count": 50,
+      "object_id": 5014,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "toy_train_063_ff6dczcpl1cv5hwkn7a1ugn0n2lb7jcv",
+      "category": "toy_train",
+      "object_instance": "toy_train_063",
+      "relative_path": "oo3d9dsingle/toy_train_063_ff6dczcpl1cv5hwkn7a1ugn0n2lb7jcv",
+      "rgb_count": 50,
+      "object_id": 5031,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "toy_train_066_q5o61ezlex20j8yb8ruvfp2t6g5hur5j",
+      "category": "toy_train",
+      "object_instance": "toy_train_066",
+      "relative_path": "oo3d9dsingle/toy_train_066_q5o61ezlex20j8yb8ruvfp2t6g5hur5j",
+      "rgb_count": 50,
+      "object_id": 5034,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "toy_truck_010_jq8gonawqp7lhnl1k1jak10mneqzjme5",
+      "category": "toy_truck",
+      "object_instance": "toy_truck_010",
+      "relative_path": "oo3d9dsingle/toy_truck_010_jq8gonawqp7lhnl1k1jak10mneqzjme5",
+      "rgb_count": 50,
+      "object_id": 5047,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "toy_truck_012_t9rkqi2im7u12hzvfu7yyyzq0tocdda1",
+      "category": "toy_truck",
+      "object_instance": "toy_truck_012",
+      "relative_path": "oo3d9dsingle/toy_truck_012_t9rkqi2im7u12hzvfu7yyyzq0tocdda1",
+      "rgb_count": 50,
+      "object_id": 5049,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "toy_truck_024_kuqrxts33xa8abkrtrdvww6u14h8pzgd",
+      "category": "toy_truck",
+      "object_instance": "toy_truck_024",
+      "relative_path": "oo3d9dsingle/toy_truck_024_kuqrxts33xa8abkrtrdvww6u14h8pzgd",
+      "rgb_count": 50,
+      "object_id": 5052,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "umbrella_004_bipx51pqc7pa0vsy93qcth95iyjmiv80",
+      "category": "umbrella",
+      "object_instance": "umbrella_004",
+      "relative_path": "oo3d9dsingle/umbrella_004_bipx51pqc7pa0vsy93qcth95iyjmiv80",
+      "rgb_count": 40,
+      "object_id": 5084,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "umbrella_012_tjf85kgxntmhvx61gub5k2ycrjrjqi7b",
+      "category": "umbrella",
+      "object_instance": "umbrella_012",
+      "relative_path": "oo3d9dsingle/umbrella_012_tjf85kgxntmhvx61gub5k2ycrjrjqi7b",
+      "rgb_count": 50,
+      "object_id": 5092,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "vase_005_3wlq39q77k4hn8z111fdlwxb8w6mo0b6",
+      "category": "vase",
+      "object_instance": "vase_005",
+      "relative_path": "oo3d9dsingle/vase_005_3wlq39q77k4hn8z111fdlwxb8w6mo0b6",
+      "rgb_count": 50,
+      "object_id": 5105,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "vase_007_dx93qvm5zfzlwu31x2brapl9pqeknzw1",
+      "category": "vase",
+      "object_instance": "vase_007",
+      "relative_path": "oo3d9dsingle/vase_007_dx93qvm5zfzlwu31x2brapl9pqeknzw1",
+      "rgb_count": 50,
+      "object_id": 5107,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "waffle_007_5pw7hwzyq0mbxrxgacyb108p9o0nm7zz",
+      "category": "waffle",
+      "object_instance": "waffle_007",
+      "relative_path": "oo3d9dsingle/waffle_007_5pw7hwzyq0mbxrxgacyb108p9o0nm7zz",
+      "rgb_count": 50,
+      "object_id": 5123,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "waffle_016_7kldor0k0mc8r5nihjdhglkt6h3tydrn",
+      "category": "waffle",
+      "object_instance": "waffle_016",
+      "relative_path": "oo3d9dsingle/waffle_016_7kldor0k0mc8r5nihjdhglkt6h3tydrn",
+      "rgb_count": 50,
+      "object_id": 5131,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "waffle_038_8in06hzyv0b4e3zs3fwd0bxj7iy5gzkj",
+      "category": "waffle",
+      "object_instance": "waffle_038",
+      "relative_path": "oo3d9dsingle/waffle_038_8in06hzyv0b4e3zs3fwd0bxj7iy5gzkj",
+      "rgb_count": 50,
+      "object_id": 5152,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "waffle_041_zl33pymfbr1dj0zxqi0lkbqqni61gk34",
+      "category": "waffle",
+      "object_instance": "waffle_041",
+      "relative_path": "oo3d9dsingle/waffle_041_zl33pymfbr1dj0zxqi0lkbqqni61gk34",
+      "rgb_count": 50,
+      "object_id": 5154,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "wallet_003_dwvb9zohw0w6cgb33ahje7arm66nvz6w",
+      "category": "wallet",
+      "object_instance": "wallet_003",
+      "relative_path": "oo3d9dsingle/wallet_003_dwvb9zohw0w6cgb33ahje7arm66nvz6w",
+      "rgb_count": 50,
+      "object_id": 5158,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "wallet_018_hle0f0r2rvmhtsfghba11wkdugl2pdcw",
+      "category": "wallet",
+      "object_instance": "wallet_018",
+      "relative_path": "oo3d9dsingle/wallet_018_hle0f0r2rvmhtsfghba11wkdugl2pdcw",
+      "rgb_count": 50,
+      "object_id": 5173,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "wallet_025_k0lpavvvcf61fbkrs6lv6gtgycxfjkp0",
+      "category": "wallet",
+      "object_instance": "wallet_025",
+      "relative_path": "oo3d9dsingle/wallet_025_k0lpavvvcf61fbkrs6lv6gtgycxfjkp0",
+      "rgb_count": 50,
+      "object_id": 5180,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "wallet_035_49qgj4ou9dfa9y4dp3t9az2sh6dfewpi",
+      "category": "wallet",
+      "object_instance": "wallet_035",
+      "relative_path": "oo3d9dsingle/wallet_035_49qgj4ou9dfa9y4dp3t9az2sh6dfewpi",
+      "rgb_count": 50,
+      "object_id": 5183,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "walnut_006_7tbimdrek1z9ermytstwhl6m64zg13q8",
+      "category": "walnut",
+      "object_instance": "walnut_006",
+      "relative_path": "oo3d9dsingle/walnut_006_7tbimdrek1z9ermytstwhl6m64zg13q8",
+      "rgb_count": 50,
+      "object_id": 5203,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "walnut_008_grlpjg3njh62msh1hs8415cmqg5kg3om",
+      "category": "walnut",
+      "object_instance": "walnut_008",
+      "relative_path": "oo3d9dsingle/walnut_008_grlpjg3njh62msh1hs8415cmqg5kg3om",
+      "rgb_count": 50,
+      "object_id": 5205,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "walnut_012_3k7l20gdbkjyvfp1ikvqp2d4txm6z668",
+      "category": "walnut",
+      "object_instance": "walnut_012",
+      "relative_path": "oo3d9dsingle/walnut_012_3k7l20gdbkjyvfp1ikvqp2d4txm6z668",
+      "rgb_count": 50,
+      "object_id": 5209,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "watch_011_v27a5s7545o2cned04m0su1r3aeqsed9",
+      "category": "watch",
+      "object_instance": "watch_011",
+      "relative_path": "oo3d9dsingle/watch_011_v27a5s7545o2cned04m0su1r3aeqsed9",
+      "rgb_count": 50,
+      "object_id": 5238,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "water_chestnut_002_6sqzyeq39j7pzxpm8hugzrtt3rtce924",
+      "category": "water_chestnut",
+      "object_instance": "water_chestnut_002",
+      "relative_path": "oo3d9dsingle/water_chestnut_002_6sqzyeq39j7pzxpm8hugzrtt3rtce924",
+      "rgb_count": 50,
+      "object_id": 5243,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "watermelon_010_ctz6v5t35x404zbp3gkvaw79mdnqbqmj",
+      "category": "watermelon",
+      "object_instance": "watermelon_010",
+      "relative_path": "oo3d9dsingle/watermelon_010_ctz6v5t35x404zbp3gkvaw79mdnqbqmj",
+      "rgb_count": 50,
+      "object_id": 5253,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "watermelon_021_1foaxl2ifjkmwtsh7m70d59dabjgzc7o",
+      "category": "watermelon",
+      "object_instance": "watermelon_021",
+      "relative_path": "oo3d9dsingle/watermelon_021_1foaxl2ifjkmwtsh7m70d59dabjgzc7o",
+      "rgb_count": 50,
+      "object_id": 5257,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "watermelon_059_nm0biy96o5bul20s34fsblezzul4l98p",
+      "category": "watermelon",
+      "object_instance": "watermelon_059",
+      "relative_path": "oo3d9dsingle/watermelon_059_nm0biy96o5bul20s34fsblezzul4l98p",
+      "rgb_count": 50,
+      "object_id": 5281,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "watermelon_064_i4k02uuk4goldxzy6v8kpvslvhzuw4zt",
+      "category": "watermelon",
+      "object_instance": "watermelon_064",
+      "relative_path": "oo3d9dsingle/watermelon_064_i4k02uuk4goldxzy6v8kpvslvhzuw4zt",
+      "rgb_count": 50,
+      "object_id": 5286,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "whistle_001_2740ubh1tjfn008h6vtdmremdf2rudzp",
+      "category": "whistle",
+      "object_instance": "whistle_001",
+      "relative_path": "oo3d9dsingle/whistle_001_2740ubh1tjfn008h6vtdmremdf2rudzp",
+      "rgb_count": 50,
+      "object_id": 5289,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "whistle_013_ysex298q1rchnrmgonze5xhzx6r6jsdq",
+      "category": "whistle",
+      "object_instance": "whistle_013",
+      "relative_path": "oo3d9dsingle/whistle_013_ysex298q1rchnrmgonze5xhzx6r6jsdq",
+      "rgb_count": 50,
+      "object_id": 5301,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "whistle_022_qe1nhpaqzt48xin6c0l8sk77pxib5m1e",
+      "category": "whistle",
+      "object_instance": "whistle_022",
+      "relative_path": "oo3d9dsingle/whistle_022_qe1nhpaqzt48xin6c0l8sk77pxib5m1e",
+      "rgb_count": 50,
+      "object_id": 5310,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "yam_011_iyov3dup8u8iwqd6w4b6td8br486xhm2",
+      "category": "yam",
+      "object_instance": "yam_011",
+      "relative_path": "oo3d9dsingle/yam_011_iyov3dup8u8iwqd6w4b6td8br486xhm2",
+      "rgb_count": 50,
+      "object_id": 5324,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "yam_015_chmdu4gkr7iksjojk52phav0wkz5kgk4",
+      "category": "yam",
+      "object_instance": "yam_015",
+      "relative_path": "oo3d9dsingle/yam_015_chmdu4gkr7iksjojk52phav0wkz5kgk4",
+      "rgb_count": 50,
+      "object_id": 5328,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "yam_032_qny4rj0pqe6ajvpmjhcjw9tzi5drt88h",
+      "category": "yam",
+      "object_instance": "yam_032",
+      "relative_path": "oo3d9dsingle/yam_032_qny4rj0pqe6ajvpmjhcjw9tzi5drt88h",
+      "rgb_count": 50,
+      "object_id": 5344,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "zongzi_006_kwqmhnf6k7tf6mkkaa0qgoysfsl0zey4",
+      "category": "zongzi",
+      "object_instance": "zongzi_006",
+      "relative_path": "oo3d9dsingle/zongzi_006_kwqmhnf6k7tf6mkkaa0qgoysfsl0zey4",
+      "rgb_count": 50,
+      "object_id": 5353,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "zongzi_008_7cfek6e3iz97o4gzn85h0rsalgy4twvj",
+      "category": "zongzi",
+      "object_instance": "zongzi_008",
+      "relative_path": "oo3d9dsingle/zongzi_008_7cfek6e3iz97o4gzn85h0rsalgy4twvj",
+      "rgb_count": 50,
+      "object_id": 5355,
+      "has_fixed_reference_views": true
+    },
+    {
+      "scene_name": "zongzi_023_f6ny2dxu81wqlbwt1on5a1muqltufrai",
+      "category": "zongzi",
+      "object_instance": "zongzi_023",
+      "relative_path": "oo3d9dsingle/zongzi_023_f6ny2dxu81wqlbwt1on5a1muqltufrai",
+      "rgb_count": 50,
+      "object_id": 5370,
+      "has_fixed_reference_views": true
+    }
+  ],
+  "min_rgb": 4
+}
