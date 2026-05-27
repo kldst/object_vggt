@@ -215,7 +215,7 @@ def _axis_angle_to_matrix(axis, angle: float) -> torch.Tensor:
 def _load_symmetry_candidates_cpu(
     symmetry_info_path: str,
     continuous_steps: int,
-) -> dict[int, torch.Tensor]:
+) -> dict[str, torch.Tensor]:
     cache_key = (str(symmetry_info_path), int(continuous_steps))
     cache = getattr(_load_symmetry_candidates_cpu, "_cache", {})
     if cache_key in cache:
@@ -247,25 +247,25 @@ def _load_symmetry_candidates_cpu(
         for base_sym in base_syms:
             for continuous_sym in continuous_syms:
                 candidates.append(base_sym @ continuous_sym)
-        candidates_by_object_id[int(object_id_str)] = torch.stack(candidates, dim=0)
+        candidates_by_object_id[str(object_id_str)] = torch.stack(candidates, dim=0)
 
     cache[cache_key] = candidates_by_object_id
     _load_symmetry_candidates_cpu._cache = cache
     return candidates_by_object_id
 
 
-def _object_ids_to_list(object_ids) -> list[int]:
+def _object_ids_to_list(object_ids) -> list[str]:
     if torch.is_tensor(object_ids):
-        return [int(x) for x in object_ids.detach().cpu().reshape(-1).tolist()]
+        return [str(int(x)) for x in object_ids.detach().cpu().reshape(-1).tolist()]
     if isinstance(object_ids, (list, tuple)):
         values = []
         for item in object_ids:
             if torch.is_tensor(item):
-                values.extend(int(x) for x in item.detach().cpu().reshape(-1).tolist())
+                values.extend(str(int(x)) for x in item.detach().cpu().reshape(-1).tolist())
             else:
-                values.append(int(item))
+                values.append(str(item))
         return values
-    return [int(object_ids)]
+    return [str(object_ids)]
 
 
 def _filter_object_ids(object_ids, valid_mask: torch.Tensor):
@@ -299,7 +299,7 @@ def _symmetric_rot6d_loss(
     candidates_cpu = _load_symmetry_candidates_cpu(symmetry_info_path, symmetry_continuous_steps)
     losses = []
     for sample_idx, object_id in enumerate(ids):
-        symmetries = candidates_cpu.get(int(object_id))
+        symmetries = candidates_cpu.get(str(object_id))
         if symmetries is None:
             symmetries = torch.eye(3, dtype=torch.float32).reshape(1, 3, 3)
         symmetries = symmetries.to(device=gt_R.device, dtype=gt_R.dtype)
@@ -416,7 +416,7 @@ def compute_object_srt_loss(
 
     gt_R = batch["object_rotation"]
     gt_translation = batch["object_translation"]
-    object_ids = batch.get("object_id", None)
+    object_ids = batch.get("symmetry_object_id", batch.get("object_id", None))
     if use_symmetric_rot6d:
         pose_rep = "symmetric_rot6d"
 

@@ -1,0 +1,282 @@
+defaults:
+  - default_dataset
+  - _self_
+
+# torchrun --master_port=29200 --nproc_per_node=1 launch.py --config default_object_oo9d_real275_ycbv_hc
+
+exp_name: baseline_oo9d_real275_ycbv_hc_multiview_0528
+img_size: 518
+num_workers: 0
+seed_value: 30
+accum_steps: 1
+patch_size: 14
+val_epoch_freq: 5
+max_img_per_gpu: 80
+limit_train_batches: 3040
+limit_val_batches: 374
+
+debug:
+  force_model_output_to_ground_truth: False
+
+# paths:
+#   baseline_root: /mnt/train-data-4-hdd/yian/freepose/baseline_0503
+#   align_json: /mnt/train-data-4-hdd/yian/freepose/baseline_0503/dataset_align.json
+#   ov9d_root: /mnt/train-data-4-hdd/yian/freepose/ov9d/ov9d
+#   ov9d_object_image_root: /mnt/train-data-4-hdd/yian/freepose/ov9d/ov9d_around_image
+#   real275_root: /mnt/train-data-4-hdd/yian/freepose/real275
+#   ycbv_root: /mnt/train-data-4-hdd/yian/freepose/datasets_real/ycbv
+#   housecat6d_root: /mnt/train-data-4-hdd/yian/freepose/housecat6d
+
+paths:
+  baseline_root: /baseline_real
+  align_json: /baseline_real/dataset_align.json
+  ov9d_root: /dataset/ov9d
+  ov9d_object_image_root: /dataset/ov9d_around_image
+  real275_root: /dataset/real275
+  ycbv_root: /dataset/ycbv
+  housecat6d_root: /dataset/housecat6d
+
+dataset_common: &dataset_common
+  num_scene_views: 4
+  num_object_views: 4
+  fixed_object_view_ids: [1, 5, 10, 15]
+  min_view_gap: 2
+  load_point_map: false
+  scale_by_points: true
+  negative_object_prob: 0.2
+  verify_files: true
+
+data:
+  train:
+    _target_: data.dynamic_dataloader.DynamicTorchDataset
+    num_workers: ${num_workers}
+    max_img_per_gpu: ${max_img_per_gpu}
+    common_config:
+      img_size: ${img_size}
+      patch_size: ${patch_size}
+      debug: False
+      map_xyz_bfloat16: False
+      repeat_batch: False
+      skip_process_batch: True
+      img_nums: [4, 4]
+    dataset:
+      _target_: data.composed_dataset.ComposedDataset
+      dataset_configs:
+        - _target_: data.datasets.ov9d_single_pose_normalize.OV9DSinglePoseNormalizeDataset
+          split: train
+          DATA_ROOT: ${paths.ov9d_root}
+          OBJECT_IMAGE_ROOT: ${paths.ov9d_object_image_root}
+          SPLIT_JSON: ${paths.baseline_root}/splits_ov9d_unseen_category_generalization/single/train.json
+          <<: *dataset_common
+          strict_fixed_object_view_ids: true
+        - _target_: data.datasets.mixed_real_pose_normalize.Real275MultiPoseNormalizeDataset
+          split: train
+          DATA_ROOT: ${paths.real275_root}
+          SPLIT_ROOT: ${paths.real275_root}/real_train
+          GT_ROOT: ${paths.real275_root}/gts/real_train_umeyama
+          OBJECT_IMAGE_ROOT: ${paths.real275_root}/real275_aligned_object_refs
+          ALIGN_JSON: ${paths.align_json}
+          <<: *dataset_common
+          strict_fixed_object_view_ids: true
+        - _target_: data.datasets.mixed_real_pose_normalize.YCBVMultiPoseNormalizeDataset
+          split: train_real
+          DATA_ROOT: ${paths.ycbv_root}
+          SPLIT_ROOT: ${paths.ycbv_root}/train_real
+          OBJECT_IMAGE_ROOT: ${paths.ycbv_root}/ycbv_aligned_object_refs
+          ALIGN_JSON: ${paths.align_json}
+          <<: *dataset_common
+          strict_fixed_object_view_ids: true
+        - _target_: data.datasets.mixed_real_pose_normalize.HouseCat6DMultiPoseNormalizeDataset
+          split: train
+          DATA_ROOT: ${paths.housecat6d_root}
+          OBJECT_IMAGE_ROOT: ${paths.housecat6d_root}/housecat6d_aligned_object_refs
+          ALIGN_JSON: ${paths.align_json}
+          <<: *dataset_common
+          strict_fixed_object_view_ids: true
+  val:
+    _target_: data.dynamic_dataloader.DynamicTorchDataset
+    num_workers: ${num_workers}
+    max_img_per_gpu: ${max_img_per_gpu}
+    common_config:
+      img_size: ${img_size}
+      patch_size: ${patch_size}
+      debug: False
+      map_xyz_bfloat16: False
+      skip_process_batch: True
+      img_nums: [4, 4]
+    dataset:
+      _target_: data.composed_dataset.ComposedDataset
+      dataset_configs:
+        - _target_: data.datasets.ov9d_single_pose_normalize.OV9DSinglePoseNormalizeDataset
+          split: val
+          DATA_ROOT: ${paths.ov9d_root}
+          OBJECT_IMAGE_ROOT: ${paths.ov9d_object_image_root}
+          SPLIT_JSON: ${paths.baseline_root}/splits_ov9d_unseen_category_generalization/single/test_unseen_category_unseen_object.json
+          <<: *dataset_common
+          strict_fixed_object_view_ids: true
+          negative_object_prob: 0.0
+        - _target_: data.datasets.mixed_real_pose_normalize.Real275MultiPoseNormalizeDataset
+          split: val
+          DATA_ROOT: ${paths.real275_root}
+          SPLIT_ROOT: ${paths.real275_root}/real_train
+          GT_ROOT: ${paths.real275_root}/gts/real_train_umeyama
+          OBJECT_IMAGE_ROOT: ${paths.real275_root}/real275_aligned_object_refs
+          ALIGN_JSON: ${paths.align_json}
+          <<: *dataset_common
+          strict_fixed_object_view_ids: true
+          negative_object_prob: 0.0
+          max_records: 1000
+        - _target_: data.datasets.mixed_real_pose_normalize.YCBVMultiPoseNormalizeDataset
+          split: test
+          DATA_ROOT: ${paths.ycbv_root}
+          SPLIT_ROOT: ${paths.ycbv_root}/test
+          OBJECT_IMAGE_ROOT: ${paths.ycbv_root}/ycbv_aligned_object_refs
+          ALIGN_JSON: ${paths.align_json}
+          <<: *dataset_common
+          strict_fixed_object_view_ids: true
+          negative_object_prob: 0.0
+          max_records: 1000
+        - _target_: data.datasets.mixed_real_pose_normalize.HouseCat6DMultiPoseNormalizeDataset
+          split: val
+          DATA_ROOT: ${paths.housecat6d_root}
+          OBJECT_IMAGE_ROOT: ${paths.housecat6d_root}/housecat6d_aligned_object_refs
+          ALIGN_JSON: ${paths.align_json}
+          <<: *dataset_common
+          strict_fixed_object_view_ids: true
+          negative_object_prob: 0.0
+          max_records: 1000
+
+logging:
+  log_dir: logs/${exp_name}
+  use_wandb: False
+  log_visuals: False
+  log_freq: 1
+  log_level_primary: DEBUG
+  log_level_secondary: WARNING
+  all_ranks: False
+  tensorboard_writer:
+    _target_: train_utils.tb_writer.TensorBoardLogger
+    path: ${logging.log_dir}/tensorboard
+  wandb_writer:
+    _target_: train_utils.wandb_logger.WandbLogger
+    path: ${logging.log_dir}/wandb
+    project: vggt-objectspc
+    entity: null
+    name: ${exp_name}
+    mode: online
+    resume: null
+  scalar_keys_to_log:
+    train:
+      keys_to_log: [loss_objective, loss_object_mask, loss_object_mask_bce, loss_object_mask_dice, loss_object_srt, loss_object_pose, loss_object_translation, loss_object_presence, acc_object_presence]
+    val:
+      keys_to_log: [loss_objective, loss_object_mask, loss_object_mask_bce, loss_object_mask_dice, loss_object_srt, loss_object_pose, loss_object_translation, loss_object_presence, acc_object_presence]
+
+checkpoint:
+  save_dir: logs/${exp_name}/ckpts
+  save_freq: 10
+  resume_checkpoint_path: /mnt/train-data-4-hdd/yian/freepose/object_pretrain_model/checkpoint_60.pt
+  load_optimizer_state: False
+  load_training_state: False
+  load_scaler_state: False
+  strict: False
+
+loss:
+  _target_: loss.MultitaskLoss
+  camera: null
+  depth: null
+  point: null
+  track: null
+  object_mask:
+    weight: 1.0
+    bce_weight: 1.0
+    dice_weight: 1.0
+    pos_weight: 2.0
+  object_srt:
+    weight: 1.0
+    loss_type: l1
+    pose_rep: rot6d
+    use_symmetric_rot6d: true
+    symmetry_info_path: /mnt/train-data-4-hdd/yian/freepose/baseline_0503/mixed_symmetry_info.json
+    symmetry_continuous_steps: 72
+    weight_pose: 1.0
+    weight_translation: 1.0
+  object_presence:
+    weight: 1.0
+
+optim:
+  param_group_modifiers: False
+  train_object_token_only: False
+  keep_frozen_aggregator_train_mode: True
+  optimizer:
+    _target_: torch.optim.AdamW
+    lr: 1e-4
+    weight_decay: 0.05
+  frozen_module_names:
+    - "*aggregator*"
+  amp:
+    enabled: True
+    amp_dtype: bfloat16
+  gradient_clip:
+    _target_: train_utils.gradient_clip.GradientClipper
+    configs:
+      - module_name: ["object_token_cross_attn", "object_token_cross_attn_blocks", "object_prototype_poolers"]
+        max_norm: 1.0
+        norm_type: 2
+      - module_name: ["object_mask_head"]
+        max_norm: 1.0
+        norm_type: 2
+      - module_name: ["object_srt_head"]
+        max_norm: 1.0
+        norm_type: 2
+  options:
+    lr:
+      - scheduler:
+          _target_: fvcore.common.param_scheduler.CompositeParamScheduler
+          schedulers:
+            - _target_: fvcore.common.param_scheduler.CosineParamScheduler
+              start_value: 1e-4
+              end_value: 1e-8
+          lengths: [1.0]
+          interval_scaling: ['rescaled']
+    weight_decay:
+      - scheduler:
+          _target_: fvcore.common.param_scheduler.ConstantParamScheduler
+          value: 0.05
+
+
+max_epochs: 100
+
+model:
+  _target_: vggt.models.vggt.VGGT
+  enable_camera: False
+  enable_depth: False
+  enable_point: False
+  enable_track: False
+  enable_object_point: False
+  enable_object_mask: True
+  enable_object_srt: True
+  use_shared_object_latent: False # set False to switch back to the original version (no shared latent)
+  enable_object_cross_attn: False
+  enable_pre_aggregator_object_cross_attn: False
+  enable_multi_layer_object_prototype_cross_attn: True
+  enable_global_pool_scene_object_pose_head: False  # when True, scene/object are pooled independently, concatenated, then fed to the original transformer decoder pose head
+  object_prototype_layer_indices: [4, 11, 17, 23]
+  object_prototype_num_tokens: 32
+  object_prototype_object_encoder_no_grad: True
+  object_cross_attn_heads: 16
+
+
+distributed:
+  # check https://docs.pytorch.org/docs/stable/generated/torch.nn.parallel.DistributedDataParallel.html for options
+  backend: nccl
+  comms_dtype: None
+  find_unused_parameters: False
+  timeout_mins: 30
+  gradient_as_bucket_view: True  # Less memory used
+  bucket_cap_mb: 25
+  broadcast_buffers: True
+
+cuda:
+    cudnn_deterministic: False
+    cudnn_benchmark: False
+    allow_tf32: True

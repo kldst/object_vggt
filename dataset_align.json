@@ -1,0 +1,116 @@
+{
+  "description": "Cross-dataset canonical-frame alignment. The target convention is OV9D's native canonical frame: every R_align maps a point from a dataset's native canonical frame to OV9D's canonical frame, i.e. p_ov9d = R_align @ p_native. OV9D's R_align is therefore identity for every class. When drawing axes on a scene image, use R_drawn = R_native_to_cam @ R_align.T (column-vector convention).",
+  "target_convention_source": "ov9d",
+  "target_convention_per_category": {
+    "bottle":          "+Y = symmetry axis (verified: 5/5 OV9D bottles have Y as longest extent and Y as symmetry axis)",
+    "bowl":            "+Y = up / perpendicular to the bowl's flat bottom (Y is the shortest extent in OV9D bowls)",
+    "can / canned_beverage": "+Y = symmetry axis (verified: 2/2 OV9D canned_beverage have Y as longest extent)",
+    "cup":             "+Y = symmetry axis; **handle on -Z** (verified by top-down rendering of 12 OV9D cup canonical meshes: 9/12 have the handle clearly protruding in the -Z direction. See verification/ov9d_cups_topdown.png. Per-mesh: |COM-Z shift| dominates |COM-X shift| for 9/12). REAL275 / HC / YCB-V mugs have native handle along the X axis; they need a 90-deg rotation about Y to put the handle on -Z.",
+    "box":             "+Y = up / vertical in posed scenes (verified: 11/12 sampled OV9D box scenes have +Y closest to image-up; box_001 is an outlier). Box mesh longest extent can be Z, but pose convention should follow OV9D's object-frame up axis.",
+    "teapot":          "+X = spout-handle axis (verified: 4/5 OV9D teapots have X as longest extent)",
+    "remote_control":  "+Y = long axis of remote (verified: 5/5 OV9D remotes have Y as longest extent)",
+    "laptop":          "+Z = longest extent (verified: 4/4 OV9D laptops; semantics unclear — probably the screen width or depth)",
+    "banana":          "OV9D banana exists (cid 8). In OV9D, +Y follows the banana concavity/curvature direction observed in rendered samples. YCB-V obj 10 needs a category-specific rotation after Z->Y so its native +X curvature direction maps to OV9D +Y.",
+    "fork / knife":    "OV9D has fork (cid 73) and knife (cid 102). HouseCat6D has one coarse cutlery class, so per-instance model names are needed for a semantic fork-vs-knife split.",
+    "red_wine_glass":  "OV9D has red_wine_glass (cid 157). HouseCat6D glass is treated as a generic glass-like object with identity orientation.",
+    "shoe":            "OV9D shoe exists (cid 167). HouseCat6D shoe keeps identity orientation."
+  },
+  "caveats": [
+    "Cups: OV9D's cup handle is on -Z (verified by top-down render of 12 sampled cup meshes - 9/12 have handle clearly protruding in -Z direction; the rest have small handle or are tumblers without clear handle). Since REAL275 / HC / YCB-V all use the X-axis (with various signs) for the handle direction, each needs a different rotation about Y to put the handle on -Z. See verification/ov9d_cups_topdown.png.",
+    "OV9D box mesh extents can suggest Z as the longest side, but OV9D's posed box scenes predominantly use +Y as the object-frame up axis. Use +Y for cross-dataset pose alignment.",
+    "Rotationally symmetric classes (bottle, can, bowl, canned_beverage, glass): only +Y / symmetry axis is fixed; X/Z signs are arbitrary even within a single dataset.",
+    "No OV9D class was found for YCB-V pitcher/power_drill/scissors/large_marker/large_clamp, REAL275 camera, or HouseCat6D tube. These cannot be semantically aligned to OV9D without adding a target class or choosing a different reference dataset."
+  ],
+  "evidence_summary": {
+    "longest_axis_per_(category,dataset)": {
+      "bottle":  {"ov9d":"Y(5/5)", "real275":"Y(3/3)", "housecat6d":"Y(21/21)", "ycbv":"Z(2/2)"},
+      "bowl":    {"ov9d":"Z(4/5)", "real275":"Z(2/3)", "ycbv":"X(1/1)"},
+      "can":     {"ov9d":"Y(2/2 canned_beverage)", "real275":"Y(3/3)", "housecat6d":"Y(15/23)", "ycbv":"Z(2/4)"},
+      "cup":     {"ov9d":"Y(3/5)", "real275":"X(3/3)", "housecat6d":"X(16/16)", "ycbv":"X(1/1)"},
+      "box":     {"ov9d":"Z(4/5)", "housecat6d":"Y(23/23)", "ycbv":"Z(3/6)"},
+      "teapot":  {"ov9d":"X(4/5)", "housecat6d":"X(15/19)"},
+      "remote":  {"ov9d":"Y(5/5)", "housecat6d":"X(19/19)"}
+    },
+    "note": "The longest-axis statistic indicates which axis tends to be the dominant 'extent' direction in each dataset. For symmetric items (bottle/can) this is the symmetry axis. For boxes it is the longest side. For cups it is X when the handle is significant (REAL275/HC/YCBV) and Y when the cup body dominates (OV9D)."
+  },
+  "datasets": {
+    "ov9d": {
+      "_": "Reference dataset — every R_align is identity.",
+      "cid_to_name_examples": {"8":"banana","15":"bottle","16":"bowl","17":"box","52":"cup","34":"canned_beverage","73":"fork","102":"knife","103":"laptop","157":"red_wine_glass","158":"remote_control","167":"shoe","186":"teapot"},
+      "classes_by_cid": {
+        "8":   {"name":"banana",          "R_align": [[1,0,0],[0,1,0],[0,0,1]]},
+        "15":  {"name":"bottle",          "R_align": [[1,0,0],[0,1,0],[0,0,1]]},
+        "16":  {"name":"bowl",            "R_align": [[1,0,0],[0,1,0],[0,0,1]]},
+        "17":  {"name":"box",             "R_align": [[1,0,0],[0,1,0],[0,0,1]]},
+        "52":  {"name":"cup",             "R_align": [[1,0,0],[0,1,0],[0,0,1]]},
+        "34":  {"name":"canned_beverage", "R_align": [[1,0,0],[0,1,0],[0,0,1]]},
+        "73":  {"name":"fork",            "R_align": [[1,0,0],[0,1,0],[0,0,1]]},
+        "102": {"name":"knife",           "R_align": [[1,0,0],[0,1,0],[0,0,1]]},
+        "103": {"name":"laptop",          "R_align": [[1,0,0],[0,1,0],[0,0,1]]},
+        "157": {"name":"red_wine_glass",  "R_align": [[1,0,0],[0,1,0],[0,0,1]]},
+        "158": {"name":"remote_control",  "R_align": [[1,0,0],[0,1,0],[0,0,1]]},
+        "167": {"name":"shoe",            "R_align": [[1,0,0],[0,1,0],[0,0,1]]},
+        "186": {"name":"teapot",          "R_align": [[1,0,0],[0,1,0],[0,0,1]]}
+      },
+      "default_R_align_for_other_classes": [[1,0,0],[0,1,0],[0,0,1]]
+    },
+
+    "real275": {
+      "class_id_to_name": {"1":"bottle","2":"bowl","3":"camera","4":"can","5":"laptop","6":"mug"},
+      "classes": {
+        "1": {"name":"bottle","R_align": [[1,0,0],[0,1,0],[0,0,1]], "note":"Native +Y=up matches OV9D"},
+        "2": {"name":"bowl",  "R_align": [[1,0,0],[0,1,0],[0,0,1]], "note":"Native +Y=up matches OV9D"},
+        "3": {"name":"camera","R_align": [[1,0,0],[0,1,0],[0,0,1]], "note":"No OV9D analog (REAL275 has 'camera', OV9D does not). Identity."},
+        "4": {"name":"can",   "R_align": [[1,0,0],[0,1,0],[0,0,1]], "note":"Native +Y=symmetry matches OV9D canned_beverage convention"},
+        "5": {"name":"laptop","R_align": [[0,0,1],[0,1,0],[-1,0,0]], "note":"REAL275 laptop has +X as the longest extent. OV9D laptop has +Z as the longest extent. Rotate X->Z by 90deg about Y: R = [[0,0,1],[0,1,0],[-1,0,0]] (det=+1). Note REAL275 only has 3 laptops; convention may not be tight."},
+        "6": {"name":"mug",   "R_align": [[0,0,1],[0,1,0],[-1,0,0]], "note":"REAL275 native handle is on +X; OV9D wants handle on -Z. Rotate +90 deg about Y: R_y(90) = [[0,0,1],[0,1,0],[-1,0,0]] (det=+1). Maps native +X -> target -Z, native +Y -> target +Y."}
+      }
+    },
+
+    "housecat6d": {
+      "category_name_to_id": {"box":1,"bottle":2,"can":3,"cup":4,"remote":5,"teapot":6,"cutlery":7,"glass":8,"shoe":9,"tube":10},
+      "classes": {
+        "bottle":  {"R_align": [[1,0,0],[0,1,0],[0,0,1]], "note":"Native +Y=symmetry matches OV9D"},
+        "can":     {"R_align": [[1,0,0],[0,1,0],[0,0,1]], "note":"Native +Y=symmetry matches OV9D"},
+        "cup":     {"R_align": [[0,0,-1],[0,1,0],[1,0,0]], "note":"HC native handle is on -X; OV9D wants -Z. Rotate -90 deg about Y: R_y(-90) = [[0,0,-1],[0,1,0],[1,0,0]] (det=+1). Maps native -X (handle) -> target -Z, native +Y -> target +Y."},
+      "box":     {"R_align": [[1,0,0],[0,1,0],[0,0,1]], "note":"HC native +Y is up, matching OV9D's box pose convention. Identity."},
+        "teapot":  {"R_align": [[1,0,0],[0,1,0],[0,0,1]], "note":"Both HC and OV9D use +X as the dominant extent (spout/handle axis). Identity."},
+        "remote":  {"R_align": [[0,1,0],[-1,0,0],[0,0,1]], "note":"HC remote has +X as long axis but its semantic direction is opposite OV9D +Y. R maps native +X -> target -Y and native -X -> target +Y (det=+1)."},
+        "glass":   {"R_align": [[1,0,0],[0,1,0],[0,0,1]], "ov9d_target_cid":157, "ov9d_target_name":"red_wine_glass", "note":"Approximate semantic mapping to OV9D red_wine_glass. Native +Y=symmetry; X/Z signs are weakly defined."},
+        "cutlery": {"R_align": [[1,0,0],[0,1,0],[0,0,1]], "ov9d_target_candidates":{"fork":73,"knife":102}, "note":"HouseCat6D uses one coarse cutlery class containing forks/knives/spoons. OV9D has fork and knife but no spoon; use per-model names for semantic split. Identity orientation by default."},
+        "shoe":    {"R_align": [[1,0,0],[0,1,0],[0,0,1]], "ov9d_target_cid":167, "ov9d_target_name":"shoe", "note":"OV9D shoe exists. Identity until a left/right/front convention is explicitly verified."},
+        "tube":    {"R_align": [[1,0,0],[0,1,0],[0,0,1]], "no_ov9d_target":true, "note":"No OV9D tube class found. Identity only; not semantically aligned to OV9D."}
+      }
+    },
+
+    "ycbv": {
+      "obj_id_to_category": {
+        "1":"can","4":"can","6":"can","9":"can",
+        "13":"bowl","14":"mug",
+        "5":"bottle","12":"bottle",
+        "2":"box","3":"box","7":"box","8":"box","16":"box","21":"box",
+        "10":"banana","11":"pitcher","15":"power_drill","17":"scissors","18":"large_marker","19":"large_clamp","20":"large_clamp"
+      },
+      "global_R_align": [[1,0,0],[0,0,1],[0,-1,0]],
+      "global_note": "All YCB-V objects use BOP Z-up convention. Apply Z->Y rotation by default to map Z-up -> Y-up to match OV9D for most categories.",
+      "ov9d_target_by_category": {
+        "banana": {"cid":8, "name":"banana"},
+        "bottle": {"cid":15, "name":"bottle"},
+        "bowl": {"cid":16, "name":"bowl"},
+        "box": {"cid":17, "name":"box"},
+        "can": {"cid":34, "name":"canned_beverage"},
+        "mug": {"cid":52, "name":"cup"},
+        "pitcher": null,
+        "power_drill": null,
+        "scissors": null,
+        "large_marker": null,
+        "large_clamp": null
+      },
+      "per_object_overrides": {
+        "10": [[0,0,-1],[1,0,0],[0,-1,0]],
+        "14": [[0,-1,0],[0,0,1],[-1,0,0]]
+      },
+      "per_object_overrides_note": "Banana (obj 10): YCB-V native +X follows the banana curvature direction, while OV9D banana uses +Y for that direction. Apply R_z(+90) after the global Z->Y rotation: [[0,0,-1],[1,0,0],[0,-1,0]] (det=+1), mapping native +X -> target +Y. Mug (obj 14): YCB-V native has Z-up and handle on +X; OV9D wants Y-up and handle on -Z. Composition R_align = R_y(90) @ R_zy = [[0,0,1],[0,1,0],[-1,0,0]] @ [[1,0,0],[0,0,1],[0,-1,0]] = [[0,-1,0],[0,0,1],[-1,0,0]] (det=+1). This maps native +X (handle) -> target -Z and native +Z (up) -> target +Y. YCB-V boxes now use the global Z->Y rotation because OV9D box pose convention is +Y-up."
+    }
+  }
+}

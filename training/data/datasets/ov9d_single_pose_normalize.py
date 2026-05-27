@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 import numpy as np
+from PIL import Image
 
 TRAINING_ROOT = Path(__file__).resolve().parents[2]
 OBJECT_ROOT = Path(__file__).resolve().parents[3]
@@ -30,6 +31,7 @@ class OV9DSinglePoseNormalizeDataset(OV9DPoseNormalizeDataset):
     """
 
     DEFAULT_DATA_ROOT = "/mnt/train-data-4-hdd/yian/freepose/ov9d/ov9d"
+    DEFAULT_OBJECT_IMAGE_ROOT = "/mnt/train-data-4-hdd/yian/freepose/ov9d/ov9d_around_image"
     DEFAULT_SPLIT_ROOT = "/mnt/train-data-4-hdd/yian/freepose/baseline/single_split"
     DEFAULT_NUM_SCENE_VIEWS = 4
     DEFAULT_NUM_OBJECT_VIEWS = 4
@@ -39,6 +41,7 @@ class OV9DSinglePoseNormalizeDataset(OV9DPoseNormalizeDataset):
         common_conf,
         split: str = "train",
         DATA_ROOT: str = DEFAULT_DATA_ROOT,
+        OBJECT_IMAGE_ROOT: str = DEFAULT_OBJECT_IMAGE_ROOT,
         SPLIT_JSON: Optional[str] = None,
         len_train: Optional[int] = None,
         len_test: Optional[int] = None,
@@ -48,9 +51,12 @@ class OV9DSinglePoseNormalizeDataset(OV9DPoseNormalizeDataset):
         min_view_gap: int = 5,
         object_view_min_gap: int = 6,
         object_view_max_gap: int = 9,
+        fixed_object_view_ids: Optional[List[int]] = None,
+        strict_fixed_object_view_ids: bool = True,
         load_point_map: bool = False,
         scale_by_points: bool = True,
         negative_object_prob: float = 0.0,
+        max_records: Optional[int] = None,
         only_scene_name: str = "",
         only_scene_names: Optional[List[str]] = None,
     ):
@@ -65,11 +71,13 @@ class OV9DSinglePoseNormalizeDataset(OV9DPoseNormalizeDataset):
         self.split = str(split)
         self.data_root = Path(DATA_ROOT)
         self.single_root = self.data_root / "oo3d9dsingle"
+        self.object_image_root = Path(OBJECT_IMAGE_ROOT)
         self.split_json = (
             Path(SPLIT_JSON)
             if SPLIT_JSON
             else Path(self.DEFAULT_SPLIT_ROOT) / f"{self.split}.json"
         )
+        self.models_info = self.load_json(self.data_root / "models_info.json")
 
         self.verify_files = bool(verify_files)
         self.num_scene_views = int(num_scene_views)
@@ -77,16 +85,34 @@ class OV9DSinglePoseNormalizeDataset(OV9DPoseNormalizeDataset):
         self.min_view_gap = int(min_view_gap)
         self.object_view_min_gap = int(object_view_min_gap)
         self.object_view_max_gap = int(object_view_max_gap)
+        self.fixed_object_view_ids = (
+            tuple(int(x) for x in fixed_object_view_ids)
+            if fixed_object_view_ids is not None
+            else None
+        )
+        if self.fixed_object_view_ids is not None and len(self.fixed_object_view_ids) != self.num_object_views:
+            raise ValueError(
+                "fixed_object_view_ids length must match num_object_views "
+                f"({len(self.fixed_object_view_ids)} != {self.num_object_views})"
+            )
+        self.strict_fixed_object_view_ids = bool(strict_fixed_object_view_ids)
         self.object_index = 0  # single-object scenes always have one object
         self.load_point_map = bool(load_point_map)
         self.scale_by_points = bool(scale_by_points)
         self.negative_object_prob = float(negative_object_prob)
+        self.max_records = int(max_records) if max_records is not None else None
 
         self.only_scene_names = [x.strip() for x in (only_scene_names or []) if str(x).strip()]
         if only_scene_name:
             self.only_scene_names = [only_scene_name.strip()]
 
         self.records, self.records_by_category = self._build_records_with_category_index()
+        if self.max_records is not None:
+            self.records = self.records[: self.max_records]
+            limited_by_category: Dict[str, List[Dict[str, Any]]] = defaultdict(list)
+            for rec in self.records:
+                limited_by_category[rec["category"]].append(rec)
+            self.records_by_category = dict(limited_by_category)
         self.sequence_list_len = len(self.records)
         self.records_by_frame_num = {
             frame_num: list(range(self.sequence_list_len)) for frame_num in range(4, 7)
@@ -138,6 +164,7 @@ class OV9DSinglePoseNormalizeDataset(OV9DPoseNormalizeDataset):
                 "scene_dir": scene_dir,
                 "category": item.get("category", ""),
                 "object_instance": item.get("object_instance", ""),
+                "object_id": int(item["object_id"]),
             }
             records.append(rec)
             by_category[rec["category"]].append(rec)
@@ -153,10 +180,44 @@ class OV9DSinglePoseNormalizeDataset(OV9DPoseNormalizeDataset):
     # Object image loading — use ``mask/`` instead of ``mask_visib/``
     # ------------------------------------------------------------------
 
-    def _load_object_image(self, scene_dir: Path, image_id: int) -> np.ndarray:
-        rgb = self.read_rgb(scene_dir / "rgb" / f"{image_id:06d}.png")
+    def _object_reference_dir(self, object_id: int) -> Path:
+        return self.object_image_root / f"obj_{int(object_id):06d}"
+
+    def _load_object_image(self, object_id: int, image_id: int) -> np.ndarray:
+        return self.read_rgb(self._object_reference_dir(object_id) / "rgb" / f"{image_id:06d}.png")
+
+    def _load_scene_object_mask(self, scene_dir: Path, image_id: int, image_shape: tuple[int, int]) -> np.ndarray:
         mask_path = scene_dir / "mask" / f"{image_id:06d}_{self.object_index:06d}.png"
-        return self.apply_mask_white_background(rgb, mask_path)
+        if not mask_path.is_file():
+            return np.zeros(image_shape, dtype=np.float32)
+        mask = np.asarray(Image.open(mask_path).convert("L"), dtype=np.float32)
+        if mask.shape != image_shape:
+            raise ValueError(
+                f"Object mask shape {mask.shape} does not match image shape {image_shape} for {mask_path}"
+            )
+        return (mask > 0).astype(np.float32)
+
+    def _process_scene_object_mask(
+        self,
+        mask: np.ndarray,
+        extrinsic: np.ndarray,
+        intrinsic: np.ndarray,
+        aspect_ratio: float,
+        filepath: str,
+    ) -> np.ndarray:
+        dummy_image = np.repeat((mask[..., None] * 255.0).astype(np.uint8), 3, axis=2)
+        original_size = np.array(mask.shape[:2], dtype=np.int32)
+        target_image_shape = self.get_target_shape(aspect_ratio)
+        _, processed_mask, *_ = self.process_one_image(
+            image=dummy_image,
+            depth_map=mask.astype(np.float32),
+            extri_opencv=extrinsic,
+            intri_opencv=intrinsic,
+            original_size=original_size,
+            target_image_shape=target_image_shape,
+            filepath=filepath,
+        )
+        return (processed_mask > 0.5).astype(bool)
 
     # ------------------------------------------------------------------
     # Object view sampling with gap range (mirrors multi dataset)
@@ -203,6 +264,20 @@ class OV9DSinglePoseNormalizeDataset(OV9DPoseNormalizeDataset):
     def _sample_object_image_ids(
         self, available_ids: List[int], count: int, rng: random.Random
     ) -> List[int]:
+        if self.fixed_object_view_ids is not None:
+            available_set = {int(x) for x in available_ids}
+            missing = [image_id for image_id in self.fixed_object_view_ids if image_id not in available_set]
+            if missing and self.strict_fixed_object_view_ids:
+                raise FileNotFoundError(
+                    f"Fixed object view ids {missing} are not available. "
+                    f"Available ids include: {sorted(available_set)[:20]}"
+                )
+            selected = [image_id for image_id in self.fixed_object_view_ids if image_id in available_set]
+            if len(selected) < self.num_object_views:
+                fallback = [image_id for image_id in sorted(available_set) if image_id not in selected]
+                selected.extend(fallback[: self.num_object_views - len(selected)])
+            return selected[: self.num_object_views]
+
         count = min(int(count), len(available_ids))
         ranged = self._ids_with_gap_range(
             available_ids,
@@ -273,13 +348,13 @@ class OV9DSinglePoseNormalizeDataset(OV9DPoseNormalizeDataset):
             else:
                 use_negative_object = False
 
-        object_scene_dir: Path = object_rec["scene_dir"]
-        object_scene_gt = (
-            scene_gt
-            if object_scene_dir == scene_dir
-            else self.load_json(object_scene_dir / "scene_gt.json")
+        object_id = int(object_rec["object_id"])
+        object_scene_dir = self._object_reference_dir(object_id)
+        object_available_ids = sorted(
+            int(path.stem)
+            for path in (object_scene_dir / "rgb").glob("*.png")
+            if path.stem.isdigit()
         )
-        object_available_ids = self._available_image_ids(object_scene_gt)
         object_ids = self._sample_object_image_ids(object_available_ids, self.num_object_views, random)
 
         # --- scene views ---
@@ -288,6 +363,7 @@ class OV9DSinglePoseNormalizeDataset(OV9DPoseNormalizeDataset):
         raw_cam_points = []
         raw_world_points = []
         point_masks = []
+        object_masks = []
         extrinsics = []
         intrinsics = []
         original_sizes = []
@@ -297,6 +373,10 @@ class OV9DSinglePoseNormalizeDataset(OV9DPoseNormalizeDataset):
                 image_id,
                 scene_camera[str(image_id)],
             )
+            object_mask = self._load_scene_object_mask(scene_dir, image_id, image.shape[:2])
+            raw_extrinsic = extrinsic.copy()
+            raw_intrinsic = intrinsic.copy()
+            process_rng_state = np.random.get_state()
             image, depth, extrinsic, intrinsic, world_points, cam_points, point_mask, _ = self._process_scene_view(
                 image=image,
                 depth=depth,
@@ -305,11 +385,20 @@ class OV9DSinglePoseNormalizeDataset(OV9DPoseNormalizeDataset):
                 aspect_ratio=aspect_ratio,
                 filepath=str(scene_dir / "rgb" / f"{image_id:06d}.png"),
             )
+            np.random.set_state(process_rng_state)
+            object_mask = self._process_scene_object_mask(
+                mask=object_mask,
+                extrinsic=raw_extrinsic,
+                intrinsic=raw_intrinsic,
+                aspect_ratio=aspect_ratio,
+                filepath=str(scene_dir / "mask" / f"{image_id:06d}_{self.object_index:06d}.png"),
+            )
             scene_images.append(image)
             raw_depths.append(depth)
             raw_cam_points.append(cam_points)
             raw_world_points.append(world_points)
             point_masks.append(point_mask)
+            object_masks.append(object_mask)
             extrinsics.append(extrinsic)
             intrinsics.append(intrinsic)
             original_sizes.append(np.array(image.shape[:2], dtype=np.int32))
@@ -334,12 +423,23 @@ class OV9DSinglePoseNormalizeDataset(OV9DPoseNormalizeDataset):
             avg_scale=avg_scale,
             scale_by_points=self.scale_by_points,
         )
+        object_info = self.models_info.get(str(int(rec["object_id"])), {})
+        object_size = None
+        if all(k in object_info for k in ("size_x", "size_y", "size_z")):
+            scale = avg_scale if self.scale_by_points else 1.0
+            object_size = (
+                np.array(
+                    [object_info["size_x"], object_info["size_y"], object_info["size_z"]],
+                    dtype=np.float32,
+                )
+                / float(scale)
+            ).astype(np.float32)
 
         # --- object reference images (masked, white background) ---
         object_images = []
         object_original_sizes = []
         for image_id in object_ids:
-            object_image = self._load_object_image(object_scene_dir, image_id)
+            object_image = self._load_object_image(object_id, image_id)
             object_image = self._process_object_image(
                 image=object_image,
                 aspect_ratio=aspect_ratio,
@@ -362,7 +462,10 @@ class OV9DSinglePoseNormalizeDataset(OV9DPoseNormalizeDataset):
             "object_cam_indices": np.array(object_ids, dtype=np.int64),
             "object_name": rec.get("object_instance") or scene_name,
             "object_reference_name": object_rec.get("object_instance") or object_rec["scene_name"],
-            "object_reference_scene_name": object_rec["scene_name"],
+            "object_reference_scene_name": f"obj_{object_id:06d}",
+            "object_id": np.array(int(rec["object_id"]), dtype=np.int64),
+            "object_reference_id": np.array(object_id, dtype=np.int64),
+            "symmetry_object_id": f"OO9DSingleCameraPose:{int(rec['object_id'])}",
             "category": rec.get("category", ""),
             "object_reference_category": object_rec.get("category", ""),
             "scene_name": scene_name,
@@ -371,11 +474,14 @@ class OV9DSinglePoseNormalizeDataset(OV9DPoseNormalizeDataset):
             "has_object": np.array(0.0 if use_negative_object else 1.0, dtype=np.float32),
             "object_rotation": normalized_object_rotation,
             "object_translation": normalized_object_translation,
+            "object_masks": object_masks,
             "object_srt": np.concatenate(
                 [normalized_object_rotation.reshape(-1), normalized_object_translation], axis=0
             ).astype(np.float32),
             "normalization_scale": np.array([avg_scale], dtype=np.float32),
         }
+        if object_size is not None:
+            batch["object_size"] = object_size
 
         if self.load_point_map:
             scale = avg_scale if self.scale_by_points else 1.0
@@ -385,7 +491,6 @@ class OV9DSinglePoseNormalizeDataset(OV9DPoseNormalizeDataset):
                     "cam_points": [(points / scale).astype(np.float32) for points in raw_cam_points],
                     "world_points": [points.astype(np.float32) for points in normalized_world_points],
                     "point_masks": point_masks,
-                    "object_masks": point_masks,
                 }
             )
 
@@ -422,9 +527,8 @@ def _print_sample_paths(dataset: OV9DSinglePoseNormalizeDataset, seq_index: int,
     scene_mask_paths = [scene_dir / "mask" / f"{i:06d}_000000.png" for i in batch["ids"].tolist()]
     scene_depth_paths = [scene_dir / "depth" / f"{i:06d}.png" for i in batch["ids"].tolist()]
 
-    obj_scene_dir = dataset.single_root / batch["object_reference_scene_name"]
+    obj_scene_dir = dataset.object_image_root / batch["object_reference_scene_name"]
     object_rgb_paths = [obj_scene_dir / "rgb" / f"{i:06d}.png" for i in batch["object_cam_indices"].tolist()]
-    object_mask_paths = [obj_scene_dir / "mask" / f"{i:06d}_000000.png" for i in batch["object_cam_indices"].tolist()]
 
     print(f"[sample seq_index={seq_index}]")
     print(f"  seq_name: {batch['seq_name']}")
@@ -441,8 +545,6 @@ def _print_sample_paths(dataset: OV9DSinglePoseNormalizeDataset, seq_index: int,
     print(f"  object_reference_scene_dir: {obj_scene_dir}")
     print("  object_rgb_paths:")
     print(_format_paths(object_rgb_paths))
-    print("  object_mask_paths:")
-    print(_format_paths(object_mask_paths))
     print(
         "  loaded_shapes: "
         f"images={len(batch['images'])}x{batch['images'][0].shape}, "

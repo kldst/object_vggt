@@ -1,0 +1,14 @@
+{
+  "split": "train",
+  "ratio_policy": "single:multi = 1:1 via equal virtual len_train values",
+  "single_train_json": "/mnt/train-data-4-hdd/yian/freepose/omni-object_clone/splits_ov9d_unseen_category_generalization/single/train.json",
+  "multi_train_json": "/mnt/train-data-4-hdd/yian/freepose/omni-object_clone/splits_ov9d_unseen_category_generalization/multi/train.json",
+  "single_train_scenes": 2790,
+  "multi_train_scenes": 7000,
+  "single_len_train": 7000,
+  "multi_len_train": 7000,
+  "effective_single_to_multi_ratio": [
+    1,
+    1
+  ]
+}
