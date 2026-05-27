@@ -44,6 +44,7 @@ class MixedPoseNormalizeBase(OV9DPoseNormalizeDataset):
         print_sample_paths: bool = False,
         print_sample_paths_limit: int = 5,
         max_records: Optional[int] = None,
+        repeat_factor: int = 1,
     ):
         BaseDataset.__init__(self, common_conf=common_conf)
         self.debug = common_conf.debug
@@ -82,11 +83,16 @@ class MixedPoseNormalizeBase(OV9DPoseNormalizeDataset):
             raise RuntimeError(f"No {type(self).__name__} samples found")
 
         if self.split in {"train", "train_real", "train_pbr"}:
-            self.len_train = int(len_train) if len_train is not None else self.sequence_list_len
+            base_len = int(len_train) if len_train is not None else self.sequence_list_len
         elif self.split in {"test", "val", "validation", "test1", "test2", "test3"}:
-            self.len_train = int(len_test) if len_test is not None else self.sequence_list_len
+            base_len = int(len_test) if len_test is not None else self.sequence_list_len
         else:
             raise ValueError(f"Invalid split: {split}")
+        # See OV9DSinglePoseNormalizeDataset.repeat_factor: virtually oversample
+        # each record by this factor (acts as a sampling weight in the mix under
+        # common_config.inside_random=True). Each draw re-samples views randomly.
+        self.repeat_factor = max(1, int(repeat_factor))
+        self.len_train = base_len * self.repeat_factor
 
         logger.info(
             "%s initialized: records=%d objects=%d",
@@ -94,6 +100,12 @@ class MixedPoseNormalizeBase(OV9DPoseNormalizeDataset):
             len(self.records),
             len(self.object_records),
         )
+        # Mirror OV9DSinglePoseNormalizeDataset's root-logging so the record count
+        # is visible in log.txt (logger.info above is suppressed by the secondary
+        # WARNING log level). Needed to size limit_train_batches for the dataset mix.
+        status = "Training" if self.training else "Testing"
+        logging.info(f"{status}: {type(self).__name__} sequence count: {self.sequence_list_len}")
+        logging.info(f"{status}: {type(self).__name__} dataset length: {len(self)}")
 
     @staticmethod
     def _load_json(path: Path) -> Dict[str, Any]:

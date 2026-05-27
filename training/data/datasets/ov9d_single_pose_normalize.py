@@ -59,6 +59,7 @@ class OV9DSinglePoseNormalizeDataset(OV9DPoseNormalizeDataset):
         max_records: Optional[int] = None,
         only_scene_name: str = "",
         only_scene_names: Optional[List[str]] = None,
+        repeat_factor: int = 1,
     ):
         # Bypass OV9DPoseNormalizeDataset.__init__ and call BaseDataset directly
         # so we can set our own defaults before _build_records.
@@ -124,11 +125,19 @@ class OV9DSinglePoseNormalizeDataset(OV9DPoseNormalizeDataset):
             )
 
         if self.split == "train":
-            self.len_train = int(len_train) if len_train is not None else self.sequence_list_len
+            base_len = int(len_train) if len_train is not None else self.sequence_list_len
         elif self.split in {"test", "val", "test1", "test2"}:
-            self.len_train = int(len_test) if len_test is not None else self.sequence_list_len
+            base_len = int(len_test) if len_test is not None else self.sequence_list_len
         else:
             raise ValueError(f"Invalid split: {split}")
+        # ``repeat_factor`` virtually oversamples each scene: the dataset reports
+        # ``repeat_factor`` x more length, so the sampler draws this dataset that
+        # many times more per epoch. Each draw re-samples scene views randomly
+        # (see get_data), so the extra draws see different view combinations.
+        # Under common_config.inside_random=True this acts as a sampling weight
+        # in the dataset mix rather than a literal per-scene repeat count.
+        self.repeat_factor = max(1, int(repeat_factor))
+        self.len_train = base_len * self.repeat_factor
 
         status = "Training" if self.training else "Testing"
         logging.info(f"{status}: OV9D single normalized pose sequence count: {self.sequence_list_len}")

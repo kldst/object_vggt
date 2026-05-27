@@ -4,7 +4,7 @@ defaults:
 
 # torchrun --master_port=29200 --nproc_per_node=1 launch.py --config default_object_oo9d_real275_ycbv_hc
 
-exp_name: baseline_oo9d_real275_ycbv_hc_multiview_0528
+exp_name: baseline_oo9d_real275_ycbv_hc_multiview_0528_multi
 img_size: 518
 num_workers: 0
 seed_value: 30
@@ -12,8 +12,8 @@ accum_steps: 1
 patch_size: 14
 val_epoch_freq: 5
 max_img_per_gpu: 80
-limit_train_batches: 3040
-limit_val_batches: 374
+limit_train_batches: 792
+limit_val_batches: 100
 
 debug:
   force_model_output_to_ground_truth: False
@@ -69,6 +69,7 @@ data:
           SPLIT_JSON: ${paths.baseline_root}/splits_ov9d_unseen_category_generalization/single/train.json
           <<: *dataset_common
           strict_fixed_object_view_ids: true
+          repeat_factor: 5
         - _target_: data.datasets.mixed_real_pose_normalize.Real275MultiPoseNormalizeDataset
           split: train
           DATA_ROOT: ${paths.real275_root}
@@ -78,6 +79,7 @@ data:
           ALIGN_JSON: ${paths.align_json}
           <<: *dataset_common
           strict_fixed_object_view_ids: true
+          repeat_factor: 30
         - _target_: data.datasets.mixed_real_pose_normalize.YCBVMultiPoseNormalizeDataset
           split: train_real
           DATA_ROOT: ${paths.ycbv_root}
@@ -86,6 +88,7 @@ data:
           ALIGN_JSON: ${paths.align_json}
           <<: *dataset_common
           strict_fixed_object_view_ids: true
+          repeat_factor: 30
         - _target_: data.datasets.mixed_real_pose_normalize.HouseCat6DMultiPoseNormalizeDataset
           split: train
           DATA_ROOT: ${paths.housecat6d_root}
@@ -93,6 +96,7 @@ data:
           ALIGN_JSON: ${paths.align_json}
           <<: *dataset_common
           strict_fixed_object_view_ids: true
+          repeat_factor: 30
   val:
     _target_: data.dynamic_dataloader.DynamicTorchDataset
     num_workers: ${num_workers}
@@ -173,8 +177,9 @@ logging:
 
 checkpoint:
   save_dir: logs/${exp_name}/ckpts
-  save_freq: 10
-  resume_checkpoint_path: /mnt/train-data-4-hdd/yian/freepose/object_pretrain_model/checkpoint_60.pt
+  save_freq: 1
+  # resume_checkpoint_path: /mnt/train-data-4-hdd/yian/freepose/object_pretrain_model/checkpoint_60.pt
+  resume_checkpoint_path: /omni_vggt/checkpoint_145.pt
   load_optimizer_state: False
   load_training_state: False
   load_scaler_state: False
@@ -196,7 +201,8 @@ loss:
     loss_type: l1
     pose_rep: rot6d
     use_symmetric_rot6d: true
-    symmetry_info_path: /mnt/train-data-4-hdd/yian/freepose/baseline_0503/mixed_symmetry_info.json
+    # symmetry_info_path: /mnt/train-data-4-hdd/yian/freepose/baseline_0503/mixed_symmetry_info.json
+    symmetry_info_path: /baseline_real/mixed_symmetry_info.json
     symmetry_continuous_steps: 72
     weight_pose: 1.0
     weight_translation: 1.0
