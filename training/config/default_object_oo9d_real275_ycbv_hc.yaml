@@ -148,7 +148,7 @@ data:
 
 logging:
   log_dir: logs/${exp_name}
-  use_wandb: False
+  use_wandb: True
   log_visuals: False
   log_freq: 1
   log_level_primary: DEBUG
